@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-name" content="Kanit + Navy">
+  <meta name="theme-color" content="#1e3a8a">
+  <title>สินเชื่อใหม่ - ข้อมูลรถ</title>
+  <!-- Google Font: Kanit -->
+  <link rel="stylesheet" href="/static/css/kanit.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/static/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/custom_loading.css">
+  <script src="/static/js/custom_loading.js"></script>
+  <script src="/static/js/notifications.js"></script>
+
+  <!-- Flatpickr CSS + ธีมสวยเข้ากับ Navy Theme -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+  <link rel="stylesheet" href="/static/css/modern_datepicker.css">
+
+  <!-- Flatpickr JS -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
+
+  <style>
+    /* === Kanit + Navy Theme === */
+    :root {
+      --navy: #1e3a8a;
+      --blue: #1e40af;
+      --sky: #dbeafe;
+      --green: #059669;
+      --red: #dc2626;
+      --gray: #6b7280;
+      --light: #f8fafc;
+      --border: #e2e8f0;
+      --shadow: 0 10px 25px rgba(30, 58, 138, 0.12);
+      --yellow: #fef3c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Kanit', sans-serif;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      min-height: 100vh;
+      padding: 5px;
+      color: #1e293b;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0px auto;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid #e0e7ff;
+    }
+
+    /* Top Header - โลโก้บริษัท + ปุ่มออกจากระบบ */
+    .top-header {
+      background: linear-gradient(135deg, var(--navy), #1e40af);
+      color: white;
+      padding: 14px 28px;
+      /* ลด padding เล็กน้อยให้โลโก้ไม่สูงเกินไป */
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* โลโก้บริษัท */
+    .company-logo {
+      height: 48px;
+      /* ปรับขนาดโลโก้ตามต้องการ */
+      width: auto;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+    }
+
+    .company-logo:hover {
+      transform: scale(1.08);
+    }
+
+    .top-header a,
+    .top-header a:hover {
+      text-decoration: none;
+    }
+
+    /* ปุ่มออกจากระบบ (แดงพรีเมียม) */
+    .btn-logout {
+      background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+      border: none;
+      color: white;
+      padding: 12px 26px;
+      border-radius: 50px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);
+      transition: all .35s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-logout i {
+      font-size: 1.4rem;
+    }
+
+    .btn-logout:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 12px 28px rgba(239, 68, 68, 0.5);
+      background: linear-gradient(135deg, #f87171, #ef4444) !important;
+    }
+
+    /* Title Bar - ชื่อชิดซ้าย + ปุ่มชิดขวา (บรรทัดเดียวกัน) */
+    .title-bar {
+      background: linear-gradient(135deg, #1e40af, #1e3a8a);
+      color: white;
+      padding: 22px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0 0 20px 20px;
+    }
+
+    .title-bar a,
+    .title-bar a:hover {
+      text-decoration: none;
+    }
+
+    .main-title {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .main-title .fa-home,
+    .main-title .fa-car-side {
+      margin-right: 0.5rem;
+    }
+
+    /* Ripple effect ทั้งสองปุ่ม */
+    .btn-logout::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width .6s, height .6s;
+    }
+
+    .btn-logout:active::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .top-header {
+        padding: 14px 20px;
+      }
+
+      .company-logo {
+        height: 42px;
+      }
+
+      .title-bar {
+        flex-direction: column;
+        align-items: center;
+        padding: 24px 24px 32px;
+        text-align: left;
+        gap: 16px;
+      }
+
+      .main-title {
+        font-size: 1.65rem;
+        text-align: left;
+      }
+
+      .btn-add {
+        align-self: flex-end;
+        margin-top: 8px;
+      }
+
+      .btn-add,
+      .btn-logout {
+        padding: 11px 24px;
+        font-size: 1rem;
+      }
+
+      .btn-add i,
+      .btn-logout i {
+        font-size: 1.3rem;
+      }
+
+      .btn-add {
+        align-self: stretch;
+      }
+    }
+
+    /* Notification System */
+    #notificationContainer {
+      z-index: 9999;
+    }
+
+    #notificationBell {
+      cursor: pointer;
+      position: relative;
+    }
+
+    #notificationBell i {
+      color: white;
+      font-size: 2rem;
+    }
+
+    #notifBadge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #dc2626;
+      color: white;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #notifDropdown {
+      position: absolute;
+      right: 40px;
+      width: 380px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid #e2e8f0;
+      max-height: 70vh;
+      overflow: hidden;
+      display: none;
+      z-index: 9999;
+    }
+
+    #notifDropdown .header {
+      padding: 16px;
+      background: var(--navy);
+      color: white;
+      border-radius: 16px 16px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #notifDropdown .header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .close-dropdown {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .close-dropdown:hover {
+      opacity: 1;
+    }
+
+    .btn-clear {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-clear:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-clear:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #notifList {
+      max-height: 60vh;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .notif-item {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .notif-item:hover {
+      background: #f8fafc;
+    }
+
+    .notif-item.unread {
+      background: #eff6ff;
+      font-weight: 600;
+    }
+
+    .notif-item .title {
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+
+    .notif-item .message {
+      font-size: 0.9rem;
+      color: #475569;
+    }
+
+    .notif-item .time {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-top: 6px;
+    }
+
+    /* Realtime Toast */
+    #realtimeToast {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 9999;
+      background: #10b981;
+      color: white;
+      padding: 18px 24px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.5s ease;
+      max-width: 380px;
+      cursor: pointer;
+    }
+
+    #realtimeToast.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    #realtimeToast i {
+      font-size: 2rem;
+      background: rgba(255, 255, 255, 0.2);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-toast {
+      margin-left: auto;
+      cursor: pointer;
+      font-size: 1.4rem;
+      opacity: 0.8;
+    }
+
+    /* Progress Steps */
+    .steps {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 20px;
+      background: var(--light);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: #6b7280;
+      position: relative;
+      flex: 1;
+      z-index: 2;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1rem;
+      z-index: 3;
+      background: #d1d5db;
+      color: #9ca3af;
+      border: 3px solid #e5e7eb;
+      transition: all 0.4s ease;
+      position: relative;
+    }
+
+    .step.active .step-circle {
+      background: var(--navy);
+      color: white;
+      border-color: var(--navy);
+      transform: scale(1.1);
+      box-shadow: 0 0 0 6px rgba(30, 58, 138, 0.2);
+    }
+
+    .step.completed .step-circle {
+      background: var(--blue);
+      color: white;
+      border-color: var(--blue);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(30, 64, 175, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(30, 64, 175, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(30, 64, 175, 0);
+      }
+    }
+
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      width: 100%;
+      height: 4px;
+      background: #d1d5db;
+      z-index: 1;
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+
+    .step.completed:not(:last-child)::after,
+    .step.active:not(:last-child)::after {
+      background: var(--blue);
+      animation: drawLine 1.2s ease-out forwards;
+      transform-origin: left;
+      transform: scaleX(0);
+    }
+
+    @keyframes drawLine {
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    .step.active,
+    .step.completed {
+      color: var(--blue);
+      font-weight: 600;
+    }
+
+    /* Form Body */
+    .form-body {
+      padding: 30px;
+    }
+
+    /* Section */
+    .section {
+      margin-bottom: 32px;
+      padding: 22px;
+      background: var(--light);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-weight: 600;
+      color: var(--navy);
+      font-size: 1.25rem;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 3px solid var(--navy);
+      padding-bottom: 8px;
+    }
+
+    .section-title i {
+      color: var(--navy);
+      font-size: 1.5rem;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(30, 58, 138, 0.1);
+      border-radius: 50%;
+      padding: 6px;
+    }
+
+    /* 2 คอลัมน์ */
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 16px;
+    }
+
+    .col {
+      position: relative;
+    }
+
+    .col.full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Input */
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #374151;
+      font-size: 0.95rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s;
+      background: white;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--navy);
+      box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.15);
+      transform: translateY(-1px);
+    }
+
+    /* ปุ่มเล็ก */
+    .btn-small {
+      padding: 6px 16px;
+      /* Wider */
+      border: none;
+      border-radius: 50px;
+      /* Rounded pill */
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-left: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* State: Search (Default) */
+    .btn-search-state {
+      background: linear-gradient(135deg, var(--navy), var(--blue));
+      color: white;
+    }
+
+    .btn-search-state:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(30, 58, 138, 0.3);
+    }
+
+    .btn-search-state:disabled {
+      background: #cbd5e1;
+      color: #64748b;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    /* State: Cancel */
+    .btn-cancel-state {
+      background: linear-gradient(135deg, #64748b, #475569);
+      /* Slate Gray Gradient */
+      color: white;
+    }
+
+    .btn-cancel-state:hover {
+      background: linear-gradient(135deg, #475569, #334155);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(71, 85, 105, 0.3);
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .text-red {
+      color: #dc2626;
+    }
+
+    /* Radio & Checkbox */
+    .radio-group {
+      display: flex;
+      gap: 20px;
+      margin: 12px 0;
+      flex-wrap: wrap;
+    }
+
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.98rem;
+      color: #4b5563;
+    }
+
+    .radio-item input[type="radio"] {
+      accent-color: var(--navy);
+      width: 18px;
+      height: 18px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      accent-color: var(--navy);
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ปุ่มย้อนกลับ & ถัดไป */
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 30px auto 0;
+      flex-wrap: wrap;
+    }
+
+    .btn-group a {
+      text-decoration: none;
+    }
+
+    .btn-back,
+    .btn-next {
+      padding: 18px 40px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1.25rem;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: all .3s;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .12);
+      min-width: 200px;
+    }
+
+    .btn-back {
+      background: #6b7280;
+      color: white;
+    }
+
+    .btn-back:hover {
+      background: #6b7280;
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(30, 58, 138, .4);
+    }
+
+    .btn-next {
+      background: var(--navy);
+      color: white;
+    }
+
+    .btn-next:hover {
+      background: var(--blue);
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(30, 58, 138, .4);
+    }
+
+    .btn-back i,
+    .btn-next i {
+      font-size: 1.4rem;
+      transition: transform .3s;
+    }
+
+    .btn-back:hover i {
+      transform: translateX(-5px);
+    }
+
+    .btn-next:hover i {
+      transform: translateX(5px);
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .input-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn-small {
+        margin-left: 0;
+        margin-top: 8px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 16px 12px;
+        font-size: 1.25rem;
+      }
+
+      .header i {
+        font-size: 2rem;
+        left: 12px;
+      }
+
+      .steps {
+        padding: 20px 10px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+      }
+
+      .step {
+        min-width: 80px;
+        font-size: 0.8rem;
+      }
+
+      .step-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+      }
+
+      .btn-group {
+        flex-direction: column;
+      }
+
+      .btn-back,
+      .btn-next {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <div class="top-header">
+      <a href="/"><img src="/static/images/logoml_white.png" alt="โลโก้บริษัท" class="company-logo"></a>
+      <a href="/logout">
+        <button class="btn-logout" style="display: none;">
+          <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+        </button>
+      </a>
+      <!-- Notification Bell + Toast -->
+      <div id="notificationContainer">
+        <div id="notificationBell">
+          <i class="fas fa-bell fa-2x"></i>
+          <span id="notifBadge" style="display: none;">0</span>
+        </div>
+        <div id="notifDropdown">
+          <div class="header">
+            <h3>ประวัติแจ้งเตือน</h3>
+            <div style="display:flex; gap:10px;">
+              <button id="clearAllNotif" class="btn-clear" disabled
+                onclick="clearAllNotifications()">ล้างประวัติ</button>
+              <button class="close-dropdown" onclick="toggleNotifDropdown()">✕</button>
+            </div>
+          </div>
+          <div id="notifList">
+            <div style="text-align:center;color:#9ca3af;padding:40px;font-size:0.95rem;">ยังไม่มีแจ้งเตือน</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Title -->
+    <div class="title-bar" style="position: relative;">
+      <a href="/main" onclick="showLoading('กำลังกลับสู่หน้าหลัก...');"
+        style="position: absolute; left: 28px; color: white; display: flex; align-items: center; gap: 8px; text-decoration: none;">
+        <i class="fas fa-chevron-left" style="font-size: 1.2rem;"></i> หน้าหลัก
+      </a>
+      <h1 class="main-title"><i class="fas fa-car-side"></i> ข้อมูลรถ</h1>
+    </div>
+
+    <div id="realtimeToast" class="toast success" style="top:80px; cursor:pointer;"
+      onclick="this.classList.remove('show')">
+      <i class="fas fa-bell"></i>
+      <div>
+        <div id="toastTitle" style="font-weight:bold;"></div>
+        <div id="toastMsg" style="font-size:0.95rem;opacity:0.9;"></div>
+      </div>
+      <span class="close-toast" onclick="this.parentElement.classList.remove('show')">&times;</span>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="steps">
+      <div class="step completed" {{ if .Loan.ID }}onclick="location.href='/step1?id={{ .Loan.ID }}'"
+        style="cursor:pointer;" {{ end }}>
+        <div class="step-circle">1</div>
+        <div>ผู้เช่าซื้อ</div>
+      </div>
+      <div class="step active" {{ if .Loan.ID }}onclick="location.href='/step2?id={{ .Loan.ID }}'"
+        style="cursor:pointer;" {{ end }}>
+        <div class="step-circle">2</div>
+        <div>ข้อมูลรถ</div>
+      </div>
+      <div class="step" {{ if .Loan.ID }}onclick="location.href='/step3?id={{ .Loan.ID }}'" style="cursor:pointer;" {{
+        end }}>
+        <div class="step-circle">3</div>
+        <div>ข้อมูลสัญญา</div>
+      </div>
+      <div class="step" {{ if .Loan.ID }}onclick="location.href='/step4?id={{ .Loan.ID }}'" style="cursor:pointer;" {{
+        end }}>
+        <div class="step-circle">4</div>
+        <div>ค้ำประกัน/อื่นๆ</div>
+      </div>
+      <div class="step" {{ if .Loan.ID }}onclick="location.href='/step5?id={{ .Loan.ID }}'" style="cursor:pointer;" {{
+        end }}>
+        <div class="step-circle">5</div>
+        <div>ประกันชีวิต</div>
+      </div>
+      <div class="step" {{ if .Loan.ID }}onclick="location.href='/step6?id={{ .Loan.ID }}'" style="cursor:pointer;" {{
+        end }}>
+        <div class="step-circle">6</div>
+        <div>ประกันภัย</div>
+      </div>
+      <div class="step" {{ if .Loan.ID }}onclick="location.href='/step7?id={{ .Loan.ID }}'" style="cursor:pointer;" {{
+        end }}>
+        <div class="step-circle">7</div>
+        <div>หักภาษี ณ ที่จ่าย</div>
+      </div>
+    </div>
+
+    <div class="form-body">
+      <form method="POST" action="/step2" onsubmit="showLoading('กำลังบันทึกและไปหน้าถัดไป...');">
+        <!-- ข้อมูลรถ -->
+        <div class="section">
+          <div class="section-title"><i class="fas fa-car"></i> ข้อมูลรถ</div>
+          <div class="row">
+            <div class="col">
+              <label>รหัสรถ :</label>
+              <div class="input-group">
+                <!-- Readonly Input -->
+                <input type="text" name="car_code" id="car_code" value="{{ .Loan.CarCode }}" readonly
+                  style="background-color: #f3f4f6; cursor: not-allowed;">
+                <!-- Search Button triggers Modal -->
+                <button type="button" id="btnToggleCarSearch" class="btn-small"
+                  style="background: {{ if .Loan.CarCode }}#6b7280{{ else }}var(--navy){{ end }}; color:white; border:none; padding: 10px 15px;"
+                  onclick="{{ if .Loan.CarCode }}resetCarSearch(){{ else }}openCarSearchModal(){{ end }}">
+                  <i class="fas {{ if .Loan.CarCode }}fa-times{{ else }}fa-search{{ end }}"></i> {{ if .Loan.CarCode
+                  }}ยกเลิก{{ else }}ค้นหา{{ end }}
+                </button>
+              </div>
+            </div>
+            <div class="col">
+              <label>ประเภทรถยนต์ :</label>
+              <select name="car_type" data-default-value="{{ .Loan.CarType }}">
+                <option value="">— เลือก —</option>
+                {{ range .CarKinds }}
+                <option value="{{ .CarKindId }}" {{ if eq (printf "%v" .CarKindId) $.Loan.CarType }}selected{{ end }}>{{
+                  .CarKindName }}</option>
+                {{ end }}
+              </select>
+            </div>
+            <div class="col">
+              <label>ยี่ห้อ :</label>
+              <select name="car_brand" data-default-value="{{ .Loan.CarBrand }}">
+                <option value="">— เลือก —</option>
+                {{ range .CarBrands }}
+                <option value="{{ .CarBrandID }}" {{ if eq (printf "%v" .CarBrandID) $.Loan.CarBrand }}selected{{ end
+                  }}>{{ .CarBrandName }}</option>
+                {{ end }}
+              </select>
+            </div>
+            <div class="col">
+              <label>วันจดทะเบียน :</label>
+              <input type="text" name="car_register_date" class="datepicker-th" placeholder="วัน-เดือน-ปี พ.ศ."
+                value="{{ if .Loan.CarRegisterDate }}{{ .Loan.CarRegisterDate }}{{ end }}">
+            </div>
+            <div class="col">
+              <label>รุ่น :</label>
+              <input type="text" name="car_model" value="{{ .Loan.CarModel }}">
+            </div>
+            <div class="col">
+              <label>ปีรถ :</label>
+              <input type="text" name="car_year" value="{{ .Loan.CarYear }}" inputmode="numeric" pattern="[0-9]*"
+                maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+            <div class="col">
+              <label>สี :</label>
+              <select name="car_color" data-default-value="{{ .Loan.CarColor }}">
+                <option value="">— เลือก —</option>
+              </select>
+            </div>
+            <div class="col">
+              <label>น้ำหนักรถ :</label>
+              <input type="text" name="car_weight" value="{{ .Loan.CarWeight }}" onblur="formatInteger(this)"
+                onfocus="removeCommas(this)" inputmode="numeric"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+            <div class="col">
+              <label>จำนวน CC :</label>
+              <input type="text" name="car_cc" value="{{ .Loan.CarCC }}" onblur="formatInteger(this)"
+                onfocus="removeCommas(this)" inputmode="numeric"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+            <div class="col">
+              <label>เลขไมล์ :</label>
+              <input type="text" name="car_mileage" value="{{ .Loan.CarMileage }}" onblur="formatInteger(this)"
+                onfocus="removeCommas(this)" inputmode="numeric"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+            <div class="col">
+              <label>ประเภทเกียร์ :</label>
+              <select name="car_gear" data-default-value="{{ .Loan.CarGear }}">
+                <option value="Manual">Manual</option>
+                <option value="Automatic">Automatic</option>
+              </select>
+            </div>
+            <div class="col">
+              <label>เลขตัวถัง :</label>
+              <input type="text" name="car_chassis_no" value="{{ .Loan.CarChassisNo }}">
+            </div>
+            <div class="col">
+              <label>เลขเครื่อง :</label>
+              <input type="text" name="car_engine_no" value="{{ .Loan.CarEngineNo }}">
+            </div>
+            <div class="col">
+              <label>สภาพรถ :</label>
+              <select name="car_condition" data-default-value="{{ .Loan.CarCondition }}">
+                <option value="OLD">เก่า</option>
+                <option value="NEW">ใหม่</option>
+              </select>
+            </div>
+            <div class="col full-width">
+              <label>เลขทะเบียน :</label>
+              <div class="input-group">
+                <input type="text" name="license_plate" value="{{ .Loan.LicensePlate }}" style="flex: 1;">
+                <select name="license_province" style="width: auto;" data-default-value="{{ .Loan.LicenseProvince }}">
+                  <option value="">— เลือก —</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ภาษีมูลค่าเพิ่ม -->
+        <div class="section">
+          <div class="section-title"><i class="fas fa-calculator"></i> ภาษีมูลค่าเพิ่ม</div>
+          <div class="row">
+            <div class="col">
+              <div class="input-group">
+                <input type="text" name="vat_rate" value="{{ .Loan.VatRate }}" inputmode="decimal"
+                  pattern="[0-9]*\.?[0-9]*"
+                  oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')">
+              </div>
+            </div>
+            <div class="col">
+              <label>ราคารถ :</label>
+              <input type="text" name="car_price" value="{{ .Loan.CarPrice }}" onblur="formatCurrency(this)"
+                onfocus="removeCommas(this)" inputmode="numeric"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+            <div class="col">
+              <div class="checkbox-item">
+                <input type="checkbox" name="is_refinance" id="refinance" {{ if .Loan.IsRefinance }}checked{{ end }}>
+                <label for="refinance">จำนำ/ Refinance</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ปุ่มย้อนกลับ + ถัดไป -->
+        <div class="btn-group">
+          <button type="submit" class="btn-next">
+            <i class="fas fa-arrow-right"></i> ถัดไป
+          </button>
+          <a href="/step1{{ if .Loan.ID }}?id={{ .Loan.ID }}{{ end }}" class="btn-back" style="text-decoration: none;">
+            <i class="fas fa-arrow-left"></i> ย้อนกลับ
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+
+
+
+
+    // Auto-select dropdowns based on data-default-value
+    document.addEventListener("DOMContentLoaded", function () {
+      showLoading('กำลังโหลดข้อมูล...');
+      const loadPromises = [];
+      const carCodeInput = document.getElementById('car_code');
+      const btnSearchCar = document.getElementById('btnSearchCar');
+
+      // 1. Enable/Disable Search Button Logic
+      function toggleSearchButton() {
+        if (btnSearchCar.classList.contains('is-cancel')) return; // Don't touch if in Cancel mode
+
+        if (carCodeInput.value.trim().length > 0) {
+          btnSearchCar.disabled = false;
+        } else {
+          btnSearchCar.disabled = true;
+        }
+      }
+
+      if (carCodeInput && btnSearchCar) {
+        carCodeInput.addEventListener('input', toggleSearchButton);
+
+        // Initial Check: If fetched from DB, switch to Cancel mode
+        if (carCodeInput.value.trim().length > 0) {
+          btnSearchCar.innerHTML = '<i class="fas fa-times" style="margin-right:5px;"></i> ยกเลิก';
+          btnSearchCar.classList.add('is-cancel');
+          btnSearchCar.classList.remove('btn-search-state');
+          btnSearchCar.classList.add('btn-cancel-state');
+          btnSearchCar.onclick = window.resetCarSearch;
+          btnSearchCar.disabled = false;
+        } else {
+          toggleSearchButton(); // Default state
+        }
+      }
+
+      // Populate Car Type - REMOVED (Handled Server-Side)
+      /* 
+      loadPromises.push(fetch('/static/data/car_kind.json')...
+      */
+
+      // Populate Car Brand - REMOVED (Handled Server-Side)
+      /* 
+      loadPromises.push(fetch('/static/data/car_brand.json')...
+      */
+
+      // Populate Car Color
+      loadPromises.push(fetch('/static/data/colors.json')
+        .then(response => response.json())
+        .then(data => {
+          const carColorSelect = document.querySelector('select[name="car_color"]');
+          if (carColorSelect) {
+            carColorSelect.innerHTML = '<option value="">— เลือก —</option>';
+            data.forEach(item => {
+              const option = document.createElement('option');
+              // Use ColorName as value as per previous hardcoded behavior (value="ขาว")
+              option.value = item.ColorName;
+              option.textContent = item.ColorName;
+              if (carColorSelect.dataset.defaultValue == item.ColorName) {
+                option.selected = true;
+              }
+              carColorSelect.appendChild(option);
+            });
+          }
+        })
+        .catch(error => console.error('Error loading car color data:', error)));
+
+      // Populate License Province
+      loadPromises.push(fetch('/static/data/province_list.json')
+        .then(response => response.json())
+        .then(data => {
+          const licenseProvinceSelect = document.querySelector('select[name="license_province"]');
+          if (licenseProvinceSelect) {
+            licenseProvinceSelect.innerHTML = '<option value="">— เลือก —</option>';
+            data.forEach(item => {
+              const option = document.createElement('option');
+              // Use ProvName as value to match existing convention
+              option.value = item.ProvName;
+              option.textContent = item.ProvName;
+              if (licenseProvinceSelect.dataset.defaultValue == item.ProvName) {
+                option.selected = true;
+              }
+              licenseProvinceSelect.appendChild(option);
+            });
+          }
+        })
+        .catch(error => console.error('Error loading province data:', error)));
+
+      Promise.allSettled(loadPromises).then(() => {
+        // Ensure manual selection loop runs after options are populated
+        document.querySelectorAll('select[data-default-value]').forEach(select => {
+          const defaultVal = select.dataset.defaultValue;
+          if (defaultVal) {
+            select.value = defaultVal;
+            for (let opts of select.options) {
+              if (opts.value == defaultVal) {
+                opts.selected = true;
+                break;
+              }
+            }
+          }
+        });
+        hideLoading();
+      });
+
+      // --- Modal Logic ---
+      window.openCarSearchModal = function () {
+        document.getElementById('carSearchModal').style.display = 'flex';
+        document.getElementById('modalCarCode').value = '';
+        setTimeout(() => document.getElementById('modalCarCode').focus(), 100);
+      }
+
+      window.closeCarSearchModal = function () {
+        document.getElementById('carSearchModal').style.display = 'none';
+      }
+
+      window.searchCarFromModal = function () {
+        const modalInput = document.getElementById('modalCarCode');
+        const carCode = modalInput.value.trim();
+
+        if (!carCode) {
+          showLoading('กรุณากรอกรหัสรถ');
+          setTimeout(hideLoading, 1500);
+          return;
+        }
+
+        if (carCode.length !== 7) {
+          showLoading('รหัสรถต้องมีจำนวน 7 ตัวอักษร');
+          setTimeout(hideLoading, 2000);
+          return;
+        }
+
+        // Validate format: 3 letters + 4 digits
+        if (!/^[A-Za-z]{3}\d{4}$/.test(carCode)) {
+          showLoading('รหัสรถไม่ถูกต้อง (ตัวอักษร 3 ตัว + ตัวเลข 4 ตัว)');
+          setTimeout(hideLoading, 2000);
+          return;
+        }
+
+        showLoading('กำลังค้นหาข้อมูลรถ...');
+
+        fetch('/api/search-car', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ car_code: carCode }),
+        })
+          .then(response => {
+            if (!response.ok) throw new Error('ไม่พบข้อมูลรถ');
+            return response.json();
+          })
+          .then(data => {
+            // 1. Populate Main Form
+            document.getElementById('car_code').value = carCode; // Set readonly field
+
+            // Map Car Type
+            const carTypeSelect = document.querySelector('select[name="car_type"]');
+            if (carTypeSelect) {
+              let carTypeValue = data.car_type;
+              if (carTypeValue == '1') carTypeValue = 'รถกระบะ';
+              else if (carTypeValue == '2') carTypeValue = 'รถเก๋ง';
+              setSelectOptionByText(carTypeSelect, carTypeValue);
+            }
+
+            const carBrandSelect = document.querySelector('select[name="car_brand"]');
+            if (carBrandSelect) setSelectOptionByText(carBrandSelect, data.car_brand);
+
+            const carGearSelect = document.querySelector('select[name="car_gear"]');
+            if (carGearSelect) carGearSelect.value = data.car_gear;
+
+            document.querySelector('input[name="car_model"]').value = data.car_sub_model || '';
+            document.querySelector('input[name="car_year"]').value = data.car_year || '';
+
+            const priceInput = document.querySelector('input[name="car_price"]');
+            if (priceInput) {
+              priceInput.value = data.car_price || '';
+              formatCurrency(priceInput); // Format immediately
+            }
+
+            // 2. Success Feedback
+            showLoading('ค้นหาข้อมูลสำเร็จ');
+            setTimeout(() => {
+              hideLoading();
+              closeCarSearchModal();
+
+              // Toggle Button to Cancel State
+              const btn = document.getElementById('btnToggleCarSearch');
+              btn.innerHTML = '<i class="fas fa-times"></i> ยกเลิก';
+              btn.style.background = '#6b7280'; // Gray
+              btn.onclick = resetCarSearch;
+            }, 1000);
+          })
+          .catch(error => {
+            showLoading(error.message);
+            setTimeout(hideLoading, 2000);
+          });
+      }
+
+      window.resetCarSearch = function () {
+        // Reset fields
+        document.getElementById('car_code').value = '';
+        document.querySelector('select[name="car_type"]').value = "";
+        document.querySelector('select[name="car_brand"]').value = "";
+        document.querySelector('input[name="car_model"]').value = "";
+        document.querySelector('select[name="car_gear"]').value = "";
+        document.querySelector('input[name="car_year"]').value = "";
+        document.querySelector('input[name="car_price"]').value = "";
+
+        // Reset Button to Search State
+        const btn = document.getElementById('btnToggleCarSearch');
+        btn.innerHTML = '<i class="fas fa-search"></i> ค้นหา';
+        btn.style.background = 'var(--navy)';
+        btn.onclick = openCarSearchModal;
+      }
+
+      // Enter key in modal
+      document.getElementById('modalCarCode')?.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+          searchCarFromModal();
+        }
+      });
+
+
+      function setSelectOptionByText(select, text) {
+        if (!text) return;
+        text = text.trim().toLowerCase();
+        // console.log(`Trying to select "${text}" in`, select);
+        for (let i = 0; i < select.options.length; i++) {
+          const optText = select.options[i].text.trim().toLowerCase();
+          const optValue = select.options[i].value.trim().toLowerCase();
+          // Debugging log
+          // console.log(`Option ${i}: text="${optText}", value="${optValue}"`);
+          if (optText === text || optValue === text) {
+            select.selectedIndex = i;
+            // console.log(`Selected index ${i}`);
+            return;
+          }
+        }
+        // console.warn(`Option "${text}" not found in`, select);
+      }
+
+    });
+  </script> <!-- End previous script block -->
+
+  <!-- Car Search Modal -->
+  <div id="carSearchModal"
+    style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; align-items:center; justify-content:center; backdrop-filter: blur(5px);">
+    <div
+      style="background:white; padding:30px; border-radius:20px; width:90%; max-width:400px; text-align:center; position:relative; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: fadeIn 0.3s;">
+      <h3 style="color:var(--navy); margin-bottom:20px; font-size:1.4rem;"><i class="fas fa-search"></i> ค้นหารหัสรถ
+      </h3>
+      <input type="text" id="modalCarCode" placeholder="กรอกรหัสรถ (เช่น ABC1234)"
+        style="width:100%; padding:14px; border:2px solid var(--border); border-radius:12px; font-size:1.2rem; text-align:center; margin-bottom:24px; outline:none;"
+        maxlength="7" oninput="this.value = this.value.toUpperCase()">
+
+      <div style="display:flex; justify-content:center; gap:12px;">
+        <button type="button" onclick="closeCarSearchModal()"
+          style="background:#f3f4f6; color:#4b5563; border:none; padding:12px 24px; border-radius:50px; cursor:pointer; font-weight:600; font-size:1rem; flex:1;">ยกเลิก</button>
+        <button type="button" onclick="searchCarFromModal()"
+          style="background:linear-gradient(135deg, var(--navy), var(--blue)); color:white; border:none; padding:12px 24px; border-radius:50px; cursor:pointer; font-weight:600; font-size:1rem; flex:1; box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);">ค้นหา</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/thai_datepicker.js"></script>
+  <script>
+    // --- Helper Functions for Comma Formatting ---
+    function formatCurrency(input) {
+      let value = input.value.replace(/,/g, '');
+      if (value === '' || isNaN(value)) return;
+      input.value = parseFloat(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function formatInteger(input) {
+      let value = input.value.replace(/,/g, '');
+      if (value === '' || isNaN(value)) return;
+      input.value = parseInt(value, 10).toLocaleString('en-US'); // No decimals
+    }
+
+    function removeCommas(input) {
+      input.value = input.value.replace(/,/g, '');
+    }
+
+    // --- DOMContentLoaded: Format Fields on Load ---
+    document.addEventListener("DOMContentLoaded", function () {
+      // 1. Flatpickr Init Removed (Handled by thai_datepicker.js)
+
+      // 2. Format Comma Fields on Load
+      const integerFields = ['car_weight', 'car_cc', 'car_mileage'];
+      integerFields.forEach(name => {
+        const el = document.querySelector(`input[name="${name}"]`);
+        if (el && el.value) {
+          formatInteger(el);
+        }
+      });
+
+      const currencyFields = ['car_price'];
+      currencyFields.forEach(name => {
+        const el = document.querySelector(`input[name="${name}"]`);
+        if (el && el.value) {
+          formatCurrency(el);
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

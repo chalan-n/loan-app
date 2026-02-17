@@ -1,0 +1,26 @@
+[
+    {
+        "SituationID": 1,
+        "SituationName": "โสด"
+    },
+    {
+        "SituationID": 2,
+        "SituationName": "สมรสจดทะเบียน"
+    },
+    {
+        "SituationID": 3,
+        "SituationName": "สมรสไม่จดทะเบียน"
+    },
+    {
+        "SituationID": 4,
+        "SituationName": "หย่าร้าง"
+    },
+    {
+        "SituationID": 5,
+        "SituationName": "หม้าย"
+    },
+    {
+        "SituationID": 6,
+        "SituationName": "แยกกันอยู่"
+    }
+]

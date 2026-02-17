@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1e3a8a">
+  <title>รายการสินเชื่อ</title>
+  <!-- Google Font: Kanit -->
+  <link rel="stylesheet" href="/static/css/kanit.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/static/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/custom_loading.css">
+  <script src="/static/js/custom_loading.js"></script>
+  <style>
+    :root {
+      --navy: #1e3a8a;
+      --green: #059669;
+      --red: #dc2626;
+      --light: #f8fafc;
+      --border: #e2e8f0;
+      --gray: #6b7280;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Kanit', sans-serif;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      min-height: 100vh;
+      padding: 5px;
+      color: #1e293b;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0px auto;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(30, 58, 138, 0.12);
+      border: 1px solid #e0e7ff;
+    }
+
+    /* Header */
+    .top-header {
+      background: linear-gradient(135deg, var(--navy), #1e40af);
+      color: white;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .top-header a,
+    .top-header a:hover {
+      text-decoration: none;
+    }
+
+    .company-logo {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+    }
+
+    .company-logo:hover {
+      transform: scale(1.08);
+    }
+
+    .btn-logout {
+      background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+      border: none;
+      color: white;
+      padding: 12px 26px;
+      border-radius: 50px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);
+      transition: all .35s ease;
+    }
+
+    .btn-logout:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 12px 28px rgba(239, 68, 68, 0.5);
+    }
+
+    /* Title Bar */
+    .title-bar {
+      background: linear-gradient(135deg, #1e40af, #1e3a8a);
+      color: white;
+      padding: 22px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 0 0 20px 20px;
+    }
+
+    .title-bar a,
+    .title-bar a:hover {
+      text-decoration: none;
+    }
+
+    .main-title {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .main-title .fa-home {
+      margin-right: 0.5rem;
+    }
+
+    .btn-add {
+      background: linear-gradient(135deg, #10b981, #059669) !important;
+      border: none;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 50px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+      transition: all .35s ease;
+    }
+
+    .btn-add:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 12px 28px rgba(16, 185, 129, 0.5);
+    }
+
+    .btn-refresh {
+      background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+      border: none;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 50px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.35);
+      transition: all .35s ease;
+      cursor: pointer;
+    }
+
+    .btn-refresh:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 12px 28px rgba(59, 130, 246, 0.5);
+    }
+
+    /* Notification System */
+    #notificationContainer {
+      z-index: 9999;
+    }
+
+    #notificationBell {
+      cursor: pointer;
+      position: relative;
+    }
+
+    #notificationBell i {
+      color: white;
+      font-size: 2rem;
+    }
+
+    #notifBadge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #dc2626;
+      color: white;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #notifDropdown {
+      position: absolute;
+      right: 40px;
+      width: 380px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid #e2e8f0;
+      max-height: 70vh;
+      overflow: hidden;
+      display: none;
+      z-index: 9999;
+    }
+
+    #notifDropdown .header {
+      padding: 16px;
+      background: var(--navy);
+      color: white;
+      border-radius: 16px 16px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #notifDropdown .header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .close-dropdown {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .close-dropdown:hover {
+      opacity: 1;
+    }
+
+    .btn-clear {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-clear:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-clear:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #notifList {
+      max-height: 60vh;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .notif-item {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .notif-item:hover {
+      background: #f8fafc;
+    }
+
+    .notif-item.unread {
+      background: #eff6ff;
+      font-weight: 600;
+    }
+
+    .notif-item .title {
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+
+    .notif-item .message {
+      font-size: 0.9rem;
+      color: #475569;
+    }
+
+    .notif-item .time {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-top: 6px;
+    }
+
+    /* Realtime Toast */
+    #realtimeToast {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 9999;
+      background: #10b981;
+      color: white;
+      padding: 18px 24px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.5s ease;
+      max-width: 380px;
+      cursor: pointer;
+    }
+
+    #realtimeToast.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    #realtimeToast i {
+      font-size: 2rem;
+      background: rgba(255, 255, 255, 0.2);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-toast {
+      margin-left: auto;
+      cursor: pointer;
+      font-size: 1.4rem;
+      opacity: 0.8;
+    }
+
+    .form-body {
+      padding: 30px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin-bottom: 32px;
+      overflow: hidden;
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.06);
+      transition: all 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--light);
+      padding: 14px 20px;
+      font-size: 1.1rem;
+      color: #4b5563;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-header .label {
+      font-weight: 500;
+      color: var(--gray);
+    }
+
+    .card-header .value {
+      color: #1e293b;
+      font-weight: 600;
+    }
+
+    .card-header .id {
+      background: var(--red);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      min-width: 70px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
+    }
+
+    .status-badge {
+      padding: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #64748b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      background: none !important;
+      box-shadow: none !important;
+    }
+
+    .status-badge i {
+      font-size: 2.5rem;
+      margin-bottom: 5px;
+    }
+
+    .status-p {
+      color: #f59e0b;
+    }
+
+    .status-a {
+      color: #10b981;
+    }
+
+    .status-m {
+      color: #0ea5e9;
+    }
+
+    .status-r {
+      color: #ef4444;
+    }
+
+    .status-c {
+      color: #64748b;
+    }
+
+    .card-body {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .customer-info {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      font-size: 1.32rem;
+      color: #374151;
+    }
+
+    .customer-info i {
+      color: var(--navy);
+      font-size: 2rem;
+    }
+
+    .customer-info span {
+      font-weight: 600;
+    }
+
+    .car-row {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .car-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .car-icon {
+      font-size: 2rem;
+      color: var(--navy);
+      flex-shrink: 0;
+    }
+
+    .car-details h3 {
+      font-size: 1.25rem;
+      margin: 0;
+      color: var(--navy);
+      font-weight: 600;
+    }
+
+    .car-details p {
+      font-size: 1.1rem;
+      color: #64748b;
+      margin: 4px 0 0;
+    }
+
+    .car-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .car-actions a {
+      text-decoration: none;
+    }
+
+    .btn-bottom {
+      width: 100%;
+      margin-top: 6px;
+      border-radius: 50px;
+      font-size: 1.25rem;
+      font-weight: 600;
+      padding: 12px 48px;
+      border: none;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      color: white !important;
+    }
+
+    .btn-bottom i {
+      font-size: 1.1rem;
+    }
+
+    .btn-bottom:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-edit {
+      background: #f97316 !important;
+    }
+
+    .btn-edit:hover {
+      background: #ea580c !important;
+    }
+
+    .btn-send {
+      background: #007bff !important;
+      cursor: pointer;
+    }
+
+    .btn-send:hover {
+      background: #0069d9 !important;
+    }
+
+    .btn-delete {
+      background: #dc2626 !important;
+    }
+
+    .btn-delete:hover {
+      background: #b91c1c !important;
+    }
+
+    .btn-sent {
+      background: #10b981 !important;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 768px) {
+      .card-body {
+        flex-direction: column;
+      }
+
+      .car-row {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .car-info,
+      .car-actions {
+        width: 100%;
+      }
+
+      .car-actions {
+        align-items: stretch;
+      }
+
+      .btn-bottom {
+        font-size: 1.1rem;
+        padding: 12px 40px;
+      }
+    }
+
+    /* Sidebar & Overlay */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      width: 280px;
+      height: 100%;
+      background: white;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      z-index: 10000;
+      transition: left 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar.active {
+      left: 0;
+    }
+
+    .sidebar-header {
+      background: var(--navy);
+      color: white;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-header h3 {
+      margin: 0;
+      font-size: 1.4rem;
+    }
+
+    .sidebar-close {
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: white;
+      background: none;
+      border: none;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-menu li {
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .sidebar-menu a {
+      display: block;
+      padding: 16px 24px;
+      color: #334155;
+      text-decoration: none;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: background 0.2s;
+    }
+
+    .sidebar-menu a:hover {
+      background: #f8fafc;
+      color: var(--navy);
+    }
+
+    .sidebar-menu i {
+      width: 24px;
+      text-align: center;
+      color: #94a3b8;
+    }
+
+    .sidebar-menu a:hover i {
+      color: var(--navy);
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .overlay.active {
+      display: block;
+      opacity: 1;
+    }
+
+    /* Hamburger Icon in Header */
+    .menu-toggle {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.8rem;
+      cursor: pointer;
+      margin-right: 15px;
+      padding: 0 5px;
+    }
+
+    /* Logout Modal */
+    .logout-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 20000;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logout-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .logout-modal {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      transform: scale(0.95);
+      transition: transform 0.3s;
+    }
+
+    .logout-overlay.active .logout-modal {
+      transform: scale(1);
+    }
+
+    .logout-modal i {
+      font-size: 3rem;
+      color: var(--red);
+      margin-bottom: 20px;
+    }
+
+    .logout-modal h3 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      color: #1e293b;
+    }
+
+    .logout-modal p {
+      color: #64748b;
+      margin-bottom: 25px;
+      font-size: 1.1rem;
+    }
+
+    .logout-actions {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .btn-modal {
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .btn-cancel {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .btn-cancel:hover {
+      background: #e2e8f0;
+    }
+
+    .btn-confirm-logout {
+      background: var(--red);
+      color: white;
+    }
+
+    .btn-confirm-logout:hover {
+      background: #b91c1c;
+    }
+
+    @media (min-width: 900px) {
+      /* Optional: keep sidebar hidden or make it permanent? user requested "slide menu", implies hidden by default or mobile friendly */
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Logout Modal -->
+  <div class="logout-overlay" id="logoutOverlay">
+    <div class="logout-modal">
+      <i class="fas fa-sign-out-alt"></i>
+      <h3>ยืนยันการออกจากระบบ</h3>
+      <p>คุณต้องการออกจากระบบใช่หรือไม่?</p>
+      <div class="logout-actions">
+        <button class="btn-modal btn-cancel" onclick="closeLogoutModal()">ยกเลิก</button>
+        <button class="btn-modal btn-confirm-logout" onclick="proceedLogout()">ออกจากระบบ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar & Overlay -->
+  <div class="overlay" onclick="toggleSidebar()"></div>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h3>เมนูหลัก</h3>
+      <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="/main"><i class="fas fa-plus-circle"></i> รายการสินเชื่อ</a></li>
+      <!-- <li><a href="/api/calculate-insurance" onclick="return false;"><i class="fas fa-calculator"></i> คำนวณสินเชื่อ</a>
+      </li> -->
+      <li><a href="/change-password"><i class="fas fa-key"></i> เปลี่ยนรหัสผ่าน</a></li>
+      <li><a href="#" onclick="confirmLogout(event)" style="color:var(--red);"><i class="fas fa-sign-out-alt"
+            style="color:var(--red);"></i> ออกจากระบบ</a></li>
+    </ul>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="top-header">
+      <div style="display:flex;align-items:center;">
+        <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <a href="/"><img src="/static/images/logoml_white.png" alt="โลโก้บริษัท" class="company-logo"></a>
+      </div>
+      <a href="#" onclick="confirmLogout(event)">
+        <button class="btn-logout" style="display: none;">
+          <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+        </button>
+      </a>
+      <!-- Notification Bell + Toast -->
+      <div id="notificationContainer">
+        <div id="notificationBell">
+          <i class="fas fa-bell fa-2x"></i>
+          <span id="notifBadge" style="display: none;">0</span>
+        </div>
+        <div id="notifDropdown">
+          <div class="header">
+            <h3>ประวัติแจ้งเตือน</h3>
+            <div style="display:flex; gap:10px;">
+              <button id="clearAllNotif" class="btn-clear" disabled
+                onclick="clearAllNotifications()">ล้างประวัติ</button>
+              <button class="close-dropdown" onclick="toggleNotifDropdown()">✕</button>
+            </div>
+          </div>
+          <div id="notifList">
+            <div style="text-align:center;color:#9ca3af;padding:40px;font-size:0.95rem;" id="hasNoNotif">
+              ยังไม่มีแจ้งเตือน</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Title Bar -->
+    <div class="title-bar">
+      <h1 class="main-title"><i class="fas fa-home"></i> รายการสินเชื่อ</h1>
+      <div style="display:flex; gap:10px;">
+        <button class="btn-refresh" onclick="window.location.reload()">
+          <i class="fas fa-sync-alt"></i> รีเฟรช
+        </button>
+        <a href="/step1">
+          <button class="btn-add">
+            <i class="fas fa-plus-circle"></i> เพิ่ม
+          </button>
+        </a>
+      </div>
+    </div>
+
+    <div id="realtimeToast" class="toast success" style="top:80px; cursor:pointer;"
+      onclick="this.classList.remove('show')">
+      <i class="fas fa-bell"></i>
+      <div>
+        <div id="toastTitle" style="font-weight:bold;"></div>
+        <div id="toastMsg" style="font-size:0.95rem;opacity:0.9;"></div>
+      </div>
+      <span class="close-toast" onclick="this.parentElement.classList.remove('show')">&times;</span>
+    </div>
+
+    <div class="form-body">
+
+      <!-- Dynamic Loop -->
+      {{ range .Loans }}
+      <div class="card">
+        <div class="card-header">
+          <div><span class="label">วันที่เซ็นสัญญา :</span> <span class="value">{{ if .ContractSignDate }}{{
+              .ContractSignDate | thaiDate }}{{ else }}-{{ end }}</span></div>
+          <div><span class="label">วันที่ส่งงาน :</span> <span class="value">{{ if .SubmittedDate }}{{ .SubmittedDate |
+              thaiDate }}{{ else }}-{{ end }}</span></div>
+          <div class="id">{{ .RefCode }}</div>
+        </div>
+        <div class="card-body">
+          <div class="customer-info">
+            <i class="fas fa-user"></i>
+            <span>
+              {{ if eq .BorrowerType "juristic" }}
+              {{ .Title }} {{ .CompanyName }}
+              {{ else }}
+              {{ .Title }}{{ .FirstName }} {{ .LastName }}
+              {{ end }}
+            </span>
+          </div>
+          <div class="car-row">
+            <div class="car-info">
+              <i class="fas fa-car-side car-icon"></i>
+              <div class="car-details">
+                <h3>{{ .CarBrand }} {{ .CarModel }} {{ .CarYear }}</h3>
+                <p>{{ .LicensePlate }} {{ .LicenseProvince }}</p>
+              </div>
+            </div>
+            <div class="car-actions">
+              <!-- Edit Button: Pass ID via query param or cookie (current logic relies on cookie, but let's link to step1) -->
+              <!-- Ideally we should set the cookie or pass ID. For now, linking to step1. 
+                  The user didn't ask for 'Edit' functionality fix, just display. 
+                  But to be helpful, let's keep the link simple. -->
+              {{ if eq .Status "D" }}
+              <a href="/step1?id={{ .ID }}"
+                onclick="document.cookie='loan_id={{ .ID }}; path=/'; showLoading('กำลังโหลดข้อมูล...');"><button
+                  class="btn-bottom btn-edit">&nbsp;&nbsp;&nbsp;<i class="fas fa-edit"></i>
+                  แก้ไข&nbsp;&nbsp;&nbsp;&nbsp;</button></a>
+
+              <button class="btn-bottom btn-send" data-id="{{ .RefCode }}" data-name="{{ if eq .BorrowerType " juristic"
+                }}{{ .Title }} {{ .CompanyName }}{{ else }}{{ .Title }}{{ .FirstName }} {{ .LastName }}{{ end }}">
+                <i class="fas fa-upload"></i> ส่งงาน
+              </button>
+
+              <button class="btn-bottom btn-delete" data-id="{{ .ID }}"><i class="fas fa-trash"></i> ลบรายการ</button>
+              {{ end }}
+
+              {{ if eq .Status "P" }}<div class="status-badge status-p"><i class="fas fa-clock"></i> รออนุมัติ</div>{{
+              end }}
+              {{ if eq .Status "A" }}<div class="status-badge status-a"><i class="fas fa-check-circle"></i> อนุมัติ<div
+                  style="font-size:0.8rem; font-weight:normal; margin-top:2px;">{{ .LastUpdateDate | thaiDate }}</div>
+              </div>{{ end }}
+              {{ if eq .Status "M" }}<div class="status-badge status-m"><i class="fas fa-exclamation-circle"></i>
+                อนุมัติ (มีเงื่อนไข)<div style="font-size:0.8rem; font-weight:normal; margin-top:2px;">{{
+                  .LastUpdateDate | thaiDate }}</div>
+              </div>{{ end }}
+              {{ if eq .Status "R" }}<div class="status-badge status-r"><i class="fas fa-times-circle"></i> ไม่อนุมัติ
+                <div style="font-size:0.8rem; font-weight:normal; margin-top:2px;">{{ .LastUpdateDate | thaiDate }}
+                </div>
+              </div>{{ end }}
+              {{ if eq .Status "C" }}<div class="status-badge status-c"><i class="fas fa-ban"></i> ยกเลิก<div
+                  style="font-size:0.8rem; font-weight:normal; margin-top:2px;">{{ .LastUpdateDate | thaiDate }}</div>
+              </div>{{ end }}
+            </div>
+          </div>
+        </div>
+      </div>
+      {{ else }}
+      <div style="text-align:center; padding: 50px; color: #64748b;">
+        <h3>ไม่พบรายการสินเชื่อ</h3>
+        <p>กดปุ่ม "เพิ่ม" เพื่อสร้างรายการใหม่</p>
+      </div>
+      {{ end }}
+
+    </div>
+  </div>
+
+  <script>
+    /* Logout Modal Logic */
+    function confirmLogout(e) {
+      if (e) e.preventDefault();
+      document.getElementById('logoutOverlay').classList.add('active');
+    }
+
+    function closeLogoutModal() {
+      document.getElementById('logoutOverlay').classList.remove('active');
+    }
+
+    function proceedLogout() {
+      window.location.href = '/logout';
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.querySelector('.sidebar');
+      const overlay = document.querySelector('.overlay');
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+    }
+
+    // WebSocket + Reconnect อัตโนมัติ
+    let ws;
+    function connectWebSocket() {
+      const wsProtocol = location.protocol === 'https:' ? 'wss://' : 'ws://';
+      ws = new WebSocket(`${wsProtocol}${location.host}/ws`);
+
+      ws.onopen = () => console.log('WebSocket เชื่อมต่อสำเร็จ');
+
+      ws.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        addNotification(data.title || 'แจ้งเตือนใหม่!', data.message || '');
+
+        new Audio('/static/sound/notif.mp3').play().catch(() => { });
+      };
+
+      ws.onclose = () => {
+        console.log('WebSocket หลุด! เชื่อมใหม่ใน 3 วินาที...');
+        setTimeout(connectWebSocket, 3000);
+      };
+    }
+    connectWebSocket();
+
+    // ประวัติแจ้งเตือน
+    let notifHistory = [];
+
+    function addNotification(title, message) {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+
+      const notif = { title, message, time: timeStr, timestamp: now.getTime(), unread: true };
+      notifHistory.unshift(notif);
+      if (notifHistory.length > 50) notifHistory.pop();
+
+      updateNotifList();
+      updateBadge();
+      updateClearButtonState();
+
+      // แสดง Toast
+      document.getElementById('toastTitle').textContent = title;
+      document.getElementById('toastMsg').textContent = message;
+      const toast = document.getElementById('realtimeToast');
+      toast.classList.add('show');
+      clearTimeout(toast.hideTimer);
+      toast.hideTimer = setTimeout(() => toast.classList.remove('show'), 5000);
+    }
+
+    function updateNotifList() {
+      const list = document.getElementById('notifList');
+      if (notifHistory.length === 0) {
+        list.innerHTML = '<div style="text-align:center;color:#9ca3af;padding:40px;font-size:0.95rem;">ยังไม่มีแจ้งเตือน</div>';
+        return;
+      }
+      list.innerHTML = notifHistory.map(n => `
+      <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="markAsRead(this, ${n.timestamp})">
+        <div class="title">${n.title}</div>
+        <div class="message">${n.message}</div>
+        <div class="time">${n.time}</div>
+      </div>
+    `).join('');
+    }
+
+    function updateBadge() {
+      const unread = notifHistory.filter(n => n.unread).length;
+      const badge = document.getElementById('notifBadge');
+      badge.textContent = unread;
+      badge.style.display = unread > 0 ? 'flex' : 'none';
+    }
+
+    // Logic for Send Work
+    document.addEventListener("click", function (e) {
+      if (e.target && e.target.closest(".btn-send")) {
+        e.preventDefault();
+        const btn = e.target.closest(".btn-send");
+        const refCode = btn.dataset.id;
+        const name = btn.dataset.name;
+
+        if (confirm(`ยืนยันการส่งงานสำหรับ ${name} หรือไม่?`)) {
+          // Show Loading
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...';
+          btn.disabled = true;
+
+          fetch('/api/sync-work', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ ref_code: refCode })
+          })
+            .then(response => response.json())
+            .then(data => {
+              if (data.error) {
+                alert('เกิดข้อผิดพลาด: ' + data.error);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+              } else {
+                addNotification('สำเร็จ', 'ส่งงานเรียบร้อยแล้ว');
+                // Change button state
+                btn.className = "btn-bottom btn-sent";
+                btn.innerHTML = '<i class="fas fa-check"></i> ส่งแล้ว';
+                btn.disabled = true;
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+              btn.innerHTML = originalText;
+              btn.disabled = false;
+            });
+        }
+      }
+    });
+
+    function markAsRead(el, ts) {
+      const n = notifHistory.find(x => x.timestamp === ts);
+      if (n) n.unread = false;
+      el.classList.remove('unread');
+      updateBadge();
+    }
+
+    function toggleNotifDropdown() {
+      const dropdown = document.getElementById('notifDropdown');
+      if (dropdown.style.display === 'block') {
+        dropdown.style.display = 'none';
+      } else {
+        dropdown.style.display = 'block';
+        // Reset unread status
+        notifHistory.forEach(n => n.unread = false);
+        updateNotifList();
+        updateBadge();
+        updateClearButtonState();
+      }
+    }
+
+    // คลิกกระดิ่ง
+    document.getElementById('notificationBell').onclick = (e) => {
+      e.stopPropagation();
+      toggleNotifDropdown();
+    };
+
+    document.getElementById('notifDropdown').onclick = (e) => e.stopPropagation();
+    document.addEventListener('click', () => document.getElementById('notifDropdown').style.display = 'none');
+
+    function clearAllNotifications() {
+      notifHistory = [];
+      updateNotifList();
+      updateBadge();
+      updateClearButtonState();
+    }
+
+    function updateClearButtonState() {
+      const btn = document.getElementById('clearAllNotif');
+      if (notifHistory.length > 0) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+      } else {
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+      }
+    }
+
+    // ปุ่มส่งงาน
+    document.querySelectorAll('.btn-send').forEach(btn => {
+      btn.addEventListener('click', async function () {
+        if (!confirm('ยืนยันส่งงานใบนี้ไปตรวจสอบหรือไม่?')) return;
+
+        const refCode = this.dataset.id;
+        const customerName = this.dataset.name;
+        const btnElement = this;
+
+        try {
+          const response = await fetch('/api/update-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ref_code: refCode })
+          });
+
+          if (!response.ok) throw new Error('Update failed');
+
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+              title: 'ใบสินเชื่อรอตรวจสอบ!',
+              message: `เลขที่ ${refCode} - ${customerName} ส่งงานแล้ว`
+            }));
+          }
+
+          btnElement.innerHTML = '<i class="fas fa-check"></i> ส่งแล้ว';
+          btnElement.disabled = true;
+          btnElement.classList.remove('btn-send');
+          btnElement.classList.add('btn-sent'); // Optional styling update if you have btn-sent style
+
+        } catch (error) {
+          console.error('Error:', error);
+          alert('เกิดข้อผิดพลาดในการส่งงาน กรุณาลองใหม่อีกครั้ง');
+        }
+      });
+    });
+
+    // ปุ่มลบรายการ
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+      btn.addEventListener('click', async function () {
+        if (!confirm('ยืนยันการลบรายการนี้ใช่หรือไม่? \n(ข้อมูลผู้กู้และผู้ค้ำประกันจะถูกลบทั้งหมด)')) return;
+
+        const loanID = this.dataset.id; // Corrected: Use .ID for deletion, not RefCode
+        try {
+          const response = await fetch('/api/delete-loan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: parseInt(loanID) })
+          });
+
+          if (!response.ok) throw new Error('Delete failed');
+
+          // Reload to show updated list
+          showLoading('กำลังลบข้อมูล...');
+          window.location.reload();
+
+        } catch (error) {
+          console.error('Error:', error);
+          alert('เกิดข้อผิดพลาดในการลบข้อมูล กรุณาลองใหม่อีกครั้ง');
+        }
+      });
+    });
+
+  </script>
+
+</body>
+
+</html>

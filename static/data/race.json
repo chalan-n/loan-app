@@ -1,0 +1,12 @@
+[
+  { "RaceID": 1, "RaceName": "ไทย" },
+  { "RaceID": 2, "RaceName": "จีน" },
+  { "RaceID": 3, "RaceName": "ญี่ปุ่น" },
+  { "RaceID": 4, "RaceName": "เกาหลี" },
+  { "RaceID": 5, "RaceName": "อเมริกัน" },
+  { "RaceID": 6, "RaceName": "อังกฤษ" },
+  { "RaceID": 7, "RaceName": "ฝรั่งเศส" },
+  { "RaceID": 8, "RaceName": "เยอรมัน" },
+  { "RaceID": 9, "RaceName": "อินเดีย" },
+  { "RaceID": 10, "RaceName": "อื่นๆ" }
+]

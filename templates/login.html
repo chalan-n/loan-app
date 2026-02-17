@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-name" content="Kanit + Navy">
+  <meta name="theme-color" content="#1e3a8a">
+  <title>เข้าสู่ระบบ | CMO APP</title>
+
+  <link rel="stylesheet" href="/static/css/kanit.css">
+  <link rel="stylesheet" href="/static/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/custom_loading.css">
+  <script src="/static/js/custom_loading.js"></script>
+
+  <style>
+    :root {
+      --navy: #1e3a8a;
+      --sky: #dbeafe;
+      --green: #059669;
+      --red: #dc2626;
+      --gray: #6b7280;
+      --light: #f8fafc;
+      --border: #e2e8f0;
+      --shadow: 0 10px 25px rgba(30, 58, 138, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Kanit', sans-serif;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+      color: #1e293b;
+      position: relative;
+    }
+
+    .login-container {
+      max-width: 420px;
+      width: 100%;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid #e0e7ff;
+    }
+
+    .login-header {
+      background: linear-gradient(135deg, var(--navy), #1e40af);
+      color: white;
+      padding: 32px 20px 28px;
+      text-align: center;
+    }
+
+    .logo {
+      width: 150px;
+      height: 50px;
+      margin: 0 auto 16px;
+      display: block;
+    }
+
+    .login-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin: 0;
+    }
+
+    .login-body {
+      padding: 40px 35px 45px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #374151;
+      font-size: 1.1rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 14px 18px 14px 48px;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      font-family: 'Kanit', sans-serif;
+      font-size: 1.1rem;
+      transition: all 0.3s;
+      background: #fafbff;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--navy);
+      box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.15);
+      background: white;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 1.3rem;
+      z-index: 2;
+      transition: color 0.3s;
+    }
+
+    .valid {
+      border-color: var(--green) !important;
+      background: #f0fdf4 !important;
+    }
+
+    .valid~.input-icon {
+      color: var(--green);
+    }
+
+    .invalid {
+      border-color: var(--red) !important;
+      background: #fef2f2 !important;
+    }
+
+    .invalid~.input-icon {
+      color: var(--red);
+    }
+
+    .error-text {
+      color: var(--red);
+      font-size: 0.9rem;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 24px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .error-text.show {
+      opacity: 1;
+    }
+
+    .btn-login {
+      width: 100%;
+      background: linear-gradient(135deg, var(--navy), #1e40af);
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 50px;
+      font-family: 'Kanit', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+      transition: all 0.3s;
+      box-shadow: 0 6px 15px rgba(30, 58, 138, 0.25);
+    }
+
+    .btn-login:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .btn-login:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(30, 58, 138, 0.35);
+    }
+
+    .spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top: 3px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .extra-links {
+      text-align: center;
+      margin-top: 28px;
+      font-size: 0.95rem;
+      color: #64748b;
+    }
+
+    .extra-links a {
+      color: var(--navy);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .extra-links a:hover {
+      text-decoration: underline;
+    }
+
+    /* === Toast Notification สวยงาม === */
+    .toast {
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      background: #10b981;
+      color: white;
+      padding: 18px 24px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      max-width: 380px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .toast i {
+      font-size: 2rem;
+      background: rgba(255, 255, 255, 0.2);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toast .close-toast {
+      margin-left: auto;
+      cursor: pointer;
+      font-size: 1.4rem;
+      opacity: 0.8;
+    }
+
+    .toast {
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      padding: 18px 24px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      max-width: 380px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .toast.success {
+      background: #10b981;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+    }
+
+    .toast.error {
+      background: #dc2626;
+      box-shadow: 0 10px 30px rgba(220, 38, 38, 0.3);
+    }
+
+    @media (max-width: 480px) {
+      .login-body {
+        padding: 35px 25px;
+      }
+
+      .login-header h1 {
+        font-size: 1.7rem;
+      }
+
+      .logo {
+        width: 130px;
+        height: auto;
+      }
+
+      .toast {
+        top: 20px;
+        right: 20px;
+        left: 20px;
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-container">
+    <div class="login-header">
+      <img src="/static/images/logoml_white.png" alt="โลโก้บริษัท" class="logo">
+      <h1>CMO APP</h1>
+    </div>
+
+    <div class="login-body">
+      <form id="loginForm" action="/login" method="post" novalidate>
+        <!-- รหัสพนักงาน (ตัวเลขเท่านั้น) -->
+        <div class="form-group">
+          <label for="username">รหัสพนักงาน</label>
+          <div class="input-wrapper">
+            <i class="fas fa-user input-icon"></i>
+            <input type="text" id="username" name="username" required autocomplete="off" placeholder="กรอกรหัสพนักงาน"
+              maxlength="6" inputmode="numeric" pattern="[0-9]*">
+          </div>
+          <div class="error-text" id="usernameError">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>กรุณากรอกรหัสพนักงาน</span>
+          </div>
+        </div>
+
+        <!-- รหัสผ่าน -->
+        <div class="form-group">
+          <label for="password">รหัสผ่าน</label>
+          <div class="input-wrapper">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" id="password" name="password" required autocomplete="off" placeholder="กรอกรหัสผ่าน">
+          </div>
+          <div class="error-text" id="passwordError">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-login" id="btnLogin" disabled>
+          <span class="spinner" id="loadingSpinner"></span>
+          <span id="btnText"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ</span>
+        </button>
+      </form>
+
+      <div class="extra-links">
+        <a href="#">ลืมรหัสผ่าน?</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+
+
+  <!-- Toast ล้มเหลว (แดง) -->
+  <div id="errorToast" class="toast error">
+    <i class="fas fa-exclamation-triangle"></i>
+    <div>
+      <div style="font-size:1.2rem; margin-bottom:4px;">เข้าสู่ระบบล้มเหลว!</div>
+      <div style="font-size:0.95rem; opacity:0.9;" id="errorToastMsg"></div>
+    </div>
+    <span class="close-toast" onclick="this.parentElement.classList.remove('show')">&times;</span>
+  </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const username = document.getElementById('username');
+    const password = document.getElementById('password');
+    const btnLogin = document.getElementById('btnLogin');
+    const btnText = document.getElementById('btnText');
+    const spinner = document.getElementById('loadingSpinner');
+
+    // Validation เหมือนเดิมทุกอย่าง
+    username.addEventListener('input', function () {
+      this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);
+      checkForm();
+    });
+
+    function setValid(input) { input.classList.remove('invalid'); input.classList.add('valid'); }
+
+    function setInvalid(input, errorEl, message) {
+      input.classList.remove('valid'); input.classList.add('invalid');
+      errorEl.classList.add('show');
+      errorEl.querySelector('span').textContent = message;
+    }
+
+    function validateUsername() {
+      const val = username.value.trim();
+      if (val.length !== 6) {
+        setInvalid(username, document.getElementById('usernameError'), 'กรุณากรอกรหัสพนักงาน 6 หลัก');
+        return false;
+      } else {
+        setValid(username);
+        document.getElementById('usernameError').classList.remove('show');
+        return true;
+      }
+    }
+
+    function validatePassword() {
+      if (password.value.length < 6) {
+        setInvalid(password, document.getElementById('passwordError'), 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร');
+        return false;
+      } else {
+        setValid(password);
+        document.getElementById('passwordError').classList.remove('show');
+        return true;
+      }
+    }
+
+    function checkForm() {
+      const isValid = validateUsername() && validatePassword();
+      btnLogin.disabled = !isValid;
+    }
+
+    username.addEventListener('input', checkForm);
+    password.addEventListener('input', function () {
+      // Allow only ASCII characters (English, numbers, symbols)
+      // Block Thai or other unicode characters
+      this.value = this.value.replace(/[^\x00-\x7F]/g, '');
+      checkForm();
+    });
+
+    // === สำคัญที่สุด: ใช้ AJAX แทน submit ฟอร์มธรรมดา ===
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault(); // ห้าม refresh หน้าเด็ดขาด!
+
+      if (!validateUsername() || !validatePassword()) return;
+
+      btnLogin.disabled = true;
+      showLoading('กำลังเข้าสู่ระบบ...');
+
+      const formData = new FormData(form);
+      let isRedirecting = false;
+
+      try {
+        const response = await fetch('/login', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (response.redirected) {
+          // สำเร็จ → เปลี่ยนข้อความ Loading และไป main (ไม่ปิด Loading)
+          isRedirecting = true;
+          showLoading('กำลังเข้าสู่หน้าหลัก...');
+          window.location.href = response.url;
+        } else {
+          // ผิด → โชว์ Toast แดง
+          document.getElementById('errorToastMsg').textContent = 'รหัสพนักงานหรือรหัสผ่านไม่ถูกต้อง';
+          document.getElementById('errorToast').classList.add('show');
+          setTimeout(() => {
+            document.getElementById('errorToast').classList.remove('show');
+          }, 4000);
+        }
+      } catch (err) {
+        document.getElementById('errorToastMsg').textContent = 'เกิดข้อผิดพลาดในการเชื่อมต่อ';
+        document.getElementById('errorToast').classList.add('show');
+      } finally {
+        if (!isRedirecting) {
+          hideLoading();
+          spinner.style.display = 'none';
+          btnText.textContent = ' เข้าสู่ระบบ';
+          btnLogin.disabled = false;
+        }
+      }
+    });
+  </script>
+
+</body>
+
+</html>

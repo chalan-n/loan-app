@@ -1,0 +1,42 @@
+[
+    {
+        "NationId": 1,
+        "NationName": "ไทย"
+    },
+    {
+        "NationId": 2,
+        "NationName": "จีน"
+    },
+    {
+        "NationId": 3,
+        "NationName": "ญี่ปุ่น"
+    },
+    {
+        "NationId": 4,
+        "NationName": "เกาหลี"
+    },
+    {
+        "NationId": 5,
+        "NationName": "อเมริกัน"
+    },
+    {
+        "NationId": 6,
+        "NationName": "อังกฤษ"
+    },
+    {
+        "NationId": 7,
+        "NationName": "ฝรั่งเศส"
+    },
+    {
+        "NationId": 8,
+        "NationName": "เยอรมัน"
+    },
+    {
+        "NationId": 9,
+        "NationName": "อินเดีย"
+    },
+    {
+        "NationId": 10,
+        "NationName": "อื่นๆ"
+    }
+]

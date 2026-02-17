@@ -1,0 +1,2060 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-name" content="Kanit + Navy">
+  <meta name="theme-color" content="#1e3a8a">
+  <title>สินเชื่อใหม่ - ผู้เช่าซื้อ</title>
+  <!-- Google Font: Kanit -->
+  <link rel="stylesheet" href="/static/css/kanit.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/static/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/custom_loading.css">
+  <script src="/static/js/custom_loading.js"></script>
+  <script src="/static/js/notifications.js"></script>
+
+  <!-- Flatpickr CSS + ธีมสวยเข้ากับ Navy Theme -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+  <link rel="stylesheet" href="/static/css/modern_datepicker.css">
+
+  <!-- Flatpickr JS -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
+
+  <style>
+    /* === Kanit + Navy Theme === */
+    :root {
+      --navy: #1e3a8a;
+      --blue: #1e40af;
+      --sky: #dbeafe;
+      --green: #059669;
+      --red: #dc2626;
+      --gray: #6b7280;
+      --light: #f8fafc;
+      --border: #e2e8f0;
+      --shadow: 0 10px 25px rgba(30, 58, 138, 0.12);
+      --yellow: #fef3c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Kanit', sans-serif;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      min-height: 100vh;
+      padding: 5px;
+      color: #1e293b;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0px auto;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid #e0e7ff;
+    }
+
+    /* Top Header - โลโก้บริษัท + ปุ่มออกจากระบบ */
+    .top-header {
+      background: linear-gradient(135deg, var(--navy), #1e40af);
+      color: white;
+      padding: 14px 28px;
+      /* ลด padding เล็กน้อยให้โลโก้ไม่สูงเกินไป */
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* โลโก้บริษัท */
+    .company-logo {
+      height: 48px;
+      /* ปรับขนาดโลโก้ตามต้องการ */
+      width: auto;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+    }
+
+    .company-logo:hover {
+      transform: scale(1.08);
+    }
+
+    .top-header a,
+    .top-header a:hover {
+      text-decoration: none;
+    }
+
+    /* ปุ่มออกจากระบบ (แดงพรีเมียม) */
+    .btn-logout {
+      background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+      border: none;
+      color: white;
+      padding: 12px 26px;
+      border-radius: 50px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);
+      transition: all .35s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-logout i {
+      font-size: 1.4rem;
+    }
+
+    .btn-logout:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 12px 28px rgba(239, 68, 68, 0.5);
+      background: linear-gradient(135deg, #f87171, #ef4444) !important;
+    }
+
+    /* Title Bar - ชื่อชิดซ้าย + ปุ่มชิดขวา (บรรทัดเดียวกัน) */
+    .title-bar {
+      background: linear-gradient(135deg, #1e40af, #1e3a8a);
+      color: white;
+      padding: 22px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0 0 20px 20px;
+    }
+
+    .title-bar a,
+    .title-bar a:hover {
+      text-decoration: none;
+    }
+
+    .main-title {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .main-title .fa-home,
+    .main-title .fa-user {
+      margin-right: 0.5rem;
+    }
+
+    /* Ripple effect ทั้งสองปุ่ม */
+    .btn-logout::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width .6s, height .6s;
+    }
+
+    .btn-logout:active::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .top-header {
+        padding: 14px 20px;
+      }
+
+      .company-logo {
+        height: 42px;
+      }
+
+      .title-bar {
+        flex-direction: column;
+        align-items: center;
+        padding: 24px 24px 32px;
+        text-align: left;
+        gap: 16px;
+      }
+
+      .main-title {
+        font-size: 1.65rem;
+        text-align: left;
+      }
+
+      .btn-add {
+        align-self: flex-end;
+        margin-top: 8px;
+      }
+
+      .btn-add,
+      .btn-logout {
+        padding: 11px 24px;
+        font-size: 1rem;
+      }
+
+      .btn-add i,
+      .btn-logout i {
+        font-size: 1.3rem;
+      }
+
+      .btn-add {
+        align-self: stretch;
+      }
+    }
+
+    /* Validation Error Styles */
+    .input-error {
+      border-color: #dc2626 !important;
+      background-color: #fef2f2 !important;
+    }
+
+    .error-text {
+      color: #dc2626;
+      font-size: 0.85rem;
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* Notification System */
+    #notificationContainer {
+      z-index: 9999;
+    }
+
+    #notificationBell {
+      cursor: pointer;
+      position: relative;
+    }
+
+    #notificationBell i {
+      color: white;
+      font-size: 2rem;
+    }
+
+    #notifBadge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #dc2626;
+      color: white;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #notifDropdown {
+      position: absolute;
+      right: 40px;
+      width: 380px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid #e2e8f0;
+      max-height: 70vh;
+      overflow: hidden;
+      display: none;
+      z-index: 9999;
+    }
+
+    #notifDropdown .header {
+      padding: 16px;
+      background: var(--navy);
+      color: white;
+      border-radius: 16px 16px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #notifDropdown .header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .close-dropdown {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .close-dropdown:hover {
+      opacity: 1;
+    }
+
+    .btn-clear {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-clear:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-clear:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #notifList {
+      max-height: 60vh;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .notif-item {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .notif-item:hover {
+      background: #f8fafc;
+    }
+
+    .notif-item.unread {
+      background: #eff6ff;
+      font-weight: 600;
+    }
+
+    .notif-item .title {
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+
+    .notif-item .message {
+      font-size: 0.9rem;
+      color: #475569;
+    }
+
+    .notif-item .time {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-top: 6px;
+    }
+
+    /* Realtime Toast */
+    #realtimeToast {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 9999;
+      background: #10b981;
+      color: white;
+      padding: 18px 24px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.5s ease;
+      max-width: 380px;
+      cursor: pointer;
+    }
+
+    #realtimeToast.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    #realtimeToast i {
+      font-size: 2rem;
+      background: rgba(255, 255, 255, 0.2);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-toast {
+      margin-left: auto;
+      cursor: pointer;
+      font-size: 1.4rem;
+      opacity: 0.8;
+    }
+
+    /* === Progress Steps === */
+    .steps {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 20px;
+      background: var(--light);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: #6b7280;
+      position: relative;
+      flex: 1;
+      z-index: 2;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1rem;
+      z-index: 3;
+      background: #d1d5db;
+      color: #9ca3af;
+      border: 3px solid #e5e7eb;
+      transition: all 0.4s ease;
+      position: relative;
+    }
+
+    .step.active .step-circle {
+      background: var(--navy);
+      color: white;
+      border-color: var(--navy);
+      transform: scale(1.1);
+      box-shadow: 0 0 0 6px rgba(30, 58, 138, 0.2);
+    }
+
+    .step.completed .step-circle {
+      background: var(--blue);
+      color: white;
+      border-color: var(--blue);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(30, 64, 175, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(30, 64, 175, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(30, 64, 175, 0);
+      }
+    }
+
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      width: 100%;
+      height: 4px;
+      background: #d1d5db;
+      z-index: 1;
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+
+    .step.completed:not(:last-child)::after,
+    .step.active:not(:last-child)::after {
+      background: var(--blue);
+      animation: drawLine 1.2s ease-out forwards;
+      transform-origin: left;
+      transform: scaleX(0);
+    }
+
+    @keyframes drawLine {
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    .step.active,
+    .step.completed {
+      color: var(--blue);
+      font-weight: 600;
+    }
+
+    /* Form Body */
+    .form-body {
+      padding: 30px;
+    }
+
+    /* Section */
+    .section {
+      margin-bottom: 32px;
+      padding: 22px;
+      background: var(--light);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-weight: 600;
+      color: var(--navy);
+      font-size: 1.25rem;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 3px solid var(--navy);
+      padding-bottom: 8px;
+    }
+
+    .section-title i {
+      color: var(--navy);
+      font-size: 1.4rem;
+    }
+
+    /* 2 คอลัมน์ */
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 16px;
+    }
+
+    .col {
+      position: relative;
+    }
+
+    .col.full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Input */
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #374151;
+      font-size: 0.95rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="tel"],
+    input[type="email"],
+    select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s;
+      background: white;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--navy);
+      box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.15);
+      transform: translateY(-1px);
+    }
+
+    /* ปุ่มเล็ก */
+    .btn-small {
+      background: #fee2e2;
+      color: var(--red);
+      padding: 6px 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      margin-left: 8px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .text-red {
+      color: #dc2626;
+    }
+
+    /* Radio & Checkbox */
+    .radio-group {
+      display: flex;
+      gap: 20px;
+      margin: 12px 0;
+      flex-wrap: wrap;
+    }
+
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.98rem;
+      color: #4b5563;
+    }
+
+    .radio-item input[type="radio"] {
+      accent-color: var(--navy);
+      width: 18px;
+      height: 18px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      accent-color: var(--navy);
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ปุ่มย้อนกลับ & ถัดไป */
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 30px auto 0;
+      flex-wrap: wrap;
+    }
+
+    .btn-group a {
+      text-decoration: none;
+    }
+
+    .btn-back,
+    .btn-next {
+      padding: 18px 40px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1.25rem;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: all .3s;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .12);
+      min-width: 200px;
+    }
+
+    .btn-back {
+      background: #6b7280;
+      color: white;
+    }
+
+    .btn-back:hover {
+      background: #6b7280;
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(30, 58, 138, .4);
+    }
+
+    .btn-next {
+      background: var(--navy);
+      color: white;
+    }
+
+    .btn-next:hover {
+      background: var(--blue);
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(30, 58, 138, .4);
+    }
+
+    .btn-back i,
+    .btn-next i {
+      font-size: 1.4rem;
+      transition: transform .3s;
+    }
+
+    .btn-back:hover i {
+      transform: translateX(-5px);
+    }
+
+    .btn-next:hover i {
+      transform: translateX(5px);
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .input-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn-small {
+        margin-left: 0;
+        margin-top: 8px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 16px 12px;
+        font-size: 1.25rem;
+      }
+
+      .header i {
+        font-size: 2rem;
+        left: 12px;
+      }
+
+      .steps {
+        padding: 20px 10px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+      }
+
+      .step {
+        min-width: 80px;
+        font-size: 0.8rem;
+      }
+
+      .step-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+      }
+
+      .btn-group {
+        flex-direction: column;
+      }
+
+      .btn-back,
+      .btn-next {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <div class="top-header">
+      <a href="/"><img src="/static/images/logoml_white.png" alt="โลโก้บริษัท" class="company-logo"></a>
+      <a href="/logout">
+        <button class="btn-logout" style="display: none;">
+          <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+        </button>
+      </a>
+      <!-- Notification Bell + Toast -->
+      <div id="notificationContainer">
+        <div id="notificationBell">
+          <i class="fas fa-bell fa-2x"></i>
+          <span id="notifBadge" style="display: none;">0</span>
+        </div>
+        <div id="notifDropdown">
+          <div class="header">
+            <h3>ประวัติแจ้งเตือน</h3>
+            <div style="display:flex; gap:10px;">
+              <button id="clearAllNotif" class="btn-clear" disabled
+                onclick="clearAllNotifications()">ล้างประวัติ</button>
+              <button class="close-dropdown" onclick="toggleNotifDropdown()">✕</button>
+            </div>
+          </div>
+          <div id="notifList">
+            <div style="text-align:center;color:#9ca3af;padding:40px;font-size:0.95rem;">ยังไม่มีแจ้งเตือน</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Header -->
+
+    <!-- Main Title -->
+    <div class="title-bar" style="position: relative;">
+      <a href="/main" onclick="showLoading('กำลังกลับสู่หน้าหลัก...');"
+        style="position: absolute; left: 28px; color: white; display: flex; align-items: center; gap: 8px; text-decoration: none;">
+        <i class="fas fa-chevron-left" style="font-size: 1.2rem;"></i> หน้าหลัก
+      </a>
+      <h1 class="main-title"><i class="fas fa-user"></i> ข้อมูลผู้เช่าซื้อ</h1>
+    </div>
+    <!-- End Main Title -->
+
+    <div id="realtimeToast" class="toast success" style="top:80px; cursor:pointer;"
+      onclick="this.classList.remove('show')">
+      <i class="fas fa-bell"></i>
+      <div>
+        <div id="toastTitle" style="font-weight:bold;"></div>
+        <div id="toastMsg" style="font-size:0.95rem;opacity:0.9;"></div>
+      </div>
+      <span class="close-toast" onclick="this.parentElement.classList.remove('show')">&times;</span>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="steps">
+      <div class="step active" {{ if .Loan.ID }}onclick="location.href='/step1?id={{ .Loan.ID }}'"
+        style="cursor:pointer;" {{ end }}>
+        <div class="step-circle">1</div>
+        <div>ข้อมูลผู้เช่าซื้อ</div>
+      </div>
+      <div class="step" {{ if .Loan.ID }}onclick="location.href='/step2?id={{ .Loan.ID }}'" style="cursor:pointer;" {{
+        end }}>
+        <div class="step-circle">2</div>
+        <div>ข้อมูลรถยนต์</div>
+      </div>
+      <div class="step" {{ if .Loan.ID }}onclick="location.href='/step3?id={{ .Loan.ID }}'" style="cursor:pointer;" {{
+        end }}>
+        <div class="step-circle">3</div>
+        <div>ข้อมูลสัญญา</div>
+      </div>
+      <div class="step" {{ if .Loan.ID }}onclick="location.href='/step4?id={{ .Loan.ID }}'" style="cursor:pointer;" {{
+        end }}>
+        <div class="step-circle">4</div>
+        <div>ค้ำประกัน/อื่นๆ</div>
+      </div>
+      <div class="step" {{ if .Loan.ID }}onclick="location.href='/step5?id={{ .Loan.ID }}'" style="cursor:pointer;" {{
+        end }}>
+        <div class="step-circle">5</div>
+        <div>ประกันชีวิต</div>
+      </div>
+      <div class="step" {{ if .Loan.ID }}onclick="location.href='/step6?id={{ .Loan.ID }}'" style="cursor:pointer;" {{
+        end }}>
+        <div class="step-circle">6</div>
+        <div>ประกันภัย</div>
+      </div>
+      <div class="step" {{ if .Loan.ID }}onclick="location.href='/step7?id={{ .Loan.ID }}'" style="cursor:pointer;" {{
+        end }}>
+        <div class="step-circle">7</div>
+        <div>หักภาษี ณ ที่จ่าย</div>
+      </div>
+    </div>
+    <!-- End Progress Steps -->
+
+    <!-- Form Body -->
+    <div class="form-body">
+      <form action="/step1" method="POST" id="step1Form" novalidate>
+
+        <!-- Section: ประเภทผู้เช่าซื้อ -->
+        <div class="section">
+          <div class="section-title"><i class="fas fa-users"></i> ประเภทผู้เช่าซื้อ</div>
+          <div class="radio-group" style="margin-top:20px;">
+            <label class="radio-item">
+              <input type="radio" name="borrower_type" value="individual" {{ if or (eq .Loan.BorrowerType "individual" )
+                (eq .Loan.BorrowerType "" ) }}checked{{ end }} onclick="toggleBorrowerType()">
+              บุคคลธรรมดา
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="borrower_type" value="juristic" {{ if eq .Loan.BorrowerType "juristic"
+                }}checked{{ end }} onclick="toggleBorrowerType()">
+              นิติบุคคล
+            </label>
+          </div>
+        </div>
+
+        <!-- Section: ข้อมูลส่วนตัว / ข้อมูลนิติบุคคล -->
+        <div class="section">
+          <div class="section-title" id="secTitleInfo"><i class="fas fa-id-card"></i> ข้อมูลส่วนตัว</div>
+
+
+          <!-- Row 1: Title, Name -->
+          <div class="row">
+            <div class="col">
+              <label for="title">คำนำหน้า</label>
+              <select id="title" name="title">
+                <option value="">-- เลือก --</option>
+                <option value="นาย" {{ if eq .Loan.Title "นาย" }}selected{{ end }}>นาย</option>
+                <option value="นาง" {{ if eq .Loan.Title "นาง" }}selected{{ end }}>นาง</option>
+                <option value="นางสาว" {{ if eq .Loan.Title "นางสาว" }}selected{{ end }}>นางสาว</option>
+                <option value="บริษัท" {{ if eq .Loan.Title "บริษัท" }}selected{{ end }}>บริษัท</option>
+                <option value="หจก." {{ if eq .Loan.Title "หจก." }}selected{{ end }}>หจก.</option>
+              </select>
+            </div>
+            <!-- Individual Name -->
+            <div class="col" id="colFirstName">
+              <label for="first_name">ชื่อ <span class="text-red">*</span></label>
+              <input type="text" id="first_name" name="first_name" value="{{ .Loan.FirstName }}">
+            </div>
+            <div class="col" id="colLastName">
+              <label for="last_name">นามสกุล <span class="text-red">*</span></label>
+              <input type="text" id="last_name" name="last_name" value="{{ .Loan.LastName }}">
+            </div>
+            <!-- Juristic Name -->
+            <div class="col full-width" id="colCompanyName" style="display:none;">
+              <label for="juristic_company_name">ชื่อบริษัท/ห้างหุ้นส่วน <span class="text-red">*</span></label>
+              <input type="text" id="juristic_company_name" name="juristic_company_name"
+                value="{{ .Loan.CompanyName }}">
+            </div>
+          </div>
+
+          <!-- Row 2: ID / Trade Reg / Dates -->
+          <div class="row">
+            <!-- Individual: ID Card -->
+            <div class="col" id="colIdCard">
+              <label for="id_card">เลขบัตรประชาชน (13 หลัก) <span class="text-red">*</span></label>
+              <input type="text" id="id_card" name="id_card" value="{{ .Loan.IdCard }}" maxlength="13"
+                inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 13)">
+              <span class="error-text" id="idCardError" style="display:none;">กรุณากรอกเลขบัตร 13 หลัก</span>
+            </div>
+
+            <!-- Juristic: Trade Registration -->
+            <div class="col" id="colTradeReg" style="display:none;">
+              <label for="trade_registration_id">เลขทะเบียนการค้า <span class="text-red">*</span></label>
+              <input type="text" id="trade_registration_id" name="trade_registration_id"
+                value="{{ .Loan.TradeRegistrationID }}" inputmode="numeric" pattern="[0-9]*"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+
+            <!-- Juristic: Tax ID (Same row as Trade Reg?) -->
+            <div class="col" id="colTaxId" style="display:none;">
+              <label for="tax_id">เลขประจำตัวผู้เสียภาษี <span class="text-red">*</span></label>
+              <input type="text" id="tax_id" name="tax_id" value="{{ .Loan.TaxID }}" inputmode="numeric"
+                pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+
+            <div class="col">
+              <label for="id_card_issue_date">
+                <span id="lblIssueDate">วันออกบัตร</span>
+              </label>
+              <div class="input-group">
+                <input type="text" id="id_card_issue_date" name="id_card_issue_date"
+                  class="datepicker-th date-input-icon no-keyboard"
+                  value="{{ if .Loan.IdCardIssueDate }}{{ .Loan.IdCardIssueDate }}{{ end }}" placeholder="เลือกวันที่"
+                  readonly>
+              </div>
+            </div>
+            <div class="col">
+              <label for="id_card_expiry_date">
+                <span id="lblExpiryDate">วันหมดอายุ</span>
+              </label>
+              <div class="input-group">
+                <input type="text" id="id_card_expiry_date" name="id_card_expiry_date"
+                  class="datepicker-th date-input-icon no-keyboard"
+                  value="{{ if .Loan.IdCardExpiryDate }}{{ .Loan.IdCardExpiryDate }}{{ end }}" placeholder="เลือกวันที่"
+                  readonly>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3: Juristic Reg Date -->
+          <div class="row" id="rowRegDate" style="display:none;">
+            <div class="col">
+              <label for="registration_date">วันจดทะเบียน</label>
+              <div class="input-group">
+                <input type="text" id="registration_date" name="registration_date"
+                  class="datepicker-th date-input-icon no-keyboard"
+                  value="{{ if .Loan.RegistrationDate }}{{ .Loan.RegistrationDate }}{{ end }}" placeholder="เลือกวันที่"
+                  readonly>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 4: Individual Extra (DOB, Age, Gender) -->
+          <div class="row" id="rowPersonalExtra">
+            <div class="col">
+              <label for="date_of_birth">วันเกิด <span class="text-red">*</span></label>
+              <div class="input-group">
+                <input type="text" id="date_of_birth" name="date_of_birth"
+                  class="datepicker-th date-input-icon no-keyboard"
+                  value="{{ if .Loan.DateOfBirth }}{{ .Loan.DateOfBirth }}{{ end }}" placeholder="เลือกวันที่" readonly
+                  onchange="calculateAge()">
+              </div>
+            </div>
+            <div class="col">
+              <label>อายุ (ปี)</label>
+              <input type="text" id="age_display" readonly style="background:#f1f5f9; color:#64748b;"
+                placeholder="คำนวณอัตโนมัติ">
+            </div>
+            <div class="col">
+              <label>เพศ</label>
+              <select id="gender" name="gender">
+                <option value="">-- เลือก --</option>
+                <option value="ชาย" {{ if eq .Loan.Gender "ชาย" }}selected{{ end }}>ชาย</option>
+                <option value="หญิง" {{ if eq .Loan.Gender "หญิง" }}selected{{ end }}>หญิง</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row 5: Mobile Phone & Other Card -->
+          <div class="row">
+            <div class="col">
+              <label for="mobile_phone"><span id="lblMobilePhone">เบอร์โทรศัพท์มือถือ</span> <span
+                  class="text-red">*</span></label>
+              <input type="tel" id="mobile_phone" name="mobile_phone" value="{{ .Loan.MobilePhone }}" maxlength="10"
+                inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)">
+            </div>
+            <div class="col" id="colOtherCard1">
+              <label>บัตรอื่นๆ :</label>
+              <select name="other_card_type" data-default-value="{{ .Loan.OtherCardType }}">
+                <option value="">— เลือก —</option>
+              </select>
+            </div>
+            <div class="col" id="colOtherCard2">
+              <label>เลขบัตร :</label>
+              <input type="text" name="other_card_number" value="{{ .Loan.OtherCardNumber }}" inputmode="numeric"
+                pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+          </div>
+
+          <div class="row" id="rowOtherCardDates">
+            <div class="col">
+              <label>วันออกบัตร :</label>
+              <input type="text" name="other_card_issue_date" class="datepicker-th" placeholder="วัน-เดือน-ปี พ.ศ."
+                readonly="readonly" value="{{ if .Loan.OtherCardIssueDate }}{{ .Loan.OtherCardIssueDate }}{{ end }}">
+            </div>
+            <div class="col">
+              <label>วันบัตรหมดอายุ :</label>
+              <input type="text" name="other_card_expiry_date" class="datepicker-th" placeholder="วัน-เดือน-ปี พ.ศ."
+                readonly="readonly" value="{{ if .Loan.OtherCardExpiryDate }}{{ .Loan.OtherCardExpiryDate }}{{ end }}">
+            </div>
+          </div>
+
+        </div>
+
+        <!-- House Registration Address -->
+        <div class="section" id="secHouseReg">
+          <div class="section-title"><i class="fas fa-home"></i> ที่อยู่ตามทะเบียนบ้าน</div>
+
+          <div class="row">
+            <div class="col">
+              <label>เลขที่ :</label>
+              <input type="text" name="house_reg_no" value="{{ .Loan.HouseRegNo }}">
+            </div>
+            <div class="col">
+              <label>อาคาร/หมู่บ้าน :</label>
+              <input type="text" name="house_reg_building" value="{{ .Loan.HouseRegBuilding }}">
+            </div>
+            <div class="col">
+              <label>ชั้นที่ :</label>
+              <input type="text" name="house_reg_floor" value="{{ .Loan.HouseRegFloor }}">
+            </div>
+            <div class="col">
+              <label>เลขที่ห้อง :</label>
+              <input type="text" name="house_reg_room" value="{{ .Loan.HouseRegRoom }}">
+            </div>
+            <div class="col">
+              <label>หมู่ :</label>
+              <input type="text" name="house_reg_moo" value="{{ .Loan.HouseRegMoo }}">
+            </div>
+            <div class="col">
+              <label>ซอย :</label>
+              <input type="text" name="house_reg_soi" value="{{ .Loan.HouseRegSoi }}">
+            </div>
+            <div class="col">
+              <label>ถนน :</label>
+              <input type="text" name="house_reg_road" value="{{ .Loan.HouseRegRoad }}">
+            </div>
+            <div class="col">
+              <label>จังหวัด :</label>
+              <select name="house_reg_province" data-default-value="{{ .Loan.HouseRegProvince }}">
+                <option value="">— เลือก —</option>
+              </select>
+            </div>
+            <div class="col">
+              <label>อำเภอ/เขต :</label>
+              <select name="house_reg_district" data-default-value="{{ .Loan.HouseRegDistrict }}">
+                <option value="">— เลือก —</option>
+              </select>
+            </div>
+            <div class="col">
+              <label>ตำบล/แขวง :</label>
+              <select name="house_reg_subdistrict" data-default-value="{{ .Loan.HouseRegSubdistrict }}">
+                <option value="">— เลือก —</option>
+              </select>
+            </div>
+            <div class="col">
+              <label>รหัสไปรษณีย์ :</label>
+              <input type="text" name="house_reg_zipcode" value="{{ .Loan.HouseRegZipcode }}" inputmode="numeric"
+                maxlength="5" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+          </div>
+        </div>
+
+        <!-- Current Address -->
+        <div class="section" id="secCurrent">
+          <div class="section-title"><i class="fas fa-map-marker-alt"></i> ที่อยู่ปัจจุบัน</div>
+
+          <div class="checkbox-item" style="margin-bottom: 20px;">
+            <input type="checkbox" id="same_as_house_reg" name="same_as_house_reg" {{ if .Loan.SameAsHouseReg
+              }}checked{{ end }}>
+            <label for="same_as_house_reg" style="margin-bottom:0;">ที่อยู่เดียวกับทะเบียนบ้าน</label>
+          </div>
+          <div id="current_address_fields">
+            <div class="row">
+              <div class="col">
+                <label>บริษัท/ห้างร้าน/นิติบุคคล :</label>
+                <input type="text" name="current_company" value="{{ .Loan.CurrentCompany }}">
+              </div>
+              <div class="col">
+                <label>เลขที่ :</label>
+                <input type="text" name="current_no" value="{{ .Loan.CurrentNo }}">
+              </div>
+              <div class="col">
+                <label>อาคาร/หมู่บ้าน :</label>
+                <input type="text" name="current_building" value="{{ .Loan.CurrentBuilding }}">
+              </div>
+              <div class="col">
+                <label>ชั้นที่ :</label>
+                <input type="text" name="current_floor" value="{{ .Loan.CurrentFloor }}">
+              </div>
+              <div class="col">
+                <label>เลขที่ห้อง :</label>
+                <input type="text" name="current_room" value="{{ .Loan.CurrentRoom }}">
+              </div>
+              <div class="col">
+                <label>หมู่ :</label>
+                <input type="text" name="current_moo" value="{{ .Loan.CurrentMoo }}">
+              </div>
+              <div class="col">
+                <label>ซอย :</label>
+                <input type="text" name="current_soi" value="{{ .Loan.CurrentSoi }}">
+              </div>
+              <div class="col">
+                <label>ถนน :</label>
+                <input type="text" name="current_road" value="{{ .Loan.CurrentRoad }}">
+              </div>
+              <div class="col">
+                <label>จังหวัด :</label>
+                <select name="current_province" data-default-value="{{ .Loan.CurrentProvince }}">
+                  <option value="">— เลือก —</option>
+                </select>
+              </div>
+              <div class="col">
+                <label>อำเภอ/เขต :</label>
+                <select name="current_district" data-default-value="{{ .Loan.CurrentDistrict }}">
+                  <option value="">— เลือก —</option>
+                </select>
+              </div>
+              <div class="col">
+                <label>ตำบล/แขวง :</label>
+                <select name="current_subdistrict" data-default-value="{{ .Loan.CurrentSubdistrict }}">
+                  <option value="">— เลือก —</option>
+                </select>
+              </div>
+              <div class="col">
+                <label>รหัสไปรษณีย์ :</label>
+                <input type="text" name="current_zipcode" value="{{ .Loan.CurrentZipcode }}" inputmode="numeric"
+                  maxlength="5" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ข้อมูลที่ทำงาน -->
+        <div class="section" id="secWork">
+          <div class="section-title"><i class="fas fa-briefcase"></i> ข้อมูลที่ทำงาน</div>
+
+          <div class="row">
+            <div class="col">
+              <label>ชื่อบริษัท :</label>
+              <input type="text" name="work_company_name" value="{{ .Loan.CompanyName }}">
+            </div>
+            <div class="col">
+              <label>อาชีพ :</label>
+              <select name="occupation" data-default-value="{{ .Loan.Occupation }}">
+                <option value="">— เลือก —</option>
+              </select>
+            </div>
+            <div class="col">
+              <label>ตำแหน่ง :</label>
+              <input type="text" name="position" value="{{ .Loan.Position }}">
+            </div>
+            <div class="col">
+              <label>เงินเดือน :</label>
+              <input type="text" name="salary" value="{{ .Loan.Salary }}" onblur="formatCurrency(this)"
+                onfocus="removeCommas(this)">
+            </div>
+            <div class="col">
+              <label>รายได้อื่นๆ :</label>
+              <input type="text" name="other_income" value="{{ .Loan.OtherIncome }}" onblur="formatCurrency(this)"
+                onfocus="removeCommas(this)">
+            </div>
+            <div class="col">
+              <label>แหล่งที่มา :</label>
+              <input type="text" name="income_source" value="{{ .Loan.IncomeSource }}">
+            </div>
+          </div>
+
+          <!-- Work Address -->
+          <div style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+            <label
+              style="font-weight:600; color:var(--navy); margin-bottom:15px; display:block;">ที่อยู่ที่ทำงาน</label>
+            <div class="row">
+              <div class="col">
+                <label>เลขที่ :</label>
+                <input type="text" name="work_no" value="{{ .Loan.WorkNo }}">
+              </div>
+              <div class="col">
+                <label>อาคาร/หมู่บ้าน :</label>
+                <input type="text" name="work_building" value="{{ .Loan.WorkBuilding }}">
+              </div>
+              <div class="col">
+                <label>ชั้นที่ :</label>
+                <input type="text" name="work_floor" value="{{ .Loan.WorkFloor }}">
+              </div>
+              <div class="col">
+                <label>เลขที่ห้อง :</label>
+                <input type="text" name="work_room" value="{{ .Loan.WorkRoom }}">
+              </div>
+              <div class="col">
+                <label>หมู่ :</label>
+                <input type="text" name="work_moo" value="{{ .Loan.WorkMoo }}">
+              </div>
+              <div class="col">
+                <label>ซอย :</label>
+                <input type="text" name="work_soi" value="{{ .Loan.WorkSoi }}">
+              </div>
+              <div class="col">
+                <label>ถนน :</label>
+                <input type="text" name="work_road" value="{{ .Loan.WorkRoad }}">
+              </div>
+              <div class="col">
+                <label>จังหวัด :</label>
+                <select name="work_province" data-default-value="{{ .Loan.WorkProvince }}">
+                  <option value="">— เลือก —</option>
+                </select>
+              </div>
+              <div class="col">
+                <label>อำเภอ/เขต :</label>
+                <select name="work_district" data-default-value="{{ .Loan.WorkDistrict }}">
+                  <option value="">— เลือก —</option>
+                </select>
+              </div>
+              <div class="col">
+                <label>ตำบล/แขวง :</label>
+                <select name="work_subdistrict" data-default-value="{{ .Loan.WorkSubdistrict }}">
+                  <option value="">— เลือก —</option>
+                </select>
+              </div>
+              <div class="col">
+                <label>รหัสไปรษณีย์ :</label>
+                <input type="text" name="work_zipcode" value="{{ .Loan.WorkZipcode }}" inputmode="numeric" maxlength="5"
+                  pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>เบอร์โทรศัพท์ที่ทำงาน :</label>
+                <input type="tel" name="work_phone" value="{{ .Loan.WorkPhone }}" inputmode="numeric" pattern="[0-9]*"
+                  oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Document Delivery Address -->
+        <div class="section" id="secDocDelivery">
+          <div class="section-title"><i class="fas fa-envelope"></i> ที่อยู่จัดส่งเอกสาร</div>
+          <div class="row">
+            <div class="col full-width">
+              <div class="radio-group" style="margin-bottom: 20px;">
+                <div class="radio-item">
+                  <input type="radio" name="doc_delivery_type" value="house_reg" id="doc_house_reg" {{ if eq
+                    .Loan.DocDeliveryType "house_reg" }}checked{{ end }}>
+                  <label for="doc_house_reg">ตามทะเบียนบ้าน</label>
+                </div>
+                <div class="radio-item">
+                  <input type="radio" name="doc_delivery_type" value="current" id="doc_current" {{ if eq
+                    .Loan.DocDeliveryType "current" }}checked{{ end }}>
+                  <label for="doc_current">ตามที่อยู่ปัจจุบัน</label>
+                </div>
+                <div class="radio-item">
+                  <input type="radio" name="doc_delivery_type" value="work" id="doc_work" {{ if eq
+                    .Loan.DocDeliveryType "work" }}checked{{ end }}>
+                  <label for="doc_work">ที่ทำงาน</label>
+                </div>
+                <div class="radio-item">
+                  <input type="radio" name="doc_delivery_type" value="other" id="doc_other" {{ if eq
+                    .Loan.DocDeliveryType "other" }}checked{{ end }}>
+                  <label for="doc_other">อื่นๆ</label>
+                </div>
+              </div>
+              <div class="error-container"></div>
+            </div>
+          </div>
+
+          <div id="doc_address_fields" style="display:none;">
+            <!-- Hidden by default, show if 'other' is selected or maybe just show all if we want manual entry always available? Let's hide initially and use JS to toggle or populate? User request was just 'add data entry', providing fields is safest. I will show them. -->
+            <div class="row">
+              <div class="col">
+                <label>เลขที่ :</label>
+                <input type="text" name="doc_no" value="{{ .Loan.DocNo }}">
+              </div>
+              <div class="col">
+                <label>อาคาร/หมู่บ้าน :</label>
+                <input type="text" name="doc_building" value="{{ .Loan.DocBuilding }}">
+              </div>
+              <div class="col">
+                <label>ชั้นที่ :</label>
+                <input type="text" name="doc_floor" value="{{ .Loan.DocFloor }}">
+              </div>
+              <div class="col">
+                <label>เลขที่ห้อง :</label>
+                <input type="text" name="doc_room" value="{{ .Loan.DocRoom }}">
+              </div>
+              <div class="col">
+                <label>หมู่ :</label>
+                <input type="text" name="doc_moo" value="{{ .Loan.DocMoo }}">
+              </div>
+              <div class="col">
+                <label>ซอย :</label>
+                <input type="text" name="doc_soi" value="{{ .Loan.DocSoi }}">
+              </div>
+              <div class="col">
+                <label>ถนน :</label>
+                <input type="text" name="doc_road" value="{{ .Loan.DocRoad }}">
+              </div>
+              <div class="col">
+                <label>จังหวัด :</label>
+                <select name="doc_province" data-default-value="{{ .Loan.DocProvince }}">
+                  <option value="">— เลือก —</option>
+                </select>
+              </div>
+              <div class="col">
+                <label>อำเภอ/เขต :</label>
+                <select name="doc_district" data-default-value="{{ .Loan.DocDistrict }}">
+                  <option value="">— เลือก —</option>
+                </select>
+              </div>
+              <div class="col">
+                <label>ตำบล/แขวง :</label>
+                <select name="doc_subdistrict" data-default-value="{{ .Loan.DocSubdistrict }}">
+                  <option value="">— เลือก —</option>
+                </select>
+              </div>
+              <div class="col">
+                <label>รหัสไปรษณีย์ :</label>
+                <input type="text" name="doc_zipcode" value="{{ .Loan.DocZipcode }}" inputmode="numeric" maxlength="5"
+                  pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+              </div>
+            </div>
+          </div>
+          <!-- For now, I will remove the display:none and let it be always visible or handle logic later. Just making fields available is the request. -->
+
+        </div>
+
+        <!-- ข้อมูลเครดิตบูโร -->
+        <div class="section" id="secCreditBureau">
+          <div class="section-title"><i class="fas fa-credit-card"></i> ข้อมูลเครดิตบูโร</div>
+          <div class="row">
+            <div class="col">
+              <label>ตรวจเครดิตบูโร :</label>
+              <div class="radio-group">
+                <div class="radio-item">
+                  <input type="radio" name="credit_bureau_status" value="found" id="credit1" {{ if eq
+                    .Loan.CreditBureauStatus "found" }}checked{{ end }}>
+                  <label for="credit1">พบ</label>
+                </div>
+                <div class="radio-item">
+                  <input type="radio" name="credit_bureau_status" value="not_found" id="credit2" {{ if eq
+                    .Loan.CreditBureauStatus "not_found" }}checked{{ end }}>
+                  <label for="credit2">ไม่พบ</label>
+                </div>
+              </div>
+              <div class="error-container"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ปุ่มย้อนกลับ + ถัดไป -->
+        <div class="btn-group">
+          <button type="submit" class="btn-next">
+            <i class="fas fa-arrow-right"></i> ถัดไป
+          </button>
+          <a href="/main" class="btn-back" style="text-decoration: none;">
+            <i class="fas fa-arrow-left"></i> ย้อนกลับ
+          </a>
+        </div>
+
+      </form>
+    </div>
+    <!-- End Form Body -->
+  </div>
+  <!-- End Container -->
+
+  <script>
+    function calculateAge() {
+      const dobInput = document.getElementById('dobInput');
+      const ageDisplay = document.getElementById('ageDisplay');
+
+      if (!dobInput || !dobInput.value) {
+        if (ageDisplay) ageDisplay.textContent = '';
+        return;
+      }
+
+      const dob = new Date(dobInput.value);
+      const today = new Date();
+
+      let age = today.getFullYear() - dob.getFullYear();
+      const m = today.getMonth() - dob.getMonth();
+
+      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+        age--;
+      }
+
+      if (age < 0) age = 0;
+
+      if (ageDisplay) {
+        ageDisplay.textContent = `(อายุ ${age} ปี)`;
+      }
+    }
+
+    // Flatpickr พ.ศ. (ไม่ใช้ altInput)
+    function toggleBorrowerType() {
+      const type = document.querySelector('input[name="borrower_type"]:checked').value;
+      const isJuristic = type === 'juristic';
+
+      // Section Title
+      document.getElementById('secTitleInfo').innerHTML = isJuristic ?
+        '<i class="fas fa-building"></i> ข้อมูลนิติบุคคล' :
+        '<i class="fas fa-id-card"></i> ข้อมูลส่วนตัว';
+
+      // Update Title Options
+      if (typeof updateTitleOptions === 'function') {
+        updateTitleOptions(isJuristic);
+      }
+
+      // Name Fields
+      // Individual
+      const colFirst = document.getElementById('colFirstName');
+      const colLast = document.getElementById('colLastName');
+      const colCompany = document.getElementById('colCompanyName');
+
+      if (colFirst) {
+        colFirst.style.display = isJuristic ? 'none' : 'block';
+        const inp = colFirst.querySelector('input');
+        if (inp) inp.disabled = isJuristic;
+      }
+      if (colLast) {
+        colLast.style.display = isJuristic ? 'none' : 'block';
+        const inp = colLast.querySelector('input');
+        if (inp) inp.disabled = isJuristic;
+      }
+      // Juristic
+      if (colCompany) {
+        colCompany.style.display = isJuristic ? 'block' : 'none';
+        const inp = colCompany.querySelector('input');
+        if (inp) inp.disabled = !isJuristic;
+      }
+
+      // ID Card vs Trade Reg vs Tax ID
+      const colIdCard = document.getElementById('colIdCard');
+      const colTradeReg = document.getElementById('colTradeReg');
+      const colTaxId = document.getElementById('colTaxId');
+
+      if (colIdCard) {
+        colIdCard.style.display = isJuristic ? 'none' : 'block';
+        const inp = colIdCard.querySelector('input');
+        if (inp) inp.disabled = isJuristic;
+      }
+      if (colTradeReg) {
+        colTradeReg.style.display = isJuristic ? 'block' : 'none';
+        const inp = colTradeReg.querySelector('input');
+        if (inp) inp.disabled = !isJuristic;
+      }
+      if (colTaxId) {
+        colTaxId.style.display = isJuristic ? 'block' : 'none';
+        const inp = colTaxId.querySelector('input');
+        if (inp) inp.disabled = !isJuristic;
+      }
+
+      // Dates Labels
+      const lblIssue = document.getElementById('lblIssueDate');
+      const lblExpiry = document.getElementById('lblExpiryDate');
+      if (lblIssue) lblIssue.innerText = isJuristic ? 'วันออกหนังสือรับรอง' : 'วันออกบัตร';
+      if (lblExpiry) lblExpiry.innerText = isJuristic ? 'วันหมดอายุหนังสือรับรอง' : 'วันหมดอายุ';
+
+      document.getElementById('rowRegDate').style.display = isJuristic ? 'grid' : 'none'; // Show Reg Date row
+
+      // Personal Extra (DOB, Age, Gender) - Hide for Juristic
+      const rowPersonal = document.getElementById('rowPersonalExtra');
+      if (rowPersonal) {
+        rowPersonal.style.display = isJuristic ? 'none' : 'grid';
+        // Disable inputs inside
+        const inputs = rowPersonal.querySelectorAll('input, select');
+        inputs.forEach(inp => inp.disabled = isJuristic);
+      }
+
+      // Mobile Phone Label
+      // "In the part of Juristic Person data... change 'Mobile Phone' to 'Phone'"
+      const lblMobile = document.getElementById('lblMobilePhone');
+      if (lblMobile) {
+        lblMobile.innerText = isJuristic ? 'เบอร์โทรศัพท์' : 'เบอร์โทรศัพท์มือถือ';
+      }
+
+      // Hide Other Card Sections if Juristic
+      const colOther1 = document.getElementById('colOtherCard1');
+      const colOther2 = document.getElementById('colOtherCard2');
+      const rowOtherDates = document.getElementById('rowOtherCardDates');
+
+      if (colOther1) colOther1.style.display = isJuristic ? 'none' : 'block';
+      if (colOther2) colOther2.style.display = isJuristic ? 'none' : 'block';
+      if (rowOtherDates) rowOtherDates.style.display = isJuristic ? 'none' : 'grid'; // row class usually flex/grid, but my css assumes block or grid. Let's stick to flex default which row usually is, or just specific style. 'row' is display:flex in many fw.
+      // Wait, let's check css for .row. It is typically grid or flex. If I set 'none', it hides. If 'flex', it shows.
+      // I'll check computed style if possible, but safe is empty string to revert to CSS? or 'flex'.
+      // My row is likely grid or flex. I will use 'flex' for row, and 'block' for col.
+      if (rowOtherDates) rowOtherDates.style.display = isJuristic ? 'none' : 'flex'; // Assuming flex for row
+
+      // Address Headers
+      // We need to change text? Or just hide/show sections?
+      // Requirement: "Address info: if juristic, fill only address according to registration"
+      // We can hide "Work Address" ? "Current Address" ?
+      // Let's hide Work Address if Juristic.
+      // And rename "House Registration" to "Address according to registration"
+
+      const secHouseReg = document.getElementById('secHouseReg');
+      const secCurrent = document.getElementById('secCurrent');
+      const secWork = document.getElementById('secWork');
+
+      if (secHouseReg && secHouseReg.querySelector('.section-title')) {
+        secHouseReg.querySelector('.section-title').innerHTML = isJuristic ?
+          '<i class="fas fa-map-marker-alt"></i> ที่อยู่ตามหนังสือรับรอง' :
+          '<i class="fas fa-home"></i> ที่อยู่ตามทะเบียนบ้าน';
+      }
+
+      // Hide Work Address for Juristic? User said "Fill only address according to registration"
+      // Maybe hide Current and Work?
+      // "In the address info part, if Juristic, adjust to fill ONLY address according to registration" -> Hide others.
+      if (secCurrent) secCurrent.style.display = isJuristic ? 'none' : 'block';
+      if (secWork) secWork.style.display = isJuristic ? 'none' : 'block';
+
+      // Doc Delivery & Credit Bureau
+      const secDocDelivery = document.getElementById('secDocDelivery');
+      const secCreditBureau = document.getElementById('secCreditBureau');
+
+      if (secDocDelivery) secDocDelivery.style.display = isJuristic ? 'none' : 'block';
+      if (secCreditBureau) secCreditBureau.style.display = isJuristic ? 'none' : 'block';
+
+      // Force Doc Delivery to HouseReg if Juristic
+      if (isJuristic) {
+        const radioHouseReg = document.getElementById('doc_house_reg');
+        if (radioHouseReg) radioHouseReg.checked = true;
+        // Also trigger any change event if needed?
+        // toggleDocAddress(); // To ensure fields hidden?
+      }
+
+      // Also validation logic might need adjustment (handled in form submit or basic required attr toggle)
+    }
+
+    // Call on load
+    document.addEventListener('DOMContentLoaded', function () {
+      toggleBorrowerType();
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      showLoading('กำลังโหลดข้อมูล...');
+      const loadPromises = [];
+
+      // Calculate on load
+      calculateAge();
+
+      flatpickr(".datepicker-th", {
+        locale: "th",
+        dateFormat: "Y-m-d", // Store as YYYY-MM-DD (CE)
+        allowInput: false,   // Prevent keyboard
+        altInput: true,      // Show user-friendly format
+        altFormat: "d-m-Y",  // Display as DD-MM-YYYY
+        onChange: function (selectedDates, dateStr, instance) {
+          if (instance.input.id === 'dobInput') {
+            calculateAge();
+          }
+        }
+      });
+
+      flatpickr(".datepicker-past", {
+        locale: "th",
+        dateFormat: "Y-m-d", // Store as YYYY-MM-DD (CE)
+        allowInput: false,   // Prevent keyboard
+        altInput: true,      // Show user-friendly format
+        altFormat: "d-m-Y",  // Display as DD-MM-YYYY
+        maxDate: "today"     // Restrict to past dates
+      });
+
+      // Populate Ethnicity (Race)
+      loadPromises.push(fetch('/api/races')
+        .then(response => response.json())
+        .then(data => {
+          const ethnicitySelect = document.querySelector('select[name="ethnicity"]');
+          if (ethnicitySelect) {
+            data.forEach(item => {
+              const option = document.createElement('option');
+              option.value = item.RaceID; // Use RaceID as value
+              option.textContent = item.RaceName; // Show RaceName
+              if (ethnicitySelect.dataset.defaultValue == item.RaceID) option.selected = true;
+              ethnicitySelect.appendChild(option);
+            });
+          }
+        })
+        .catch(error => console.error('Error loading race data:', error)));
+
+      // Populate Nation (from table nation)
+      loadPromises.push(fetch('/api/nations')
+        .then(response => response.json())
+        .then(data => {
+          const nationalitySelect = document.querySelector('select[name="nationality"]');
+          if (nationalitySelect) {
+            data.forEach(item => {
+              const option = document.createElement('option');
+              option.value = item.NationId; // Use NationId as value
+              option.textContent = item.NationName; // Show NationName
+              if (nationalitySelect.dataset.defaultValue == item.NationId) option.selected = true;
+              nationalitySelect.appendChild(option);
+            });
+          }
+        })
+        .catch(error => console.error('Error loading nationality data:', error)));
+
+      // Populate Religion
+      loadPromises.push(fetch('/api/religions')
+        .then(response => response.json())
+        .then(data => {
+          const religionSelect = document.querySelector('select[name="religion"]');
+          if (religionSelect) {
+            data.forEach(item => {
+              const option = document.createElement('option');
+              option.value = item.ReligionID; // Use ReligionID as value
+              option.textContent = item.ReligionName; // Show ReligionName
+              if (religionSelect.dataset.defaultValue == item.ReligionID) option.selected = true;
+              religionSelect.appendChild(option);
+            });
+          }
+        })
+        .catch(error => console.error('Error loading religion data:', error)));
+
+      // Populate Marital Status
+      loadPromises.push(fetch('/api/situations')
+        .then(response => response.json())
+        .then(data => {
+          const maritalSelect = document.querySelector('select[name="marital_status"]');
+          if (maritalSelect) {
+            data.forEach(item => {
+              const option = document.createElement('option');
+              option.value = item.SituationID; // Use SituationID as value
+              option.textContent = item.SituationName; // Show SituationName
+              if (maritalSelect.dataset.defaultValue == item.SituationID) option.selected = true;
+              maritalSelect.appendChild(option);
+            });
+          }
+        })
+        .catch(error => console.error('Error loading marital status data:', error)));
+
+      // Populate Other Cards
+      loadPromises.push(fetch('/static/data/other_cards.json')
+        .then(response => response.json())
+        .then(data => {
+          const otherCardSelect = document.querySelector('select[name="other_card_type"]');
+          if (otherCardSelect) {
+            data.forEach(item => {
+              const option = document.createElement('option');
+              option.value = item.CardId; // Use CardId as value
+              option.textContent = item.CardName; // Show CardName
+              if (otherCardSelect.dataset.defaultValue == item.CardId) option.selected = true;
+              otherCardSelect.appendChild(option);
+            });
+          }
+        })
+        .catch(error => console.error('Error loading other card data:', error)));
+
+      // Populate Occupation
+      loadPromises.push(fetch('/api/occupations')
+        .then(response => response.json())
+        .then(data => {
+          const occupationSelect = document.querySelector('select[name="occupation"]');
+          if (occupationSelect) {
+            data.forEach(item => {
+              const option = document.createElement('option');
+              option.value = item.OccupyID; // Use OccupyID as value
+              option.textContent = item.OccupyName; // Show OccupyName
+              if (occupationSelect.dataset.defaultValue == item.OccupyID) option.selected = true;
+              occupationSelect.appendChild(option);
+            });
+          }
+        })
+        .catch(error => console.error('Error loading occupation data:', error)));
+
+      // Populate Titles with Caching and Filtering
+      let cachedTitles = [];
+
+      function updateTitleOptions(isJuristic) {
+        const titleSelect = document.querySelector('select[name="title"]');
+        if (!titleSelect) return;
+
+        const currentValue = titleSelect.getAttribute('data-default-value') || titleSelect.value;
+        titleSelect.innerHTML = '<option value="">— เลือก —</option>';
+
+        // Filter titles by TitleType
+        let options = [];
+        if (cachedTitles.length > 0) {
+          if (isJuristic) {
+            options = cachedTitles.filter(t => t.TitleType === 'juristic');
+          } else {
+            options = cachedTitles.filter(t => t.TitleType === 'individual');
+          }
+        }
+
+        // Fallback if no options found
+        if (options.length === 0) {
+          if (isJuristic) {
+            options = [{ TitleName: 'บริษัท' }, { TitleName: 'หจก.' }];
+          } else {
+            options = [{ TitleName: 'นาย' }, { TitleName: 'นาง' }, { TitleName: 'นางสาว' }];
+          }
+        }
+
+        options.forEach(item => {
+          const option = document.createElement('option');
+          option.value = item.TitleName;
+          option.textContent = item.TitleName;
+          if (currentValue === item.TitleName) option.selected = true;
+          titleSelect.appendChild(option);
+        });
+      }
+
+      loadPromises.push(fetch('/api/titles')
+        .then(response => response.json())
+        .then(data => {
+          cachedTitles = data;
+          // Initial update based on current selection
+          const type = document.querySelector('input[name="borrower_type"]:checked')?.value || "individual";
+          updateTitleOptions(type === 'juristic');
+        })
+        .catch(error => console.error('Error loading title data:', error)));
+
+      // Cascading Address Logic
+      let provinces = [], districts = [], subdistricts = [];
+
+      function setupAddressCascading(prefix) {
+        const provinceSelect = document.querySelector(`select[name="${prefix}_province"]`);
+        const districtSelect = document.querySelector(`select[name="${prefix}_district"]`);
+        const subdistrictSelect = document.querySelector(`select[name="${prefix}_subdistrict"]`);
+        const zipcodeInput = document.querySelector(`input[name="${prefix}_zipcode"]`);
+
+        if (!provinceSelect || !districtSelect || !subdistrictSelect || !zipcodeInput) return;
+
+        // Populate Provinces (only if data is ready)
+        const populateProvinces = () => {
+          provinceSelect.innerHTML = '<option value="">— เลือก —</option>';
+          provinces.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.textContent = p.name_th;
+            if (provinceSelect.dataset.defaultValue == p.id) opt.selected = true;
+            provinceSelect.appendChild(opt);
+          });
+          // Trigger change manually if default value exists
+          if (provinceSelect.dataset.defaultValue) {
+            provinceSelect.dispatchEvent(new Event('change'));
+          }
+        };
+
+        // If data is already loaded, populate immediately
+        if (provinces.length > 0) populateProvinces();
+
+        // Province Change
+        provinceSelect.addEventListener('change', function () {
+          const pid = this.value;
+          districtSelect.innerHTML = '<option value="">— เลือก —</option>';
+          subdistrictSelect.innerHTML = '<option value="">— เลือก —</option>';
+          if (!districtSelect.dataset.defaultValue) zipcodeInput.value = '';
+
+          districtSelect.disabled = !pid;
+          subdistrictSelect.disabled = true;
+
+          if (pid) {
+            const filtered = districts.filter(d => d.province_id == pid);
+            filtered.forEach(d => {
+              const opt = document.createElement('option');
+              opt.value = d.id;
+              opt.textContent = d.name_th;
+              if (districtSelect.dataset.defaultValue == d.id) opt.selected = true;
+              districtSelect.appendChild(opt);
+            });
+            districtSelect.disabled = false;
+
+            // Trigger change if default exists
+            if (districtSelect.dataset.defaultValue) {
+              districtSelect.dispatchEvent(new Event('change'));
+            }
+          }
+        });
+
+        // District Change
+        districtSelect.addEventListener('change', function () {
+          const did = this.value;
+          subdistrictSelect.innerHTML = '<option value="">— เลือก —</option>';
+          if (!subdistrictSelect.dataset.defaultValue) zipcodeInput.value = '';
+
+          subdistrictSelect.disabled = !did;
+
+          if (did) {
+            const filtered = subdistricts.filter(s => s.district_id == did);
+            filtered.forEach(s => {
+              const opt = document.createElement('option');
+              opt.value = s.id;
+              opt.textContent = s.name_th;
+              opt.dataset.zip = s.zip_code;
+              if (subdistrictSelect.dataset.defaultValue == s.id) opt.selected = true;
+              subdistrictSelect.appendChild(opt);
+            });
+            subdistrictSelect.disabled = false;
+
+            // Trigger change if default exists
+            if (subdistrictSelect.dataset.defaultValue) {
+              subdistrictSelect.dispatchEvent(new Event('change'));
+            }
+          }
+        });
+
+        // Subdistrict Change
+        subdistrictSelect.addEventListener('change', function () {
+          const selected = this.options[this.selectedIndex];
+          if (selected && selected.dataset.zip) {
+            zipcodeInput.value = selected.dataset.zip;
+          } else {
+            zipcodeInput.value = '';
+          }
+        });
+
+        // Expose populate function to be called after fetch
+        return populateProvinces;
+      }
+
+      // Initialize handlers
+      const updateHouseReg = setupAddressCascading('house_reg');
+      const updateCurrent = setupAddressCascading('current');
+      const updateWork = setupAddressCascading('work');
+      const updateDoc = setupAddressCascading('doc');
+
+      // Load Data (Cache)
+      const cachedData = localStorage.getItem('addressData_v2');
+      if (cachedData) {
+        try {
+          const { provinces: p, districts: d, subdistricts: s } = JSON.parse(cachedData);
+          provinces = p;
+          districts = d;
+          subdistricts = s;
+
+          if (updateHouseReg) updateHouseReg();
+          if (updateCurrent) updateCurrent();
+          if (updateWork) updateWork();
+          if (updateDoc) updateDoc();
+        } catch (e) {
+          console.error('Error parsing cached data', e);
+          localStorage.removeItem('addressData_v2');
+          loadPromises.push(fetchAddressData());
+        }
+      } else {
+        loadPromises.push(fetchAddressData());
+      }
+
+      // Wait for all promises to settle
+      Promise.allSettled(loadPromises).then(() => {
+        hideLoading();
+      });
+
+      function fetchAddressData() {
+        return Promise.all([
+          fetch('/static/data/provinces.json').then(r => r.json()),
+          fetch('/static/data/district.json').then(r => r.json()),
+          fetch('/static/data/sub_districts.json').then(r => r.json())
+        ]).then(([p, d, s]) => {
+          provinces = p;
+          districts = d;
+          subdistricts = s;
+
+          // Save cache
+          localStorage.setItem('addressData_v2', JSON.stringify({ provinces: p, districts: d, subdistricts: s }));
+
+          // Populate all dropdowns now that data is loaded
+          if (updateHouseReg) updateHouseReg();
+          if (updateCurrent) updateCurrent();
+          if (updateWork) updateWork();
+          if (updateDoc) updateDoc();
+        }).catch(err => console.error('Error loading address data:', err));
+      }
+
+      // Address Logic
+      function toggleCurrentAddress() {
+        const isChecked = document.getElementById('same_as_house_reg').checked;
+        const currentAddressFields = document.getElementById('current_address_fields');
+        if (currentAddressFields) {
+          if (isChecked) {
+            currentAddressFields.style.display = 'none';
+          } else {
+            currentAddressFields.style.display = 'block';
+          }
+        }
+      }
+
+      function toggleDocAddress() {
+        const docAddressFields = document.getElementById('doc_address_fields');
+        const docOtherRadio = document.getElementById('doc_other');
+
+        if (docAddressFields && docOtherRadio) {
+          if (docOtherRadio.checked) {
+            docAddressFields.style.display = 'block';
+          } else {
+            docAddressFields.style.display = 'none';
+          }
+        }
+      }
+
+      // Initial state and Event Listeners
+      const sameAsHomeCheckbox = document.getElementById('same_as_house_reg');
+      if (sameAsHomeCheckbox) {
+        sameAsHomeCheckbox.addEventListener('change', toggleCurrentAddress);
+        toggleCurrentAddress(); // Run on load
+      }
+
+      const docRadios = document.querySelectorAll('input[name="doc_delivery_type"]');
+      docRadios.forEach(radio => {
+        radio.addEventListener('change', toggleDocAddress);
+      });
+      toggleDocAddress(); // Run on load
+    });
+
+
+    // ฟังก์ชันตรวจสอบเลขบัตรประชาชน
+    function checkThaiID(id) {
+      if (id.length != 13) return false;
+      let sum = 0;
+      for (let i = 0; i < 12; i++) {
+        sum += parseFloat(id.charAt(i)) * (13 - i);
+      }
+      let check = (11 - sum % 11) % 10;
+      if (check == parseFloat(id.charAt(12))) return true;
+      return false;
+    }
+
+    // Validation 100% ทำงานทันทีทุกช่อง
+    document.querySelector('form').addEventListener('submit', function (e) {
+      let isValid = true;
+      let firstError = null;
+
+      // ล้าง error เก่า
+      document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+      document.querySelectorAll('.error-text').forEach(el => el.remove());
+      document.querySelectorAll('.radio-group').forEach(g => {
+        g.style.border = '';
+        g.style.backgroundColor = '';
+        g.style.padding = '';
+      });
+      document.querySelectorAll('.error-container').forEach(c => c.innerHTML = '');
+
+      const showError = (container, msg) => {
+        isValid = false;
+        if (!firstError) firstError = container;
+
+        // ถ้าเป็น radio ให้แสดงใน .error-container
+        const errorContainer = container.querySelector('.error-container') || container;
+        const err = document.createElement('small');
+        err.className = 'error-text';
+        err.textContent = msg;
+        errorContainer.appendChild(err);
+
+        // ไฮไลต์ radio group
+        const radioGroup = container.querySelector('.radio-group');
+        if (radioGroup) {
+          radioGroup.style.border = '2px solid #dc2626';
+          radioGroup.style.borderRadius = '8px';
+          radioGroup.style.padding = '10px';
+          radioGroup.style.backgroundColor = '#fef2f2';
+        } else {
+          // กรณี input ปกติ
+          const input = container.querySelector('input, select');
+          if (input) input.classList.add('input-error');
+        }
+      };
+
+      const getValue = name => document.querySelector(`[name="${name}"]`)?.value.trim() || '';
+      const getRadio = name => document.querySelector(`[name="${name}"]:checked`);
+
+      // ตรวจทุกช่อง
+      if (!getValue('title')) showError(document.querySelector('[name="title"]').closest('.col'), 'กรุณาเลือกคำนำหน้า');
+      // Validate Juristic vs Individual
+      const borrowerType = document.querySelector('input[name="borrower_type"]:checked')?.value;
+      if (borrowerType === 'individual') {
+        if (!getValue('first_name')) showError(document.querySelector('[name="first_name"]').closest('.col'), 'กรุณากรอกชื่อ');
+        if (!getValue('last_name')) showError(document.querySelector('[name="last_name"]').closest('.col'), 'กรุณากรอกนามสกุล');
+
+        // Work Company Name for Individual
+        // if (!getValue('work_company_name')) showError(document.querySelector('[name="work_company_name"]').closest('.col'), 'กรุณากรอกชื่อบริษัท');
+        // Unsure if work company is mandatory for individual. Previous logic forced it.
+        // Let's assume yes if it was in previous logic.
+        if (!getValue('work_company_name')) showError(document.querySelector('[name="work_company_name"]').closest('.col'), 'กรุณากรอกชื่อบริษัท');
+
+      } else {
+        // Juristic
+        if (!getValue('juristic_company_name')) showError(document.querySelector('[name="juristic_company_name"]').closest('.col'), 'กรุณากรอกชื่อบริษัท/ห้างหุ้นส่วน');
+        if (!getValue('trade_registration_id')) showError(document.querySelector('[name="trade_registration_id"]').closest('.col'), 'กรุณากรอกเลขทะเบียนการค้า');
+        if (!getValue('tax_id')) showError(document.querySelector('[name="tax_id"]').closest('.col'), 'กรุณากรอกเลขประจำตัวผู้เสียภาษี');
+      }
+
+      if (!getValue('occupation')) showError(document.querySelector('[name="occupation"]').closest('.col'), 'กรุณาเลือกอาชีพ');
+      if (!getValue('position')) showError(document.querySelector('[name="position"]').closest('.col'), 'กรุณากรอกตำแหน่ง');
+
+      const salary = getValue('salary').replace(/,/g, '');
+      if (!salary) showError(document.querySelector('[name="salary"]').closest('.col'), 'กรุณากรอกเงินเดือน');
+      else if (isNaN(salary) || Number(salary) <= 0) showError(document.querySelector('[name="salary"]').closest('.col'), 'เงินเดือนต้องมากกว่า 0');
+
+      if (!getRadio('credit_bureau_status')) showError(document.querySelector('[name="credit_bureau_status"]').closest('.col'), 'กรุณาเลือกสถานะเครดิตบูโร');
+
+      if (!isValid) {
+        e.preventDefault();
+        firstError?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        showLoading('กำลังบันทึกและไปหน้าถัดไป...');
+      }
+    });
+
+    // --- Helper Functions for Comma Formatting ---
+    function formatCurrency(input) {
+      let value = input.value.replace(/,/g, '');
+      if (value === '' || isNaN(value)) return;
+      input.value = parseFloat(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function removeCommas(input) {
+      input.value = input.value.replace(/,/g, '');
+    }
+
+    // --- DOMContentLoaded: Format Fields on Load ---
+    document.addEventListener("DOMContentLoaded", function () {
+      const fieldsToFormat = ['salary', 'other_income'];
+      fieldsToFormat.forEach(name => {
+        const el = document.querySelector(`input[name="${name}"]`);
+        if (el && el.value) {
+          formatCurrency(el);
+        }
+      });
+    });
+  </script>
+  <script src="/static/js/thai_datepicker.js"></script>
+</body>
+
+</html>

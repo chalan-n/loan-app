@@ -1,0 +1,22 @@
+[
+    {
+        "insurance_classid": "1",
+        "insurance_classname": "ประกันภัยชั้น 1"
+    },
+    {
+        "insurance_classid": "2",
+        "insurance_classname": "ประกันภัยชั้น 2"
+    },
+    {
+        "insurance_classid": "2+",
+        "insurance_classname": "ประกันภัยชั้น 2+"
+    },
+    {
+        "insurance_classid": "3+",
+        "insurance_classname": "ประกันภัยชั้น 3+"
+    },
+    {
+        "insurance_classid": "3",
+        "insurance_classname": "ประกันภัยชั้น 3"
+    }
+]

@@ -1,0 +1,54 @@
+[
+    {
+        "CarBrandId": "TOYOTA",
+        "CarBrandName": "TOYOTA"
+    },
+    {
+        "CarBrandId": "HONDA",
+        "CarBrandName": "HONDA"
+    },
+    {
+        "CarBrandId": "ISUZU",
+        "CarBrandName": "ISUZU"
+    },
+    {
+        "CarBrandId": "MITSUBISHI",
+        "CarBrandName": "MITSUBISHI"
+    },
+    {
+        "CarBrandId": "NISSAN",
+        "CarBrandName": "NISSAN"
+    },
+    {
+        "CarBrandId": "MAZDA",
+        "CarBrandName": "MAZDA"
+    },
+    {
+        "CarBrandId": "FORD",
+        "CarBrandName": "FORD"
+    },
+    {
+        "CarBrandId": "MG",
+        "CarBrandName": "MG"
+    },
+    {
+        "CarBrandId": "SUZUKI",
+        "CarBrandName": "SUZUKI"
+    },
+    {
+        "CarBrandId": "CHEVROLET",
+        "CarBrandName": "CHEVROLET"
+    },
+    {
+        "CarBrandId": "HYUNDAI",
+        "CarBrandName": "HYUNDAI"
+    },
+    {
+        "CarBrandId": "KIA",
+        "CarBrandName": "KIA"
+    },
+    {
+        "CarBrandId": "SUBARU",
+        "CarBrandName": "SUBARU"
+    }
+]

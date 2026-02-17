@@ -1,0 +1,30 @@
+[
+    {
+        "OccupyID": "1",
+        "OccupyName": "พนักงานบริษัท"
+    },
+    {
+        "OccupyID": "2",
+        "OccupyName": "เจ้าของกิจการ"
+    },
+    {
+        "OccupyID": "3",
+        "OccupyName": "รับจ้างทั่วไป/ฟรีแลนซ์"
+    },
+    {
+        "OccupyID": "4",
+        "OccupyName": "ข้าราชการ/รัฐวิสาหกิจ"
+    },
+    {
+        "OccupyID": "5",
+        "OccupyName": "เกษตรกร"
+    },
+    {
+        "OccupyID": "6",
+        "OccupyName": "ค้าขาย"
+    },
+    {
+        "OccupyID": "99",
+        "OccupyName": "อื่นๆ"
+    }
+]

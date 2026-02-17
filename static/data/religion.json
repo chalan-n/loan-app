@@ -1,0 +1,26 @@
+[
+    {
+        "ReligionID": 1,
+        "ReligionName": "พุทธ"
+    },
+    {
+        "ReligionID": 2,
+        "ReligionName": "อิสลาม"
+    },
+    {
+        "ReligionID": 3,
+        "ReligionName": "คริสต์"
+    },
+    {
+        "ReligionID": 4,
+        "ReligionName": "ฮินดู"
+    },
+    {
+        "ReligionID": 5,
+        "ReligionName": "ซิกข์"
+    },
+    {
+        "ReligionID": 6,
+        "ReligionName": "ไม่นับถือศาสนา"
+    }
+]

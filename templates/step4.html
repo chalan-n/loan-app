@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-name" content="Kanit + Navy">
+  <meta name="theme-color" content="#1e3a8a">
+  <title>สินเชื่อใหม่ - ข้อมูลค้ำประกัน / อื่นๆ</title>
+
+  <!-- Google Font: Kanit -->
+  <link rel="stylesheet" href="/static/css/kanit.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/static/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/custom_loading.css">
+  <script src="/static/js/custom_loading.js"></script>
+  <script src="/static/js/notifications.js"></script>
+
+  <style>
+    :root {
+      --navy: #1e3a8a;
+      --blue: #1e40af;
+      --light: #f8fafc;
+      --border: #e2e8f0;
+      --shadow: 0 10px 25px rgba(30, 58, 138, 0.12);
+      --orange: #fed7aa;
+      --red: #dc2626;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Kanit', sans-serif;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      min-height: 100vh;
+      padding: 5px;
+      color: #1e293b;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0px auto;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid #e0e7ff;
+    }
+
+    /* Top Header - โลโก้บริษัท + ปุ่มออกจากระบบ */
+    .top-header {
+      background: linear-gradient(135deg, var(--navy), #1e40af);
+      color: white;
+      padding: 14px 28px;
+      /* ลด padding เล็กน้อยให้โลโก้ไม่สูงเกินไป */
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* โลโก้บริษัท */
+    .company-logo {
+      height: 48px;
+      /* ปรับขนาดโลโก้ตามต้องการ */
+      width: auto;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+    }
+
+    .company-logo:hover {
+      transform: scale(1.08);
+    }
+
+    .top-header a,
+    .top-header a:hover {
+      text-decoration: none;
+    }
+
+    /* ปุ่มออกจากระบบ (แดงพรีเมียม) */
+    .btn-logout {
+      background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+      border: none;
+      color: white;
+      padding: 12px 26px;
+      border-radius: 50px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);
+      transition: all .35s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-logout i {
+      font-size: 1.4rem;
+    }
+
+    .btn-logout:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 12px 28px rgba(239, 68, 68, 0.5);
+      background: linear-gradient(135deg, #f87171, #ef4444) !important;
+    }
+
+    /* Title Bar - ชื่อชิดซ้าย + ปุ่มชิดขวา (บรรทัดเดียวกัน) */
+    .title-bar {
+      background: linear-gradient(135deg, #1e40af, #1e3a8a);
+      color: white;
+      padding: 22px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0 0 20px 20px;
+    }
+
+    .title-bar a,
+    .title-bar a:hover {
+      text-decoration: none;
+    }
+
+    .main-title {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .main-title .fa-home,
+    .main-title .fa-users {
+      margin-right: 0.5rem;
+    }
+
+    /* Ripple effect ทั้งสองปุ่ม */
+    .btn-logout::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width .6s, height .6s;
+    }
+
+    .btn-logout:active::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .top-header {
+        padding: 14px 20px;
+      }
+
+      .company-logo {
+        height: 42px;
+      }
+
+      .title-bar {
+        flex-direction: column;
+        align-items: center;
+        padding: 24px 24px 32px;
+        text-align: left;
+        gap: 16px;
+      }
+
+      .main-title {
+        font-size: 1.65rem;
+        text-align: left;
+      }
+
+      .btn-add {
+        align-self: flex-end;
+        margin-top: 8px;
+      }
+
+      .btn-add,
+      .btn-logout {
+        padding: 11px 24px;
+        font-size: 1rem;
+      }
+
+      .btn-add i,
+      .btn-logout i {
+        font-size: 1.3rem;
+      }
+
+      .btn-add {
+        align-self: stretch;
+      }
+    }
+
+    /* Notification System */
+    #notificationContainer {
+      z-index: 9999;
+    }
+
+    #notificationBell {
+      cursor: pointer;
+      position: relative;
+    }
+
+    #notificationBell i {
+      color: white;
+      font-size: 2rem;
+    }
+
+    #notifBadge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #dc2626;
+      color: white;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #notifDropdown {
+      position: absolute;
+      right: 40px;
+      width: 380px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid #e2e8f0;
+      max-height: 70vh;
+      overflow: hidden;
+      display: none;
+      z-index: 9999;
+    }
+
+    #notifDropdown .header {
+      padding: 16px;
+      background: var(--navy);
+      color: white;
+      border-radius: 16px 16px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #notifDropdown .header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .close-dropdown {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .close-dropdown:hover {
+      opacity: 1;
+    }
+
+    .btn-clear {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-clear:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-clear:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #notifList {
+      max-height: 60vh;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .notif-item {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .notif-item:hover {
+      background: #f8fafc;
+    }
+
+    .notif-item.unread {
+      background: #eff6ff;
+      font-weight: 600;
+    }
+
+    .notif-item .title {
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+
+    .notif-item .message {
+      font-size: 0.9rem;
+      color: #475569;
+    }
+
+    .notif-item .time {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-top: 6px;
+    }
+
+    /* Realtime Toast */
+    #realtimeToast {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 9999;
+      background: #10b981;
+      color: white;
+      padding: 18px 24px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.5s ease;
+      max-width: 380px;
+      cursor: pointer;
+    }
+
+    #realtimeToast.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    #realtimeToast i {
+      font-size: 2rem;
+      background: rgba(255, 255, 255, 0.2);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-toast {
+      margin-left: auto;
+      cursor: pointer;
+      font-size: 1.4rem;
+      opacity: 0.8;
+    }
+
+    /* Progress Steps */
+    .steps {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 20px;
+      background: var(--light);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: #6b7280;
+      position: relative;
+      flex: 1;
+      z-index: 2;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1rem;
+      z-index: 3;
+      background: #d1d5db;
+      color: #9ca3af;
+      border: 3px solid #e5e7eb;
+      transition: all 0.4s ease;
+      position: relative;
+    }
+
+    .step.active .step-circle {
+      background: var(--navy);
+      color: white;
+      border-color: var(--navy);
+      transform: scale(1.1);
+      box-shadow: 0 0 0 6px rgba(30, 58, 138, 0.2);
+    }
+
+    .step.completed .step-circle {
+      background: var(--blue);
+      color: white;
+      border-color: var(--blue);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(30, 64, 175, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(30, 64, 175, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(30, 64, 175, 0);
+      }
+    }
+
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      width: 100%;
+      height: 4px;
+      background: #d1d5db;
+      z-index: 1;
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+
+    .step.completed:not(:last-child)::after,
+    .step.active:not(:last-child)::after {
+      background: var(--blue);
+      animation: drawLine 1.2s ease-out forwards;
+      transform-origin: left;
+      transform: scaleX(0);
+    }
+
+    @keyframes drawLine {
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    .step.active,
+    .step.completed {
+      color: var(--blue);
+      font-weight: 600;
+    }
+
+    /* Form Body */
+    .form-body {
+      padding: 30px;
+    }
+
+    /* Section */
+    .section {
+      margin-bottom: 32px;
+      padding: 22px;
+      background: var(--light);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-weight: 600;
+      color: var(--navy);
+      font-size: 1.25rem;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 3px solid var(--navy);
+      padding-bottom: 8px;
+    }
+
+    .section-title i {
+      color: var(--navy);
+      font-size: 1.5rem;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(30, 58, 138, 0.1);
+      border-radius: 50%;
+      padding: 6px;
+    }
+
+    /* Row & Col */
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 16px;
+    }
+
+    .col {
+      position: relative;
+    }
+
+    .col.full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Input */
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #374151;
+      font-size: 0.95rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s;
+      background: white;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--navy);
+      box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.15);
+      transform: translateY(-1px);
+    }
+
+    /* Input with search icon */
+    .input-search {
+      position: relative;
+    }
+
+    .input-search input {
+      padding-right: 50px;
+    }
+
+    .input-search .search-icon {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6b7280;
+      font-size: 1.2rem;
+      pointer-events: none;
+    }
+
+    /* Number input */
+    input[type="number"] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    /* Guarantor Card Hover Effect */
+    .guarantor-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .guarantor-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    }
+
+    /* ปุ่มย้อนกลับ & ถัดไป */
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 30px auto 0;
+      flex-wrap: wrap;
+    }
+
+    .btn-group a {
+      text-decoration: none;
+    }
+
+    .btn-back,
+    .btn-next {
+      padding: 18px 40px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1.25rem;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: all .3s;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .12);
+      min-width: 200px;
+    }
+
+    .btn-back {
+      background: #6b7280;
+      color: white;
+    }
+
+    .btn-back:hover {
+      background: #6b7280;
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(30, 58, 138, .4);
+    }
+
+    .btn-next {
+      background: var(--navy);
+      color: white;
+    }
+
+    .btn-next:hover {
+      background: var(--blue);
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(30, 58, 138, .4);
+    }
+
+    .btn-back i,
+    .btn-next i {
+      font-size: 1.4rem;
+      transition: transform .3s;
+    }
+
+    .btn-back:hover i {
+      transform: translateX(-5px);
+    }
+
+    .btn-next:hover i {
+      transform: translateX(5px);
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 16px 12px;
+        font-size: 1.3rem;
+      }
+
+      .header i {
+        font-size: 2.2rem;
+      }
+
+      .steps {
+        padding: 20px 10px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+      }
+
+      .step {
+        min-width: 80px;
+        font-size: 0.8rem;
+      }
+
+      .step-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+      }
+
+      .btn-group {
+        flex-direction: column;
+      }
+
+      .btn-back,
+      .btn-next {
+        width: 100%;
+      }
+    }
+
+    .btn-add-guarantor {
+      background: rgba(30, 58, 138, 0.1);
+      color: var(--navy);
+      border: 1px solid rgba(30, 58, 138, 0.2);
+      padding: 5px 12px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s;
+      box-shadow: none;
+    }
+
+    .btn-add-guarantor:hover {
+      background: rgba(30, 58, 138, 0.2);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="top-header">
+      <a href="/"><img src="/static/images/logoml_white.png" alt="โลโก้บริษัท" class="company-logo"></a>
+      <a href="/logout">
+        <button class="btn-logout" style="display: none;">
+          <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+        </button>
+      </a>
+      <!-- Notification Bell + Toast -->
+      <div id="notificationContainer">
+        <div id="notificationBell">
+          <i class="fas fa-bell fa-2x"></i>
+          <span id="notifBadge" style="display: none;">0</span>
+        </div>
+        <div id="notifDropdown">
+          <div class="header">
+            <h3>ประวัติแจ้งเตือน</h3>
+            <div style="display:flex; gap:10px;">
+              <button id="clearAllNotif" class="btn-clear" disabled
+                onclick="clearAllNotifications()">ล้างประวัติ</button>
+              <button class="close-dropdown" onclick="toggleNotifDropdown()">✕</button>
+            </div>
+          </div>
+          <div id="notifList">
+            <div style="text-align:center;color:#9ca3af;padding:40px;font-size:0.95rem;">ยังไม่มีแจ้งเตือน</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Title -->
+    <div class="title-bar" style="position: relative;">
+      <a href="/main" onclick="showLoading('กำลังกลับสู่หน้าหลัก...');"
+        style="position: absolute; left: 28px; color: white; display: flex; align-items: center; gap: 8px; text-decoration: none;">
+        <i class="fas fa-chevron-left" style="font-size: 1.2rem;"></i> หน้าหลัก
+      </a>
+      <h1 class="main-title"><i class="fas fa-users"></i> ข้อมูลค้ำประกัน / อื่นๆ</h1>
+    </div>
+
+    <div id="realtimeToast" class="toast success" style="top:80px; cursor:pointer;"
+      onclick="this.classList.remove('show')">
+      <i class="fas fa-bell"></i>
+      <div>
+        <div id="toastTitle" style="font-weight:bold;"></div>
+        <div id="toastMsg" style="font-size:0.95rem;opacity:0.9;"></div>
+      </div>
+      <span class="close-toast" onclick="this.parentElement.classList.remove('show')">&times;</span>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="steps">
+      <div class="step completed" {{ if .Loan.ID }}onclick="location.href='/step1?id={{ .Loan.ID }}'"
+        style="cursor:pointer;" {{ end }}>
+        <div class="step-circle">1</div>
+        <div>ผู้เช่าซื้อ</div>
+      </div>
+      <div class="step completed" {{ if .Loan.ID }}onclick="location.href='/step2?id={{ .Loan.ID }}'"
+        style="cursor:pointer;" {{ end }}>
+        <div class="step-circle">2</div>
+        <div>ข้อมูลรถ</div>
+      </div>
+      <div class="step completed" {{ if .Loan.ID }}onclick="location.href='/step3?id={{ .Loan.ID }}'"
+        style="cursor:pointer;" {{ end }}>
+        <div class="step-circle">3</div>
+        <div>ข้อมูลสัญญา</div>
+      </div>
+      <div class="step active" {{ if .Loan.ID }}onclick="location.href='/step4?id={{ .Loan.ID }}'"
+        style="cursor:pointer;" {{ end }}>
+        <div class="step-circle">4</div>
+        <div>ค้ำประกัน/อื่นๆ</div>
+      </div>
+      <div class="step" {{ if .Loan.ID }}onclick="location.href='/step5?id={{ .Loan.ID }}'" style="cursor:pointer;" {{
+        end }}>
+        <div class="step-circle">5</div>
+        <div>ประกันชีวิต</div>
+      </div>
+      <div class="step" {{ if .Loan.ID }}onclick="location.href='/step6?id={{ .Loan.ID }}'" style="cursor:pointer;" {{
+        end }}>
+        <div class="step-circle">6</div>
+        <div>ประกันภัย</div>
+      </div>
+      <div class="step" {{ if .Loan.ID }}onclick="location.href='/step7?id={{ .Loan.ID }}'" style="cursor:pointer;" {{
+        end }}>
+        <div class="step-circle">7</div>
+        <div>หักภาษี ณ ที่จ่าย</div>
+      </div>
+    </div>
+
+    <div class="form-body">
+      <form method="POST" action="/step4" onsubmit="showLoading('กำลังบันทึกและไปหน้าถัดไป...');">
+        <!-- ผู้ค้ำประกัน -->
+        <div class="section">
+          <div class="section-title" style="justify-content: space-between;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <i class="fas fa-user-shield"></i> ผู้ค้ำประกัน
+            </div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <button type="button" id="addGuarantorBtn" class="btn-add-guarantor"
+                  onclick="location.href='/add-guarantor?loan_id={{.Loan.ID}}'">
+                  <i class="fas fa-plus"></i> เพิ่มผู้ค้ำ
+                </button>
+                <label
+                  style="font-size: 1rem; font-weight:normal; display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 0;">
+                  <input type="checkbox" id="no_guarantor" name="no_guarantor" style="width: 18px; height: 18px;" {{ if
+                    .Loan.NoGuarantor }}checked{{ end }}>
+                  ไม่มีผู้ค้ำ
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col full-width">
+              <!-- List of added guarantors (Grid Layout) -->
+              <div
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 10px;">
+                {{ range .Loan.Guarantors }}
+                <div class="guarantor-card"
+                  style="background:white; padding:15px; border-radius:12px; border:1px solid #e5e7eb; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; display:flex; flex-direction:column; gap:10px;">
+                  <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                      <div
+                        style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color:white; width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 4px rgba(30, 64, 175, 0.2);">
+                        <i class="fas fa-user-shield"></i>
+                      </div>
+                      <div>
+                        <div style="font-weight:600; color:#1f2937; font-size: 1rem;">
+                          {{ if eq .GuarantorType "juristic" }}
+                          {{ .Title }} {{ .CompanyName }}
+                          {{ else }}
+                          {{ .Title }}{{ .FirstName }} {{ .LastName }}
+                          {{ end }}
+                        </div>
+                        <div style="font-size:0.85rem; color:#6b7280; display:flex; align-items:center; gap:5px;">
+                          <i class="fas fa-briefcase" style="font-size:0.7rem;"></i> <span class="occupation-label"
+                            data-id="{{ .Occupation }}">รอโหลด...</span>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    style="border-top: 1px solid #f3f4f6; padding-top: 10px; display:flex; justify-content:space-between; align-items:center;">
+                    <span
+                      style="font-size:0.75rem; background:#ecfdf5; color:#047857; padding:2px 8px; border-radius:4px; font-weight:500;">ผู้ค้ำประกัน</span>
+                    <div style="display:flex; gap:24px;">
+                      <button type="button" style="background:none; border:none; color:#3b82f6; cursor:pointer;"
+                        title="แก้ไข"
+                        onclick="location.href='/add-guarantor?loan_id={{ $.Loan.ID }}&guarantor_id={{ .ID }}'">
+                        <i class="fas fa-edit" style="font-size: 1.3rem;"></i>
+                      </button>
+                      <button type="button" style="background:none; border:none; color:#ef4444; cursor:pointer;"
+                        title="ลบ" onclick="deleteGuarantor('{{ .ID }}', '{{ $.Loan.ID }}')">
+                        <i class="fas fa-trash-alt" style="font-size: 1.3rem;"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                {{ else }}
+                <div
+                  style="grid-column: 1 / -1; text-align:center; padding:40px; border:2px dashed #cbd5e1; border-radius:16px; color:#64748b; background:#f8fafc;">
+                  <div
+                    style="background:#e2e8f0; width:60px; height:60px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; margin-bottom:15px;">
+                    <i class="fas fa-user-plus" style="font-size:24px; color:#94a3b8;"></i>
+                  </div>
+                  <div style="font-weight:500; font-size:1rem; margin-bottom:5px;">ยังไม่มีผู้ค้ำประกัน</div>
+                  <div style="font-size:0.875rem; color:#94a3b8;">กดปุ่ม "เพิ่มผู้ค้ำ" ด้านบนเพื่อเพิ่มข้อมูล</div>
+                </div>
+                {{ end }}
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- พนักงาน -->
+        <div class="section">
+          <div class="section-title">
+            <i class="fas fa-user-tie"></i>
+            พนักงาน
+          </div>
+          <div class="row">
+            <div class="col">
+              <label>บริษัท/ผู้ขาย :</label>
+              <div class="input-search">
+                <!-- Hidden ID Field -->
+                <input type="hidden" name="company_seller_id" value="{{ .Loan.CompanySellerID }}">
+                <input type="text" name="company_seller" value="{{ .Loan.CompanySeller }}" placeholder="ค้นหา" readonly
+                  onclick="openSearchModal()" style="cursor:pointer;" />
+                <i class="fas fa-search search-icon" style="pointer-events: auto; cursor: pointer;"
+                  onclick="openSearchModal()"></i>
+              </div>
+            </div>
+
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="col">
+                <label>เงินค่าคอมฯ :</label>
+                <input type="text" name="commission" value="{{ .Loan.Commission }}" oninput="formatMoney(this)"
+                  placeholder="0.00" />
+              </div>
+              <div class="col"></div>
+            </div>
+          </div>
+
+          <!-- ปุ่มย้อนกลับ + ถัดไป -->
+          <div class="btn-group">
+            <button type="submit" class="btn-next">
+              <i class="fas fa-arrow-right"></i> ถัดไป
+            </button>
+            <a href="/step3" class="btn-back" style="text-decoration: none;">
+              <i class="fas fa-arrow-left"></i> ย้อนกลับ
+            </a>
+          </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+
+
+
+  </script>
+  </div>
+  <!-- End Container -->
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const noGuarantorCheckbox = document.getElementById("no_guarantor");
+      const guarantorFields = [
+        "guarantor1_name", "guarantor1_contact",
+        "guarantor2_name", "guarantor2_contact",
+        "guarantor3_name", "guarantor3_contact"
+      ];
+
+      function toggleGuarantors() {
+        if (!noGuarantorCheckbox) return;
+
+        const isChecked = noGuarantorCheckbox.checked;
+        guarantorFields.forEach(name => {
+          const el = document.querySelector(`[name="${name}"]`);
+          if (el) {
+            el.disabled = isChecked;
+            if (isChecked) {
+              if (el.tagName === 'SELECT') el.selectedIndex = 0;
+              else el.value = "";
+              el.classList.add('disabled-input'); // Add styling class if needed
+            } else {
+              el.classList.remove('disabled-input');
+            }
+          }
+          // Also disable search icons/containers if needed?
+          // For now just inputs.
+        });
+      }
+
+      if (noGuarantorCheckbox) {
+        noGuarantorCheckbox.addEventListener("change", toggleGuarantors);
+        toggleGuarantors(); // Run on load
+      }
+
+      // Logic for Add Guarantor Button
+      const row2 = document.getElementById('row_guarantor2');
+      const row3 = document.getElementById('row_guarantor3');
+      const addBtn = document.getElementById('addGuarantorBtn');
+
+      function initGuarantorRows() {
+        if (!row2 || !row3) return;
+
+        // Check if they have values
+        const val2 = document.querySelector('[name="guarantor2_name"]').value.trim();
+        const val3 = document.querySelector('[name="guarantor3_name"]').value.trim();
+
+        // Initial State
+        if (val3 !== "") {
+          row2.style.display = 'grid';
+          row3.style.display = 'grid';
+          addBtn.style.display = 'none'; // Max reached
+        } else if (val2 !== "") {
+          row2.style.display = 'grid';
+          row3.style.display = 'none';
+          addBtn.style.display = 'flex';
+        } else {
+          row2.style.display = 'none';
+          row3.style.display = 'none';
+          addBtn.style.display = 'flex';
+        }
+      }
+
+      if (addBtn) {
+        addBtn.addEventListener('click', function () {
+          if (row2.style.display === 'none') {
+            row2.style.display = 'grid';
+          } else if (row3.style.display === 'none') {
+            row3.style.display = 'grid';
+            addBtn.style.display = 'none';
+          }
+        });
+
+        // Run init
+        initGuarantorRows();
+
+        // Hook into noGuarantor to hide/show button? 
+        // If "No Guarantor" is checked, maybe hide the button?
+        noGuarantorCheckbox.addEventListener('change', function () {
+          if (this.checked) {
+            addBtn.style.display = 'none';
+            // Also hide rows? Or just disable? Existing logic disables inputs.
+            // If we hide rows, we might lose context of "there are 3 disabled inputs".
+            // Let's keep rows as is (visible/hidden based on add) but disabled content.
+            // But button should be hidden.
+          } else {
+            // Restore button state?
+            initGuarantorRows();
+          }
+        });
+        // Initial check
+        if (noGuarantorCheckbox.checked) {
+          addBtn.style.display = 'none';
+        }
+      }
+
+    });
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Fix for Add Guarantor Button Visibility
+      // This overrides any previous broken logic
+      const addBtn = document.getElementById('addGuarantorBtn');
+      const noGuarantorCheckbox = document.getElementById("no_guarantor");
+
+      if (addBtn && noGuarantorCheckbox) {
+        function updateState() {
+          if (noGuarantorCheckbox.checked) {
+            addBtn.style.setProperty('display', 'none', 'important');
+          } else {
+            addBtn.style.setProperty('display', 'flex', 'important');
+          }
+        }
+        noGuarantorCheckbox.addEventListener('change', updateState);
+        // Run immediately to set correct state
+        setTimeout(updateState, 100); // Small delay to ensure other scripts finished
+      }
+    });
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      showLoading('กำลังโหลดข้อมูล...');
+
+      // Auto-uncheck 'No Guarantor' if there are guarantors in the list
+      const guarantorCards = document.querySelectorAll('.guarantor-card');
+      const noGuarantorCheckbox = document.getElementById("no_guarantor");
+
+      if (guarantorCards.length > 0 && noGuarantorCheckbox && noGuarantorCheckbox.checked) {
+        console.log("Guarantors exist, auto-unchecking 'No Guarantor'");
+        noGuarantorCheckbox.checked = false;
+        // Dispatch event to ensure UI updates (enabling buttons etc)
+        noGuarantorCheckbox.dispatchEvent(new Event('change'));
+      }
+
+      // Load Occupation Data and Map IDs to Names
+      fetch('/static/data/occupation.json')
+        .then(response => response.json())
+        .then(data => {
+          const occupationMap = {};
+          data.forEach(item => {
+            occupationMap[item.OccupyID] = item.OccupyName;
+          });
+
+          document.querySelectorAll('.occupation-label').forEach(el => {
+            const id = el.getAttribute('data-id');
+            if (occupationMap[id]) {
+              el.textContent = occupationMap[id];
+            } else {
+              el.textContent = '-';
+            }
+          });
+        })
+        .catch(err => console.error("Error loading occupations:", err))
+        .finally(() => {
+          hideLoading();
+        });
+    });
+  </script>
+  <script>
+    function deleteGuarantor(id, loanId) {
+      if (!confirm('ยืนยันลบผู้ค้ำประกันนี้?')) return;
+
+      // Create a temporary form to submit POST request
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/delete-guarantor';
+
+      const idInput = document.createElement('input');
+      idInput.type = 'hidden';
+      idInput.name = 'id';
+      idInput.value = id;
+      form.appendChild(idInput);
+
+      const loanIdInput = document.createElement('input');
+      loanIdInput.type = 'hidden';
+      loanIdInput.name = 'loan_id';
+      loanIdInput.value = loanId;
+      form.appendChild(loanIdInput);
+
+      document.body.appendChild(form);
+      form.submit();
+    }
+  </script>
+  <!-- Search Modal -->
+  <div id="searchSellerModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-search"></i> ค้นหาบริษัท/ผู้ขาย</h3>
+        <span class="close-modal" onclick="closeSearchModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="search-box">
+          <input type="text" id="sellerSearchInput" placeholder="พิมพ์ชื่อ หรือ รหัสเต๊นท์..."
+            onkeyup="if(event.key === 'Enter') searchSellers()">
+          <button type="button" onclick="searchSellers()"><i class="fas fa-search"></i> ค้นหา</button>
+        </div>
+        <div class="search-results-container">
+          <table class="search-table" id="sellerTable" style="display:none;">
+            <thead>
+              <tr>
+                <th width="15%">รหัส</th>
+                <th>ชื่อบริษัท/ผู้ขาย</th>
+                <th width="15%">เลือก</th>
+              </tr>
+            </thead>
+            <tbody id="sellerList">
+              <!-- Results -->
+            </tbody>
+          </table>
+          <div id="searchPlaceholder" style="text-align:center; padding: 40px; color:#cbd5e1;">
+            <i class="fas fa-store" style="font-size: 3rem; margin-bottom: 10px;"></i>
+            <p>กรอกข้อมูลค้นหาด้านบน</p>
+          </div>
+          <div id="searchLoading" style="display:none; text-align:center; padding: 40px;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--navy);"></i>
+            <p>กำลังค้นหา...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 10% auto;
+      padding: 0;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      animation: slideIn 0.3s ease;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      padding: 20px;
+      background: var(--navy);
+      color: white;
+      border-radius: 16px 16px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .close-modal {
+      color: white;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close-modal:hover {
+      color: #ccc;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .search-box input {
+      flex: 1;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 15px;
+    }
+
+    .search-box button {
+      background: var(--blue);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .search-box button:hover {
+      background: var(--navy);
+    }
+
+    .search-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .search-table th,
+    .search-table td {
+      border-bottom: 1px solid #e2e8f0;
+      padding: 12px;
+      text-align: left;
+    }
+
+    .search-table th {
+      background: #f8fafc;
+      color: #64748b;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .btn-select {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .btn-select:hover {
+      background: #059669;
+    }
+  </style>
+
+  <script>
+    // Modal Logic
+    const modal = document.getElementById("searchSellerModal");
+
+    function openSearchModal() {
+      modal.style.display = "block";
+      document.getElementById("sellerSearchInput").focus();
+    }
+
+    function closeSearchModal() {
+      modal.style.display = "none";
+    }
+
+    window.onclick = function (event) {
+      if (event.target == modal) {
+        closeSearchModal();
+      }
+    }
+
+    // Mock Search Function
+    function searchSellers() {
+      const query = document.getElementById("sellerSearchInput").value;
+      const list = document.getElementById("sellerList");
+      const table = document.getElementById("sellerTable");
+      const placeholder = document.getElementById("searchPlaceholder");
+      const loading = document.getElementById("searchLoading");
+
+      if (!query) {
+        placeholder.style.display = 'block';
+        table.style.display = 'none';
+        return;
+      }
+
+      placeholder.style.display = 'none';
+      table.style.display = 'none';
+      loading.style.display = 'block';
+
+      // Call API
+      fetch('/api/search-showroom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: query })
+      })
+        .then(response => response.json())
+        .then(data => {
+          loading.style.display = 'none';
+          table.style.display = 'table';
+          list.innerHTML = '';
+
+          if (data.error || data.length === 0) {
+            list.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">ไม่พบข้อมูล</td></tr>';
+          } else {
+            data.forEach(item => {
+              const row = document.createElement('tr');
+              // Map backend: showroom_id, showroom_name
+              row.innerHTML = `
+                 <td><span style="background:#e0f2fe; color:#0369a1; padding: 2px 8px; border-radius: 4px; font-size:0.85rem;">${item.showroom_id}</span></td>
+                 <td>${item.showroom_name}</td>
+                 <td><button class="btn-select" onclick="selectSeller('${item.showroom_id}', '${item.showroom_name}')">เลือก</button></td>
+             `;
+              list.appendChild(row);
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          loading.style.display = 'none';
+          table.style.display = 'table';
+          list.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px; color:red;">เกิดข้อผิดพลาดในการค้นหา</td></tr>';
+        });
+    }
+
+    function selectSeller(code, name) {
+      const inputName = document.querySelector('input[name="company_seller"]');
+      const inputId = document.querySelector('input[name="company_seller_id"]');
+
+      if (inputName) inputName.value = name;
+      if (inputId) inputId.value = code;
+
+      closeSearchModal();
+    }
+  </script>
+  <script>
+    function formatMoney(input) {
+      let value = input.value.replace(/,/g, '');
+      if (isNaN(value) || value === '') {
+        // Allow typing, but maybe filter non-digits? 
+        // For simple UX, just let user type, but if they want auto-comma:
+        // logic: split integer and decimal
+        // This simple version just handles integer part mainly or uses Intl
+        // But better:
+        return;
+      }
+
+      // Remove non-digit chars except dot
+      value = value.replace(/[^0-9.]/g, '');
+
+      const parts = value.split('.');
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+      input.value = parts.join('.');
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,22 @@
+[
+    {
+        "CompanyID": "01",
+        "CompanyName": "วิริยะประกันภัย"
+    },
+    {
+        "CompanyID": "02",
+        "CompanyName": "ทิพยประกันภัย"
+    },
+    {
+        "CompanyID": "03",
+        "CompanyName": "กรุงไทยพานิชประกันภัย"
+    },
+    {
+        "CompanyID": "04",
+        "CompanyName": "เมืองไทยประกันภัย"
+    },
+    {
+        "CompanyID": "05",
+        "CompanyName": "กรุงเทพประกันภัย"
+    }
+]

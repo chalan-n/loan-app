@@ -1,0 +1,310 @@
+[
+    {
+        "ProvID": 1,
+        "ProvName": "กรุงเทพมหานคร"
+    },
+    {
+        "ProvID": 2,
+        "ProvName": "สมุทรปราการ"
+    },
+    {
+        "ProvID": 3,
+        "ProvName": "นนทบุรี"
+    },
+    {
+        "ProvID": 4,
+        "ProvName": "ปทุมธานี"
+    },
+    {
+        "ProvID": 5,
+        "ProvName": "พระนครศรีอยุธยา"
+    },
+    {
+        "ProvID": 6,
+        "ProvName": "อ่างทอง"
+    },
+    {
+        "ProvID": 7,
+        "ProvName": "ลพบุรี"
+    },
+    {
+        "ProvID": 8,
+        "ProvName": "สิงห์บุรี"
+    },
+    {
+        "ProvID": 9,
+        "ProvName": "ชัยนาท"
+    },
+    {
+        "ProvID": 10,
+        "ProvName": "สระบุรี"
+    },
+    {
+        "ProvID": 11,
+        "ProvName": "ชลบุรี"
+    },
+    {
+        "ProvID": 12,
+        "ProvName": "ระยอง"
+    },
+    {
+        "ProvID": 13,
+        "ProvName": "จันทบุรี"
+    },
+    {
+        "ProvID": 14,
+        "ProvName": "ตราด"
+    },
+    {
+        "ProvID": 15,
+        "ProvName": "ฉะเชิงเทรา"
+    },
+    {
+        "ProvID": 16,
+        "ProvName": "ปราจีนบุรี"
+    },
+    {
+        "ProvID": 17,
+        "ProvName": "นครนายก"
+    },
+    {
+        "ProvID": 18,
+        "ProvName": "สระแก้ว"
+    },
+    {
+        "ProvID": 19,
+        "ProvName": "นครราชสีมา"
+    },
+    {
+        "ProvID": 20,
+        "ProvName": "บุรีรัมย์"
+    },
+    {
+        "ProvID": 21,
+        "ProvName": "สุรินทร์"
+    },
+    {
+        "ProvID": 22,
+        "ProvName": "ศรีสะเกษ"
+    },
+    {
+        "ProvID": 23,
+        "ProvName": "อุบลราชธานี"
+    },
+    {
+        "ProvID": 24,
+        "ProvName": "ยโสธร"
+    },
+    {
+        "ProvID": 25,
+        "ProvName": "ชัยภูมิ"
+    },
+    {
+        "ProvID": 26,
+        "ProvName": "อำนาจเจริญ"
+    },
+    {
+        "ProvID": 27,
+        "ProvName": "หนองบัวลำภู"
+    },
+    {
+        "ProvID": 28,
+        "ProvName": "ขอนแก่น"
+    },
+    {
+        "ProvID": 29,
+        "ProvName": "อุดรธานี"
+    },
+    {
+        "ProvID": 30,
+        "ProvName": "เลย"
+    },
+    {
+        "ProvID": 31,
+        "ProvName": "หนองคาย"
+    },
+    {
+        "ProvID": 32,
+        "ProvName": "มหาสารคาม"
+    },
+    {
+        "ProvID": 33,
+        "ProvName": "ร้อยเอ็ด"
+    },
+    {
+        "ProvID": 34,
+        "ProvName": "กาฬสินธุ์"
+    },
+    {
+        "ProvID": 35,
+        "ProvName": "สกลนคร"
+    },
+    {
+        "ProvID": 36,
+        "ProvName": "นครพนม"
+    },
+    {
+        "ProvID": 37,
+        "ProvName": "มุกดาหาร"
+    },
+    {
+        "ProvID": 38,
+        "ProvName": "เชียงใหม่"
+    },
+    {
+        "ProvID": 39,
+        "ProvName": "ลำพูน"
+    },
+    {
+        "ProvID": 40,
+        "ProvName": "ลำปาง"
+    },
+    {
+        "ProvID": 41,
+        "ProvName": "อุตรดิตถ์"
+    },
+    {
+        "ProvID": 42,
+        "ProvName": "แพร่"
+    },
+    {
+        "ProvID": 43,
+        "ProvName": "น่าน"
+    },
+    {
+        "ProvID": 44,
+        "ProvName": "พะเยา"
+    },
+    {
+        "ProvID": 45,
+        "ProvName": "เชียงราย"
+    },
+    {
+        "ProvID": 46,
+        "ProvName": "แม่ฮ่องสอน"
+    },
+    {
+        "ProvID": 47,
+        "ProvName": "นครสวรรค์"
+    },
+    {
+        "ProvID": 48,
+        "ProvName": "อุทัยธานี"
+    },
+    {
+        "ProvID": 49,
+        "ProvName": "กำแพงเพชร"
+    },
+    {
+        "ProvID": 50,
+        "ProvName": "ตาก"
+    },
+    {
+        "ProvID": 51,
+        "ProvName": "สุโขทัย"
+    },
+    {
+        "ProvID": 52,
+        "ProvName": "พิษณุโลก"
+    },
+    {
+        "ProvID": 53,
+        "ProvName": "พิจิตร"
+    },
+    {
+        "ProvID": 54,
+        "ProvName": "เพชรบูรณ์"
+    },
+    {
+        "ProvID": 55,
+        "ProvName": "ราชบุรี"
+    },
+    {
+        "ProvID": 56,
+        "ProvName": "กาญจนบุรี"
+    },
+    {
+        "ProvID": 57,
+        "ProvName": "สุพรรณบุรี"
+    },
+    {
+        "ProvID": 58,
+        "ProvName": "นครปฐม"
+    },
+    {
+        "ProvID": 59,
+        "ProvName": "สมุทรสาคร"
+    },
+    {
+        "ProvID": 60,
+        "ProvName": "สมุทรสงคราม"
+    },
+    {
+        "ProvID": 61,
+        "ProvName": "เพชรบุรี"
+    },
+    {
+        "ProvID": 62,
+        "ProvName": "ประจวบคีรีขันธ์"
+    },
+    {
+        "ProvID": 63,
+        "ProvName": "นครศรีธรรมราช"
+    },
+    {
+        "ProvID": 64,
+        "ProvName": "กระบี่"
+    },
+    {
+        "ProvID": 65,
+        "ProvName": "พังงา"
+    },
+    {
+        "ProvID": 66,
+        "ProvName": "ภูเก็ต"
+    },
+    {
+        "ProvID": 67,
+        "ProvName": "สุราษฎร์ธานี"
+    },
+    {
+        "ProvID": 68,
+        "ProvName": "ระนอง"
+    },
+    {
+        "ProvID": 69,
+        "ProvName": "ชุมพร"
+    },
+    {
+        "ProvID": 70,
+        "ProvName": "สงขลา"
+    },
+    {
+        "ProvID": 71,
+        "ProvName": "สตูล"
+    },
+    {
+        "ProvID": 72,
+        "ProvName": "ตรัง"
+    },
+    {
+        "ProvID": 73,
+        "ProvName": "พัทลุง"
+    },
+    {
+        "ProvID": 74,
+        "ProvName": "ปัตตานี"
+    },
+    {
+        "ProvID": 75,
+        "ProvName": "ยะลา"
+    },
+    {
+        "ProvID": 76,
+        "ProvName": "นราธิวาส"
+    },
+    {
+        "ProvID": 77,
+        "ProvName": "บึงกาฬ"
+    }
+]

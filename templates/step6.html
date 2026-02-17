@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-name" content="Kanit + Navy">
+  <meta name="theme-color" content="#1e3a8a">
+  <title>สินเชื่อใหม่ - ข้อมูลประกันภัย</title>
+  <!-- Google Font: Kanit -->
+  <link rel="stylesheet" href="/static/css/kanit.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/static/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/custom_loading.css">
+  <script src="/static/js/custom_loading.js"></script>
+  <script src="/static/js/notifications.js"></script>
+
+  <!-- Flatpickr CSS + ธีมสวยเข้ากับ Navy Theme -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+
+  <!-- Flatpickr JS -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
+  <!-- custom_loading.css already included -->
+  <link rel="stylesheet" href="/static/css/modern_datepicker.css">
+  <style>
+    /* Datepicker Style moved to modern_datepicker.css */
+
+    :root {
+      --navy: #1e3a8a;
+      --blue: #1e40af;
+      --light: #f8fafc;
+      --border: #e2e8f0;
+      --shadow: 0 10px 25px rgba(30, 58, 138, 0.12);
+      --orange: #fed7aa;
+      --red: #dc2626;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Kanit', sans-serif;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      min-height: 100vh;
+      padding: 5px;
+      color: #1e293b;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0px auto;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid #e0e7ff;
+    }
+
+    /* Top Header - โลโก้บริษัท + ปุ่มออกจากระบบ */
+    .top-header {
+      background: linear-gradient(135deg, var(--navy), #1e40af);
+      color: white;
+      padding: 14px 28px;
+      /* ลด padding เล็กน้อยให้โลโก้ไม่สูงเกินไป */
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* โลโก้บริษัท */
+    .company-logo {
+      height: 48px;
+      /* ปรับขนาดโลโก้ตามต้องการ */
+      width: auto;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+    }
+
+    .company-logo:hover {
+      transform: scale(1.08);
+    }
+
+    .top-header a,
+    .top-header a:hover {
+      text-decoration: none;
+    }
+
+    /* ปุ่มออกจากระบบ (แดงพรีเมียม) */
+    .btn-logout {
+      background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+      border: none;
+      color: white;
+      padding: 12px 26px;
+      border-radius: 50px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);
+      transition: all .35s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-logout i {
+      font-size: 1.4rem;
+    }
+
+    .btn-logout:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 12px 28px rgba(239, 68, 68, 0.5);
+      background: linear-gradient(135deg, #f87171, #ef4444) !important;
+    }
+
+    /* Title Bar - ชื่อชิดซ้าย + ปุ่มชิดขวา (บรรทัดเดียวกัน) */
+    .title-bar {
+      background: linear-gradient(135deg, #1e40af, #1e3a8a);
+      color: white;
+      padding: 22px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0 0 20px 20px;
+    }
+
+    .title-bar a,
+    .title-bar a:hover {
+      text-decoration: none;
+    }
+
+    .main-title {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .main-title .fa-home,
+    .main-title .fa-shield-alt {
+      margin-right: 0.5rem;
+    }
+
+    /* Ripple effect ทั้งสองปุ่ม */
+    .btn-logout::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width .6s, height .6s;
+    }
+
+    .btn-logout:active::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .top-header {
+        padding: 14px 20px;
+      }
+
+      .company-logo {
+        height: 42px;
+      }
+
+      .title-bar {
+        flex-direction: column;
+        align-items: center;
+        padding: 24px 24px 32px;
+        text-align: left;
+        gap: 16px;
+      }
+
+      .main-title {
+        font-size: 1.65rem;
+        text-align: left;
+      }
+
+      .btn-add {
+        align-self: flex-end;
+        margin-top: 8px;
+      }
+
+      .btn-add,
+      .btn-logout {
+        padding: 11px 24px;
+        font-size: 1rem;
+      }
+
+      .btn-add i,
+      .btn-logout i {
+        font-size: 1.3rem;
+      }
+
+      .btn-add {
+        align-self: stretch;
+      }
+    }
+
+    /* Notification System */
+    #notificationContainer {
+      z-index: 9999;
+    }
+
+    #notificationBell {
+      cursor: pointer;
+      position: relative;
+    }
+
+    #notificationBell i {
+      color: white;
+      font-size: 2rem;
+    }
+
+    #notifBadge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #dc2626;
+      color: white;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #notifDropdown {
+      position: absolute;
+      right: 40px;
+      width: 380px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid #e2e8f0;
+      max-height: 70vh;
+      overflow: hidden;
+      display: none;
+      z-index: 9999;
+    }
+
+    #notifDropdown .header {
+      padding: 16px;
+      background: var(--navy);
+      color: white;
+      border-radius: 16px 16px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #notifDropdown .header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .close-dropdown {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .close-dropdown:hover {
+      opacity: 1;
+    }
+
+    .btn-clear {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-clear:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-clear:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #notifList {
+      max-height: 60vh;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .notif-item {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .notif-item:hover {
+      background: #f8fafc;
+    }
+
+    .notif-item.unread {
+      background: #eff6ff;
+      font-weight: 600;
+    }
+
+    .notif-item .title {
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+
+    .notif-item .message {
+      font-size: 0.9rem;
+      color: #475569;
+    }
+
+    .notif-item .time {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-top: 6px;
+    }
+
+    /* Realtime Toast */
+    #realtimeToast {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 9999;
+      background: #10b981;
+      color: white;
+      padding: 18px 24px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.5s ease;
+      max-width: 380px;
+      cursor: pointer;
+    }
+
+    #realtimeToast.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    #realtimeToast i {
+      font-size: 2rem;
+      background: rgba(255, 255, 255, 0.2);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-toast {
+      margin-left: auto;
+      cursor: pointer;
+      font-size: 1.4rem;
+      opacity: 0.8;
+    }
+
+    /* Progress Steps */
+    .steps {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 20px;
+      background: var(--light);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: #6b7280;
+      position: relative;
+      flex: 1;
+      z-index: 2;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1rem;
+      z-index: 3;
+      background: #d1d5db;
+      color: #9ca3af;
+      border: 3px solid #e5e7eb;
+      transition: all 0.4s ease;
+      position: relative;
+    }
+
+    .step.active .step-circle {
+      background: var(--navy);
+      color: white;
+      border-color: var(--navy);
+      transform: scale(1.1);
+      box-shadow: 0 0 0 6px rgba(30, 58, 138, 0.2);
+    }
+
+    .step.completed .step-circle {
+      background: var(--blue);
+      color: white;
+      border-color: var(--blue);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(30, 64, 175, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(30, 64, 175, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(30, 64, 175, 0);
+      }
+    }
+
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      width: 100%;
+      height: 4px;
+      background: #d1d5db;
+      z-index: 1;
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+
+    .step.completed:not(:last-child)::after,
+    .step.active:not(:last-child)::after {
+      background: var(--blue);
+      animation: drawLine 1.2s ease-out forwards;
+      transform-origin: left;
+      transform: scaleX(0);
+    }
+
+    @keyframes drawLine {
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    .step.active,
+    .step.completed {
+      color: var(--blue);
+      font-weight: 600;
+    }
+
+    /* Form Body */
+    .form-body {
+      padding: 30px;
+    }
+
+    /* Section */
+    .section {
+      margin-bottom: 32px;
+      padding: 22px;
+      background: var(--light);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-weight: 600;
+      color: var(--navy);
+      font-size: 1.25rem;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 3px solid var(--navy);
+      padding-bottom: 8px;
+    }
+
+    .section-title i {
+      color: var(--navy);
+      font-size: 1.5rem;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(30, 58, 138, 0.1);
+      border-radius: 50%;
+      padding: 6px;
+    }
+
+    /* Row & Col */
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 16px;
+    }
+
+    .col {
+      position: relative;
+    }
+
+    .col.full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Input */
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #374151;
+      font-size: 0.95rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s;
+      background: white;
+      margin-bottom: 15px;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--navy);
+      box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.15);
+      transform: translateY(-1px);
+    }
+
+    input[readonly] {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    /* Info Box */
+    .info-box {
+      background: rgba(30, 58, 138, 0.1);
+      padding: 16px;
+      border-radius: 12px;
+      font-weight: 500;
+      color: var(--navy);
+      margin-bottom: 20px;
+      border-left: 5px solid var(--navy);
+    }
+
+    /* Upload Area */
+    .upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      background: #fafafa;
+      margin-top: 16px;
+    }
+
+    .upload-area label {
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .upload-area input[type="text"] {
+      margin-bottom: 12px;
+      background: #f3f4f6;
+    }
+
+    .upload-btn {
+      background: #e2e8f0;
+      color: #374151;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-block;
+      transition: all 0.3s;
+    }
+
+    .upload-btn:hover {
+      background: #cbd5e1;
+    }
+
+    /* Radio Group */
+    .radio-group {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+    }
+
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.98rem;
+      color: #4b5563;
+    }
+
+    .radio-item input[type="radio"] {
+      accent-color: var(--navy);
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ปุ่มย้อนกลับ & ถัดไป */
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 30px auto 0;
+      flex-wrap: wrap;
+    }
+
+    .btn-group a {
+      text-decoration: none;
+    }
+
+    .btn-back,
+    .btn-next {
+      padding: 18px 40px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1.25rem;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: all .3s;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .12);
+      min-width: 200px;
+    }
+
+    .btn-back {
+      background: #6b7280;
+      color: white;
+    }
+
+    .btn-back:hover {
+      background: #6b7280;
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(30, 58, 138, .4);
+    }
+
+    .btn-next {
+      background: var(--navy);
+      color: white;
+    }
+
+    .btn-next:hover {
+      background: var(--blue);
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(30, 58, 138, .4);
+    }
+
+    .btn-back i,
+    .btn-next i {
+      font-size: 1.4rem;
+      transition: transform .3s;
+    }
+
+    .btn-back:hover i {
+      transform: translateX(-5px);
+    }
+
+    .btn-next:hover i {
+      transform: translateX(5px);
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 16px 12px;
+        font-size: 1.3rem;
+      }
+
+      .header i {
+        font-size: 2.2rem;
+      }
+
+      .steps {
+        padding: 20px 10px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+      }
+
+      .step {
+        min-width: 80px;
+        font-size: 0.8rem;
+      }
+
+      .step-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+      }
+
+      .btn-back,
+      .btn-next {
+        width: 100%;
+      }
+    }
+
+    .input-error {
+      border: 1px solid #dc2626 !important;
+      background-color: #fef2f2;
+    }
+
+    .error-message {
+      color: #dc2626;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <div class="top-header">
+      <a href="/"><img src="/static/images/logoml_white.png" alt="โลโก้บริษัท" class="company-logo"></a>
+      <a href="/logout">
+        <button class="btn-logout" style="display: none;">
+          <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+        </button>
+      </a>
+      <!-- Notification Bell + Toast -->
+      <div id="notificationContainer">
+        <div id="notificationBell">
+          <i class="fas fa-bell fa-2x"></i>
+          <span id="notifBadge" style="display: none;">0</span>
+        </div>
+        <div id="notifDropdown">
+          <div class="header">
+            <h3>ประวัติแจ้งเตือน</h3>
+            <div style="display:flex; gap:10px;">
+              <button id="clearAllNotif" class="btn-clear" disabled
+                onclick="clearAllNotifications()">ล้างประวัติ</button>
+              <button class="close-dropdown" onclick="toggleNotifDropdown()">✕</button>
+            </div>
+          </div>
+          <div id="notifList">
+            <div style="text-align:center;color:#9ca3af;padding:40px;font-size:0.95rem;">ยังไม่มีแจ้งเตือน</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Title -->
+    <div class="title-bar" style="position: relative;">
+      <a href="/main" onclick="showLoading('กำลังกลับสู่หน้าหลัก...');"
+        style="position: absolute; left: 28px; color: white; display: flex; align-items: center; gap: 8px; text-decoration: none;">
+        <i class="fas fa-chevron-left" style="font-size: 1.2rem;"></i> หน้าหลัก
+      </a>
+      <h1 class="main-title"><i class="fas fa-car-crash"></i> ประกันภัย</h1>
+    </div>
+
+    <div id="realtimeToast" class="toast success" style="top:80px; cursor:pointer;"
+      onclick="this.classList.remove('show')">
+      <i class="fas fa-bell"></i>
+      <div>
+        <div id="toastTitle" style="font-weight:bold;"></div>
+        <div id="toastMsg" style="font-size:0.95rem;opacity:0.9;"></div>
+      </div>
+      <span class="close-toast" onclick="this.parentElement.classList.remove('show')">&times;</span>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="steps">
+      <div class="step completed" {{ if .Loan.ID }}onclick="location.href='/step1?id={{ .Loan.ID }}'"
+        style="cursor:pointer;" {{ end }}>
+        <div class="step-circle">1</div>
+        <div>ผู้เช่าซื้อ</div>
+      </div>
+      <div class="step completed" {{ if .Loan.ID }}onclick="location.href='/step2?id={{ .Loan.ID }}'"
+        style="cursor:pointer;" {{ end }}>
+        <div class="step-circle">2</div>
+        <div>ข้อมูลรถ</div>
+      </div>
+      <div class="step completed" {{ if .Loan.ID }}onclick="location.href='/step3?id={{ .Loan.ID }}'"
+        style="cursor:pointer;" {{ end }}>
+        <div class="step-circle">3</div>
+        <div>ข้อมูลสัญญา</div>
+      </div>
+      <div class="step completed" {{ if .Loan.ID }}onclick="location.href='/step4?id={{ .Loan.ID }}'"
+        style="cursor:pointer;" {{ end }}>
+        <div class="step-circle">4</div>
+        <div>ค้ำประกัน/อื่นๆ</div>
+      </div>
+      <div class="step completed" {{ if .Loan.ID }}onclick="location.href='/step5?id={{ .Loan.ID }}'"
+        style="cursor:pointer;" {{ end }}>
+        <div class="step-circle">5</div>
+        <div>ประกันชีวิต</div>
+      </div>
+      <div class="step active" {{ if .Loan.ID }}onclick="location.href='/step6?id={{ .Loan.ID }}'"
+        style="cursor:pointer;" {{ end }}>
+        <div class="step-circle">6</div>
+        <div>ประกันภัย</div>
+      </div>
+      <div class="step" {{ if .Loan.ID }}onclick="location.href='/step7?id={{ .Loan.ID }}'" style="cursor:pointer;" {{
+        end }}>
+        <div class="step-circle">7</div>
+        <div>หักภาษี ณ ที่จ่าย</div>
+      </div>
+    </div>
+
+    <div class="form-body">
+      <form method="POST" action="/step6"
+        onsubmit="if(!validateForm()) return false; showLoading('กำลังบันทึกและไปหน้าถัดไป...');">
+
+        <!-- ข้อมูลรถยนต์ -->
+        <div class="section">
+          <div class="section-title">
+            <i class="fas fa-info-circle"></i>
+            ข้อมูลรถยนต์
+          </div>
+
+          <!-- แสดง 2 บรรทัด + ไอคอน -->
+          <div class="info-box">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+              <i class="fas fa-car" style="color:var(--navy);font-size:1.3rem;"></i>
+              <strong>{{ .Loan.CarBrand }} {{ .Loan.CarModel }} {{ .Loan.CarYear }}</strong>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <i class="fas fa-id-card-alt" style="color:var(--navy);font-size:1.3rem;"></i>
+              <span>{{ .Loan.LicensePlate }} {{ .Loan.LicenseProvince }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+              <i class="fas fa-barcode" style="color:var(--navy);font-size:1.3rem;"></i>
+              <span>เลขถัง : {{ .Loan.CarChassisNo }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+              <i class="fas fa-cogs" style="color:var(--navy);font-size:1.3rem;"></i>
+              <span>เลขเครื่อง : {{ .Loan.CarEngineNo }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ข้อมูลประกันภัย -->
+        <div class="section">
+          <div class="section-title">
+            <i class="fas fa-shield-alt"></i>
+            ข้อมูลประกันภัย
+          </div>
+          <div class="row">
+            <div class="col full-width">
+              <label>ประเภทประกัน :</label>
+              <div class="radio-group">
+                <div class="radio-item">
+                  <input type="radio" name="insurance_type" value="free" id="no" {{ if eq .Loan.CarInsuranceType "free"
+                    }}checked{{ end }}>
+                  <label for="no">แถมประกัน</label>
+                </div>
+                <div class="radio-item">
+                  <input type="radio" name="insurance_type" value="buy" id="with" {{ if or (eq
+                    .Loan.CarInsuranceType "buy" ) (eq .Loan.CarInsuranceType "" ) }}checked{{ end }}>
+                  <label for="with">ซื้อประกัน</label>
+                </div>
+                <div class="radio-item">
+                  <input type="radio" name="insurance_type" value="refinance" id="refinance" {{ if eq
+                    .Loan.CarInsuranceType "refinance" }}checked{{ end }}>
+                  <label for="refinance">ไม่ทำประกัน</label>
+                </div>
+              </div>
+            </div>
+
+            <div id="car_insurance_details">
+              <div class="col">
+                <label>บริษัทประกันภัย</label>
+                <select name="insurance_company" id="insurance_company"
+                  data-default-value="{{ .Loan.CarInsuranceCompany }}">
+                  <option value="">-- กรุณาเลือกบริษัทประกันภัย --</option>
+                  <!-- Generated via JS -->
+                </select>
+              </div>
+              <div class="col">
+                <label>ประกันชั้น</label>
+                <select name="insurance_class" id="insurance_class" data-default-value="{{ .Loan.CarInsuranceClass }}">
+                  <option value="">-- กรุณาเลือก --</option>
+                  <!-- Generated via JS -->
+                </select>
+              </div>
+
+              <div class="row">
+                <div class="col">
+                  <label>วันที่รับแจ้ง</label>
+                  <input type="text" name="notification_date" class="datepicker-th" placeholder="วัน-เดือน-ปี พ.ศ."
+                    value="{{ if .Loan.CarInsuranceNotifyDate }}{{ .Loan.CarInsuranceNotifyDate }}{{ end }}" />
+                </div>
+                <div class="col">
+                  <label>เลขที่รับแจ้ง</label>
+                  <input type="text" name="notification_number" value="{{ .Loan.CarInsuranceNotifyNo }}" />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <label>วันที่เริ่มคุ้มครอง</label>
+                  <input type="text" name="coverage_start_date" class="datepicker-th" placeholder="วัน-เดือน-ปี พ.ศ."
+                    value="{{ if .Loan.CarInsuranceStartDate }}{{ .Loan.CarInsuranceStartDate }}{{ end }}" />
+                </div>
+                <div class="col">
+                  <label>ค่าประกัน :</label>
+                  <input type="text" name="insurance_cost" value="{{ .Loan.CarInsurancePremium }}"
+                    onblur="formatCurrency(this)" onfocus="removeCommas(this)">
+                </div>
+                <div class="col">
+                  <label>ค่าเลี่ยงประกัน :</label>
+                  <input type="text" name="avoidance_fee" value="{{ .Loan.CarInsuranceAvoidanceFee }}"
+                    onblur="formatCurrency(this)" onfocus="removeCommas(this)">
+                </div>
+              </div>
+              <!-- Moved Beginning and Refinance Fee to Step 3 -->
+            </div>
+
+
+            <!-- อัปโหลดเอกสาร -->
+            <div class="section" id="upload_section">
+              <div class="section-title">
+                <i class="fas fa-file-upload"></i>
+                เอกสารที่ต้องอัปโหลด
+              </div>
+
+              <div class="upload-area">
+                <label>ใบรับแจ้งประกันภัยรถยนต์</label>
+
+                <!-- Upload Button -->
+                <div style="text-align: center;">
+                  <input type="file" id="fileInput" style="display:none;" onchange="handleFileUpload(this)" />
+                  <button type="button" class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-cloud-upload-alt"></i> เลือกไฟล์
+                  </button>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div id="uploadLoading" style="display:none; margin-top:15px; text-align:center; color:var(--navy);">
+                  <i class="fas fa-spinner fa-spin fa-2x"></i>
+                  <div style="margin-top:5px; font-size:0.9rem;">กำลังอัปโหลด...</div>
+                </div>
+
+                <!-- File List -->
+                <div id="uploadedFileList" style="margin-top:20px;">
+                  <!-- JS will populate this -->
+                </div>
+                <!-- Hidden input to store file list for form logic if needed -->
+                <input type="hidden" id="existingFiles" value="{{ .Loan.CarInsuranceFile }}">
+              </div>
+            </div>
+
+            <!-- ปุ่มย้อนกลับ + ถัดไป -->
+            <div class="btn-group">
+              <button type="submit" class="btn-next">
+                <i class="fas fa-arrow-right"></i> ถัดไป
+              </button>
+              <a href="/step5" class="btn-back" style="text-decoration: none;">
+                <i class="fas fa-arrow-left"></i> ย้อนกลับ
+              </a>
+            </div>
+          </div>
+      </form>
+    </div>
+
+    <script src="/static/js/thai_datepicker.js"></script>
+
+    <script>
+      // Validation
+      function validateForm() {
+        // const radioRefinance = document.getElementById("refinance");
+        // // If "No Insurance" (refinance) is checked, skip validation?? 
+        // // NO, new requirement says we MUST enter Avoidance Fee for Refinance.
+        // // So we must validate.
+
+        const radioBuy = document.getElementById("with");
+        const radioFree = document.getElementById("no");
+        const radioRefinance = document.getElementById("refinance");
+
+        // Determine Mode
+        let isBuy = radioBuy && radioBuy.checked;
+        let isFree = radioFree && radioFree.checked;
+        let isRefinance = radioRefinance && radioRefinance.checked;
+
+        let isValid = true;
+
+        // Helper to show error
+        const showError = (name, msg) => {
+          const el = document.querySelector(`[name="${name}"]`);
+          if (!el) return;
+
+          // Remove old error
+          const parent = el.closest('.col') || el.parentElement;
+          const existing = parent.querySelector('.error-message');
+          if (existing) existing.remove();
+
+          el.classList.add('input-error');
+          const span = document.createElement('span');
+          span.className = 'error-message';
+          span.textContent = msg;
+          parent.appendChild(span);
+          isValid = false;
+        };
+
+        // Helper to clear error
+        const clearError = (name) => {
+          const el = document.querySelector(`[name="${name}"]`);
+          if (!el) return;
+          el.classList.remove('input-error');
+          const parent = el.closest('.col') || el.parentElement;
+          const existing = parent.querySelector('.error-message');
+          if (existing) existing.remove();
+        };
+
+        // Fields to validate always (unless logic says otherwise)
+        const commonFields = [
+          { name: 'insurance_company', msg: 'กรุณาเลือกบริษัทประกันภัย' },
+          { name: 'insurance_class', msg: 'กรุณาเลือกชั้นประกัน' },
+          { name: 'notification_date', msg: 'กรุณากรอกวันที่รับแจ้ง' },
+          { name: 'notification_number', msg: 'กรุณากรอกเลขที่รับแจ้ง' },
+          { name: 'coverage_start_date', msg: 'กรุณากรอกวันที่เริ่มคุ้มครอง' },
+          { name: 'beginning_amount', msg: 'กรุณากรอก Beginning' },
+          { name: 'refinance_fee', msg: 'กรุณากรอกค่าธรรมเนียม Refinance' }
+        ];
+
+        // If Buy -> Validate Insurance Cost
+        if (isBuy) {
+          commonFields.push({ name: 'insurance_cost', msg: 'กรุณากรอกค่าประกัน' });
+          // Should verify > 0 ? Yes
+        }
+
+        // If Free OR Refinance -> Validate Avoidance Fee
+        if (isFree || isRefinance) {
+          commonFields.push({ name: 'avoidance_fee', msg: 'กรุณากรอกค่าเลี่ยงประกัน' });
+        }
+
+        commonFields.forEach(f => {
+          const el = document.querySelector(`[name="${f.name}"]`);
+          if (el) {
+            const val = el.value.trim();
+
+            // 1. Basic Empty Check
+            if (!val) {
+              showError(f.name, f.msg);
+            }
+            // 2. Additional Value Checks (Optional but good practice)
+            else if (f.name === 'insurance_cost' && isBuy && parseFloat(val.replace(/,/g, '')) <= 0) {
+              showError(f.name, 'ค่าประกันต้องมากกว่า 0');
+            }
+            else if (f.name === 'avoidance_fee' && (isFree || isRefinance) && parseFloat(val.replace(/,/g, '')) <= 0) {
+              showError(f.name, 'ค่าเลี่ยงประกันต้องมากกว่า 0');
+            } else {
+              clearError(f.name);
+            }
+          }
+        });
+
+        // Scroll to first error
+        if (!isValid) {
+          const firstError = document.querySelector('.input-error');
+          if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        return isValid;
+      }
+
+      // คลิกกระดิ่ง
+      document.getElementById('notificationBell').onclick = (e) => {
+        e.stopPropagation();
+        const dropdown = document.getElementById('notifDropdown');
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        notifHistory.forEach(n => n.unread = false);
+        updateNotifList();
+        updateBadge();
+      };
+      document.addEventListener('click', () => document.getElementById('notifDropdown').style.display = 'none');
+      document.getElementById('clearAllNotif').onclick = () => {
+        if (confirm('ล้างประวัติทั้งหมดหรือไม่?')) {
+          notifHistory = [];
+          updateNotifList();
+          updateBadge();
+        }
+      };
+
+      // ทำให้ปุ่ม Upload ทำงาน
+      document.querySelectorAll('.upload-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+          this.nextElementSibling.click();
+        });
+      });
+
+      // Auto-select dropdowns based on data-default-value
+      document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('select[data-default-value]').forEach(select => {
+          const defaultVal = select.dataset.defaultValue;
+          if (defaultVal) {
+            select.value = defaultVal;
+            for (let opts of select.options) {
+              if (opts.value == defaultVal) {
+                opts.selected = true;
+                break;
+              }
+            }
+          }
+        });
+      });
+      // Toggle Car Insurance Fields
+      document.addEventListener("DOMContentLoaded", function () {
+        const radioFree = document.getElementById("no"); // Value: free
+        const radioBuy = document.getElementById("with"); // Value: with
+        const radioRefinance = document.getElementById("refinance"); // Value: refinance
+
+        const detailsDiv = document.getElementById("car_insurance_details");
+        const uploadSection = document.getElementById("upload_section");
+
+        // Fee Fields
+        const inputCost = document.querySelector('input[name="insurance_cost"]');
+        const inputAvoidance = document.querySelector('input[name="avoidance_fee"]');
+
+        function toggleDetails() {
+          // 'refinance' value corresponds to 'ไม่ทำประกัน' label
+          // 'with' = ซื้อ
+          // 'free' = แถม ('no' id but value is free)
+
+          const isRefinance = radioRefinance.checked;
+          const isBuy = radioBuy.checked;
+          const isFree = radioFree.checked;
+
+          // Display Logic: Show details for all? 
+          // Previous logic: if isRefinance (No Insurance) -> Hide details.
+          // BUT new requirement says: 
+          // "If Free OR No Insurance -> Must enter Avoidance Fee".
+          // This implies details section must be VISIBLE even for "No Insurance" if we need to enter Avoidance Fee.
+          // Let's CHECK user request carefully: "ถ้าเลือกแถมซื้อประกันหรือไม่ทำประกัน ต้องกรอกข้อมูลช่องค่าเลี่ยงประกัน"
+          // So "No Insurance" (refinance) DOES need to see the avoidance fee input.
+          // Thus, detailsDiv should only be hidden if we really don't need ANY info, but here we seem to need info in all cases?
+          // Wait, 'step6.html' usually has "Car Insurance Details" block. 
+          // If 'refinance' previously hid everything, we must now SHOW it but restrict fields.
+          // Let's assume we ALWAYS show details now to allow entering fees? 
+          // OR maybe only show fees?
+          // Current HTML structure allows hiding the whole block.
+          // Let's SHOW details block always for now to access the fields, or conditionalize visibility of subsections?
+          // Simpler: Show block always so we can set fees.
+
+          if (detailsDiv) detailsDiv.style.display = "block";
+          if (uploadSection) uploadSection.style.display = "block";
+
+          // Lock/Unlock Logic
+          if (isBuy) {
+            // Case: Buy Insurance (ซื้อ)
+            // - Enter Insurance Cost
+            // - Avoidance Fee ReadOnly (and clear?)
+            if (inputCost) {
+              inputCost.readOnly = false;
+              inputCost.style.backgroundColor = "white";
+            }
+            if (inputAvoidance) {
+              inputAvoidance.readOnly = true;
+              inputAvoidance.style.backgroundColor = "#e5e7eb";
+              inputAvoidance.value = ""; // Clear
+            }
+          } else if (isFree || isRefinance) {
+            // Case: Free (แถม) OR No Insurance (ไม่ทำ)
+            // - Enter Avoidance Fee
+            // - Insurance Cost ReadOnly
+            if (inputCost) {
+              inputCost.readOnly = true;
+              inputCost.style.backgroundColor = "#e5e7eb";
+              inputCost.value = ""; // Clear
+            }
+            if (inputAvoidance) {
+              inputAvoidance.readOnly = false;
+              inputAvoidance.style.backgroundColor = "white";
+            }
+          }
+        }
+
+        if (radioFree && radioBuy && radioRefinance) {
+          toggleDetails();
+          radioFree.addEventListener("change", toggleDetails);
+          radioBuy.addEventListener("change", toggleDetails);
+          radioRefinance.addEventListener("change", toggleDetails);
+        }
+      });
+
+      // Populate Car Insurance Companies and Classes
+      document.addEventListener("DOMContentLoaded", function () {
+        showLoading('กำลังโหลดข้อมูล...');
+        const loadPromises = [];
+
+        // 1. Insurance Companies
+        loadPromises.push(fetch('/api/insucomps')
+          .then(response => response.json())
+          .then(data => {
+            const select = document.getElementById('insurance_company');
+            if (!select) return;
+
+            const defaultVal = select.dataset.defaultValue;
+
+            data.forEach(item => {
+              const option = document.createElement('option');
+              option.value = item.CompanyID;
+              option.textContent = item.CompanyName;
+              if (defaultVal == item.CompanyID) option.selected = true; // Auto-select if matches default
+              select.appendChild(option);
+            });
+          })
+          .catch(err => console.error('Error loading insurance companies:', err)));
+
+        // 2. Insurance Classes
+        loadPromises.push(fetch('/api/insuclasses')
+          .then(response => response.json())
+          .then(data => {
+            const select = document.getElementById('insurance_class');
+            if (!select) return;
+
+            const defaultVal = select.dataset.defaultValue;
+
+            data.forEach(item => {
+              const option = document.createElement('option');
+              option.value = item.insurance_classid;
+              option.textContent = item.insurance_classname;
+              if (defaultVal == item.insurance_classid) option.selected = true;
+              select.appendChild(option);
+            });
+          })
+          .catch(err => console.error('Error loading insurance classes:', err)));
+
+        // Wait for all
+        Promise.allSettled(loadPromises).then(() => {
+          hideLoading();
+        });
+      });
+
+      // --- Change 3: Helper Functions for Comma Formatting ---
+      function formatCurrency(input) {
+        let value = input.value.replace(/,/g, '');
+        if (value === '' || isNaN(value)) return;
+        input.value = parseFloat(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      function removeCommas(input) {
+        input.value = input.value.replace(/,/g, '');
+      }
+
+      // --- Change 4: Submit Handler to Clean Data ---
+      document.querySelector('form').addEventListener('submit', function (e) {
+        // Clean commas from specific fields before submit
+        const fieldsToClean = ['insurance_cost', 'beginning_amount', 'refinance_fee', 'avoidance_fee'];
+        fieldsToClean.forEach(name => {
+          const el = document.querySelector(`input[name="${name}"]`);
+          if (el) removeCommas(el);
+        });
+
+        // Also continue with showLoading if validation passed
+        // Note: the existing inline onsubmit="showLoading..." might conflict or race. 
+        // Best to keep showLoading in the inline onsubmit, but cleaning here. 
+        // Actually, submit event fires before default action. 
+        // If inline onsubmit returns true, form submits.
+        // We just need to modify values.
+      });
+
+      // --- Change 5: Format on Load ---
+      document.addEventListener("DOMContentLoaded", function () {
+        const fieldsToFormat = ['insurance_cost', 'beginning_amount', 'refinance_fee', 'avoidance_fee'];
+        fieldsToFormat.forEach(name => {
+          const el = document.querySelector(`input[name="${name}"]`);
+          if (el && el.value) {
+            formatCurrency(el);
+          }
+        });
+      });
+
+      // --- Change 6: File Upload Logic (Real API) ---
+
+      // Init List on Load
+      document.addEventListener("DOMContentLoaded", function () {
+        const filesStr = document.getElementById('existingFiles').value;
+        if (filesStr) {
+          const files = filesStr.split(',');
+          files.forEach(filename => {
+            if (filename.trim()) addFileToList(filename.trim());
+          });
+        }
+      });
+
+      function addFileToList(filename) {
+        const list = document.getElementById('uploadedFileList');
+        const item = document.createElement('div');
+        item.style.cssText = "background:white; border:1px solid #e2e8f0; padding:10px; border-radius:8px; display:flex; align-items:center; margin-bottom:10px; justify-content:space-between;";
+
+        // File Info
+        const info = document.createElement('div');
+        info.style.display = 'flex';
+        info.style.alignItems = 'center';
+        info.style.gap = '10px';
+        // Extract original name for display (remove prefix LoanID_Timestamp_)
+        const parts = filename.split('_');
+        const displayName = parts.length > 2 ? parts.slice(2).join('_') : filename;
+
+        info.innerHTML = `<i class="fas fa-file-alt" style="color:var(--navy); font-size:1.2rem;"></i> 
+                          <span style="font-weight:500; font-size:0.95rem;">${displayName}</span>`;
+
+        // Actions
+        const actions = document.createElement('div');
+        actions.style.display = 'flex';
+        actions.style.gap = '10px';
+
+        // View
+        const viewBtn = document.createElement('a');
+        viewBtn.href = `/file/${filename}`;
+        viewBtn.target = "_blank";
+        viewBtn.className = "btn-small";
+        viewBtn.style.cssText = "background:var(--sky); color:var(--navy); padding:6px 12px; border-radius:6px; text-decoration:none; font-size:0.85rem; font-weight:600; cursor:pointer;";
+        viewBtn.innerHTML = '<i class="fas fa-eye"></i> ดู';
+
+        // Delete
+        const delBtn = document.createElement('button');
+        delBtn.type = "button";
+        delBtn.style.cssText = "background:#ef4444; color:white; padding:6px 12px; border:none; border-radius:6px; font-size:0.85rem; font-weight:600; cursor:pointer;";
+        delBtn.innerHTML = '<i class="fas fa-trash-alt"></i> ลบ';
+        delBtn.onclick = () => deleteFile(filename, item);
+
+        actions.appendChild(viewBtn);
+        actions.appendChild(delBtn);
+
+        item.appendChild(info);
+        item.appendChild(actions);
+
+        list.appendChild(item);
+      }
+
+      function handleFileUpload(input) {
+        if (!input.files || input.files.length === 0) return;
+
+        const file = input.files[0];
+        const loading = document.getElementById('uploadLoading');
+
+        // Show loading
+        loading.style.display = 'block';
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        fetch('/api/upload-insurance-file', {
+          method: 'POST',
+          body: formData
+        })
+          .then(res => res.json())
+          .then(data => {
+            loading.style.display = 'none';
+            if (data.error) {
+              alert('Upload Failed: ' + data.error);
+            } else {
+              addFileToList(data.filename);
+              input.value = ''; // Reset input
+            }
+          })
+          .catch(err => {
+            loading.style.display = 'none';
+            console.error(err);
+            alert('Upload Error');
+          });
+      }
+
+      function deleteFile(filename, itemElement) {
+        if (!confirm('ต้องการลบไฟล์นี้ใช่หรือไม่?')) return;
+
+        fetch('/api/delete-insurance-file', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: filename })
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.error) {
+              alert('Delete Failed: ' + data.error);
+            } else {
+              itemElement.remove();
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            alert('Delete Error');
+          });
+      }
+    </script>
+</body>
+
+</html>

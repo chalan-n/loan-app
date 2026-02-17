@@ -1,0 +1,50 @@
+[
+    {
+        "ColorID": "1",
+        "ColorName": "ขาว"
+    },
+    {
+        "ColorID": "2",
+        "ColorName": "ดำ"
+    },
+    {
+        "ColorID": "3",
+        "ColorName": "เทา"
+    },
+    {
+        "ColorID": "4",
+        "ColorName": "บรอนซ์เงิน"
+    },
+    {
+        "ColorID": "5",
+        "ColorName": "บรอนซ์ทอง"
+    },
+    {
+        "ColorID": "6",
+        "ColorName": "แดง"
+    },
+    {
+        "ColorID": "7",
+        "ColorName": "น้ำเงิน"
+    },
+    {
+        "ColorID": "8",
+        "ColorName": "เขียว"
+    },
+    {
+        "ColorID": "9",
+        "ColorName": "น้ำตาล"
+    },
+    {
+        "ColorID": "10",
+        "ColorName": "เหลือง"
+    },
+    {
+        "ColorID": "11",
+        "ColorName": "ส้ม"
+    },
+    {
+        "ColorID": "12",
+        "ColorName": "อื่นๆ"
+    }
+]

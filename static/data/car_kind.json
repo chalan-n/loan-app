@@ -1,0 +1,7 @@
+[
+  { "CarKindId": "1", "CarKindName": "รถเก๋ง" },
+  { "CarKindId": "2", "CarKindName": "รถกระบะ" },
+  { "CarKindId": "3", "CarKindName": "รถตู้" },
+  { "CarKindId": "4", "CarKindName": "รถบรรทุก" },
+  { "CarKindId": "5", "CarKindName": "รถจักรยานยนต์" }
+]
