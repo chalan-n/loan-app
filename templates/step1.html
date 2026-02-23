@@ -1399,28 +1399,41 @@
 
   <script>
     function calculateAge() {
-      const dobInput = document.getElementById('dobInput');
-      const ageDisplay = document.getElementById('ageDisplay');
+      const dobInput = document.getElementById('date_of_birth');
+      const ageDisplay = document.getElementById('age_display');
 
       if (!dobInput || !dobInput.value) {
-        if (ageDisplay) ageDisplay.textContent = '';
+        if (ageDisplay) ageDisplay.value = '';
         return;
       }
 
-      const dob = new Date(dobInput.value);
+      // Parse DD-MM-YYYY
+      const parts = dobInput.value.split('-');
+      if (parts.length !== 3) return;
+
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      let year = parseInt(parts[2], 10);
+
+      // Convert Buddhist era to AD
+      if (year > 2400) {
+        year -= 543;
+      }
+
+      const birthDate = new Date(year, month, day);
       const today = new Date();
 
-      let age = today.getFullYear() - dob.getFullYear();
-      const m = today.getMonth() - dob.getMonth();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
 
-      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
         age--;
       }
 
       if (age < 0) age = 0;
 
       if (ageDisplay) {
-        ageDisplay.textContent = `(อายุ ${age} ปี)`;
+        ageDisplay.value = age;
       }
     }
 
@@ -1580,7 +1593,9 @@
         altInput: true,      // Show user-friendly format
         altFormat: "d-m-Y",  // Display as DD-MM-YYYY
         onChange: function (selectedDates, dateStr, instance) {
-          if (instance.input.id === 'dobInput') {
+          if (instance.element.id === 'date_of_birth') {
+            // Update the actual input value first
+            instance.element.value = dateStr;
             calculateAge();
           }
         }
