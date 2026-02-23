@@ -1719,10 +1719,125 @@
       fetchPromises.push(pOccupations);
 
       // 8. Address Data (Provinces/Districts/Subdistricts)
+      let provinces = [], districts = [], subdistricts = [];
+
+      function setupAddressCascading(prefix) {
+        const provinceSelect = document.querySelector(`select[name="${prefix}_province"]`);
+        const districtSelect = document.querySelector(`select[name="${prefix}_district"]`);
+        const subdistrictSelect = document.querySelector(`select[name="${prefix}_subdistrict"]`);
+        const zipcodeInput = document.querySelector(`input[name="${prefix}_zipcode"]`);
+
+        if (!provinceSelect || !districtSelect || !subdistrictSelect || !zipcodeInput) return;
+
+        // Populate Provinces (only if data is ready)
+        const populateProvinces = () => {
+          provinceSelect.innerHTML = '<option value="">— เลือก —</option>';
+          provinces.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.textContent = p.name_th;
+            if (provinceSelect.dataset.defaultValue == p.id) opt.selected = true;
+            provinceSelect.appendChild(opt);
+          });
+          // Trigger change manually if default value exists
+          if (provinceSelect.dataset.defaultValue) {
+            provinceSelect.dispatchEvent(new Event('change'));
+          }
+        };
+
+        // If data is already loaded, populate immediately
+        if (provinces.length > 0) populateProvinces();
+
+        // Province Change
+        provinceSelect.addEventListener('change', function () {
+          const pid = this.value;
+          districtSelect.innerHTML = '<option value="">— เลือก —</option>';
+          subdistrictSelect.innerHTML = '<option value="">— เลือก —</option>';
+          zipcodeInput.value = '';
+          districtSelect.disabled = !pid;
+          subdistrictSelect.disabled = true;
+
+          if (pid) {
+            const filtered = districts.filter(d => d.province_id == pid);
+            filtered.forEach(d => {
+              const opt = document.createElement('option');
+              opt.value = d.id;
+              opt.textContent = d.name_th;
+              if (districtSelect.dataset.defaultValue == d.id) opt.selected = true;
+              districtSelect.appendChild(opt);
+            });
+            if (districtSelect.dataset.defaultValue) {
+              districtSelect.dispatchEvent(new Event('change'));
+            }
+          }
+        });
+
+        // District Change
+        districtSelect.addEventListener('change', function () {
+          const did = this.value;
+          subdistrictSelect.innerHTML = '<option value="">— เลือก —</option>';
+          zipcodeInput.value = '';
+          subdistrictSelect.disabled = !did;
+
+          if (did) {
+            const filtered = subdistricts.filter(s => s.district_id == did);
+            filtered.forEach(s => {
+              const opt = document.createElement('option');
+              opt.value = s.id;
+              opt.textContent = s.name_th;
+              // เก็บ zipcode ไว้ใน dataset
+              opt.dataset.zipcode = s.zip_code;
+              if (subdistrictSelect.dataset.defaultValue == s.id) opt.selected = true;
+              subdistrictSelect.appendChild(opt);
+            });
+            if (subdistrictSelect.dataset.defaultValue) {
+              subdistrictSelect.dispatchEvent(new Event('change'));
+            }
+          }
+        });
+
+        // Subdistrict Change -> Auto Zipcode
+        subdistrictSelect.addEventListener('change', function () {
+          const selectedOption = this.options[this.selectedIndex];
+          if (selectedOption && selectedOption.dataset.zipcode) {
+            zipcodeInput.value = selectedOption.dataset.zipcode;
+            // Clear default value after first load
+            zipcodeInput.dataset.defaultValue = '';
+          } else {
+            zipcodeInput.value = '';
+          }
+        });
+
+        // Expose populate function to be called after fetch
+        return populateProvinces;
+      }
       const pAddress = new Promise((resolve, reject) => {
-        fetchAddressData().then(() => resolve()).catch(() => resolve()); // Resolve anyway to not block entire UI if address fails? 
-        // fetchAddressData logic needs to be Promisified or checking its internal state
-        // Re-implement fetchAddressData to return promise below
+        updateHouseReg = setupAddressCascading('house_reg');
+        updateCurrent = setupAddressCascading('current');
+        updateWork = setupAddressCascading('work');
+        updateDoc = setupAddressCascading('doc');
+
+        const cachedData = localStorage.getItem('addressData_v3');
+        if (cachedData) {
+          try {
+            const { provinces: p, districts: d, subdistricts: s } = JSON.parse(cachedData);
+            provinces = p;
+            districts = d;
+            subdistricts = s;
+
+            if (updateHouseReg) updateHouseReg();
+            if (updateCurrent) updateCurrent();
+            if (updateWork) updateWork();
+            if (updateDoc) updateDoc();
+            resolve();
+          } catch (e) {
+            console.error('Error parsing cached data', e);
+            localStorage.removeItem('addressData_v3');
+            fetchAddressData().then(() => resolve()).catch(() => resolve());
+          }
+        } else {
+          fetchAddressData().then(() => resolve()).catch(() => resolve());
+        }
       });
       fetchPromises.push(pAddress);
 
@@ -1750,8 +1865,8 @@
         districts = d;
         subdistricts = s;
 
-        // Save cache
-        localStorage.setItem('addressData_v2', JSON.stringify({ provinces: p, districts: d, subdistricts: s }));
+        // Save cache (use a different key so it forces a refresh and picks up district_id fix)
+        localStorage.setItem('addressData_v3', JSON.stringify({ provinces: p, districts: d, subdistricts: s }));
 
         // Populate all dropdowns now that data is loaded
         if (typeof updateHouseReg === 'function') updateHouseReg();

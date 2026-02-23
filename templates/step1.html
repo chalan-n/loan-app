@@ -1407,21 +1407,62 @@
         return;
       }
 
-      // Parse DD-MM-YYYY
-      const parts = dobInput.value.split('-');
-      if (parts.length !== 3) return;
+      let year, month, day;
+      
+      // รองรับทั้ง YYYY-MM-DD และ DD-MM-YYYY
+      if (dobInput.value.includes('-')) {
+        const parts = dobInput.value.split('-');
+        if (parts.length === 3) {
+          if (parts[0].length === 4) {
+            // YYYY-MM-DD (format จาก onChange ของ flatpickr)
+            year = parseInt(parts[0], 10);
+            month = parseInt(parts[1], 10) - 1;
+            day = parseInt(parts[2], 10);
+          } else {
+            // DD-MM-YYYY (format จาก input value ปกติ)
+            day = parseInt(parts[0], 10);
+            month = parseInt(parts[1], 10) - 1;
+            year = parseInt(parts[2], 10);
+          }
+        } else {
+          return;
+        }
+      } else if (dobInput.value.includes('/')) {
+        // เผื่อมีการกรอกแบบ DD/MM/YYYY หรือ MM/DD/YYYY
+        const parts = dobInput.value.split('/');
+        if (parts.length === 3) {
+          if (parts[2].length === 4) {
+            day = parseInt(parts[0], 10);
+            month = parseInt(parts[1], 10) - 1;
+            year = parseInt(parts[2], 10);
+          } else {
+            year = parseInt(parts[0], 10);
+            month = parseInt(parts[1], 10) - 1;
+            day = parseInt(parts[2], 10);
+          }
+        } else {
+          return;
+        }
+      } else {
+        return;
+      }
 
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
-      let year = parseInt(parts[2], 10);
-
-      // Convert Buddhist era to AD
+      const today = new Date();
+      
+      // ตรวจสอบว่าเป็น พ.ศ. หรือ ค.ศ.
+      // 1. ถ้าปีเกิน 2400 (เช่น 2520) ลบ 543 ได้เลย
+      // 2. ถ้าได้ 1977 แล้วบวก 543 เป็น 2520 ซึ่งมันเกินปีปัจจุบัน (2026) ถือว่าเป็นปีพุทธศักราช
       if (year > 2400) {
         year -= 543;
+      } else if (year > today.getFullYear()) {
+        // กรณี user กรอกหรือ flatpickr ส่งปี พ.ศ. มาแต่ตัวเลขไม่ถึง 2400 (ซึ่งเป็นไปได้ยาก แต่อาจเกิดจากบั๊กของ picker)
+        // หรือถ้า year ดันเป็นปีที่เกินปีปัจจุบันไปมาก ให้คิดว่าเป็น พ.ศ.
+        if (year - 543 <= today.getFullYear()) {
+          year -= 543;
+        }
       }
 
       const birthDate = new Date(year, month, day);
-      const today = new Date();
 
       let age = today.getFullYear() - birthDate.getFullYear();
       const m = today.getMonth() - birthDate.getMonth();
@@ -1430,7 +1471,10 @@
         age--;
       }
 
-      if (age < 0) age = 0;
+      // ถ้าอายุผิดปกติ (ติดลบ หรือมากกว่า 120) ให้ล้างค่าทิ้ง
+      if (age < 0 || age > 120) {
+        age = '';
+      }
 
       if (ageDisplay) {
         ageDisplay.value = age;
