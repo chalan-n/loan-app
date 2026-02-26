@@ -590,10 +590,20 @@ func Step3Post(c *fiber.Ctx) error {
 
 /* ค้ำประกัน/อื่นๆ */
 func Step4(c *fiber.Ctx) error {
-	loanID := c.Cookies("loan_id")
+	// Support ?id= query param (e.g. redirect back from add_guarantor) or cookie
+	loanID := c.Query("id")
+	if loanID == "" {
+		loanID = c.Cookies("loan_id")
+	} else {
+		// Update cookie so subsequent navigation stays consistent
+		c.Cookie(&fiber.Cookie{
+			Name:  "loan_id",
+			Value: loanID,
+		})
+	}
+
 	var loan models.LoanApplication
 	if loanID != "" {
-		// Force migration to fix 1054 error
 		config.DB.AutoMigrate(&models.Guarantor{})
 		config.DB.Preload("Guarantors").First(&loan, loanID)
 	}
