@@ -604,8 +604,7 @@ func Step4(c *fiber.Ctx) error {
 
 	var loan models.LoanApplication
 	if loanID != "" {
-		config.DB.AutoMigrate(&models.Guarantor{})
-		config.DB.Preload("Guarantors").First(&loan, loanID)
+		config.DB.Preload("Guarantors", "deleted_at IS NULL").First(&loan, loanID)
 	}
 	return c.Render("step4", fiber.Map{
 		"title": "ขั้นตอน 4",

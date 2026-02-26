@@ -1,11 +1,12 @@
 package models
 
-import "gorm.io/gorm"
-
 type Guarantor struct {
-	gorm.Model
-	LoanID     int32  `json:"loan_id" gorm:"type:int"` // Foreign Key
-	SyncStatus string `json:"sync_status" gorm:"default:'WAITING'"`
+	ID         uint       `gorm:"primarykey" json:"id"`
+	CreatedAt  *LocalTime `json:"created_at"`
+	UpdatedAt  *LocalTime `json:"updated_at"`
+	DeletedAt  *LocalTime `gorm:"index" json:"deleted_at"`
+	LoanID     int32      `json:"loan_id" gorm:"type:int"` // Foreign Key
+	SyncStatus string     `json:"sync_status" gorm:"default:'WAITING'"`
 
 	// Personal Info
 	GuarantorType string `json:"guarantor_type" gorm:"default:'individual'"` // individual, juristic
