@@ -1004,26 +1004,26 @@
           <div class="row" id="rowEthnicity">
             <div class="col">
               <label>เชื้อชาติ</label>
-              <input type="text" name="ethnicity" value="{{ .Loan.Ethnicity }}" placeholder="เช่น ไทย">
+              <select name="ethnicity" data-default-value="{{ .Loan.Ethnicity }}">
+                <option value="">— เลือก —</option>
+              </select>
             </div>
             <div class="col">
               <label>สัญชาติ</label>
-              <input type="text" name="nationality" value="{{ .Loan.Nationality }}" placeholder="เช่น ไทย">
+              <select name="nationality" data-default-value="{{ .Loan.Nationality }}">
+                <option value="">— เลือก —</option>
+              </select>
             </div>
             <div class="col">
               <label>ศาสนา</label>
-              <input type="text" name="religion" value="{{ .Loan.Religion }}" placeholder="เช่น พุทธ">
+              <select name="religion" data-default-value="{{ .Loan.Religion }}">
+                <option value="">— เลือก —</option>
+              </select>
             </div>
             <div class="col">
               <label>สถานภาพ</label>
-              <select name="marital_status">
-                <option value="">-- เลือก --</option>
-                <option value="โสด" {{ if eq .Loan.MaritalStatus "โสด" }}selected{{ end }}>โสด</option>
-                <option value="สมรส" {{ if eq .Loan.MaritalStatus "สมรส" }}selected{{ end }}>สมรส</option>
-                <option value="หม้าย" {{ if eq .Loan.MaritalStatus "หม้าย" }}selected{{ end }}>หม้าย</option>
-                <option value="หย่า" {{ if eq .Loan.MaritalStatus "หย่า" }}selected{{ end }}>หย่า</option>
-                <option value="แยกกันอยู่" {{ if eq .Loan.MaritalStatus "แยกกันอยู่" }}selected{{ end }}>แยกกันอยู่
-                </option>
+              <select name="marital_status" data-default-value="{{ .Loan.MaritalStatus }}">
+                <option value="">— เลือก —</option>
               </select>
             </div>
           </div>
