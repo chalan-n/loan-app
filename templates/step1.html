@@ -1000,6 +1000,34 @@
             </div>
           </div>
 
+          <!-- Row 4.5: Ethnicity, Nationality, Religion, Marital Status -->
+          <div class="row" id="rowEthnicity">
+            <div class="col">
+              <label>เชื้อชาติ</label>
+              <input type="text" name="ethnicity" value="{{ .Loan.Ethnicity }}" placeholder="เช่น ไทย">
+            </div>
+            <div class="col">
+              <label>สัญชาติ</label>
+              <input type="text" name="nationality" value="{{ .Loan.Nationality }}" placeholder="เช่น ไทย">
+            </div>
+            <div class="col">
+              <label>ศาสนา</label>
+              <input type="text" name="religion" value="{{ .Loan.Religion }}" placeholder="เช่น พุทธ">
+            </div>
+            <div class="col">
+              <label>สถานภาพ</label>
+              <select name="marital_status">
+                <option value="">-- เลือก --</option>
+                <option value="โสด" {{ if eq .Loan.MaritalStatus "โสด" }}selected{{ end }}>โสด</option>
+                <option value="สมรส" {{ if eq .Loan.MaritalStatus "สมรส" }}selected{{ end }}>สมรส</option>
+                <option value="หม้าย" {{ if eq .Loan.MaritalStatus "หม้าย" }}selected{{ end }}>หม้าย</option>
+                <option value="หย่า" {{ if eq .Loan.MaritalStatus "หย่า" }}selected{{ end }}>หย่า</option>
+                <option value="แยกกันอยู่" {{ if eq .Loan.MaritalStatus "แยกกันอยู่" }}selected{{ end }}>แยกกันอยู่
+                </option>
+              </select>
+            </div>
+          </div>
+
           <!-- Row 5: Mobile Phone & Other Card -->
           <div class="row">
             <div class="col">
@@ -1408,7 +1436,7 @@
       }
 
       let year, month, day;
-      
+
       // รองรับทั้ง YYYY-MM-DD และ DD-MM-YYYY
       if (dobInput.value.includes('-')) {
         const parts = dobInput.value.split('-');
@@ -1448,7 +1476,7 @@
       }
 
       const today = new Date();
-      
+
       // ตรวจสอบว่าเป็น พ.ศ. หรือ ค.ศ.
       // 1. ถ้าปีเกิน 2400 (เช่น 2520) ลบ 543 ได้เลย
       // 2. ถ้าได้ 1977 แล้วบวก 543 เป็น 2520 ซึ่งมันเกินปีปัจจุบัน (2026) ถือว่าเป็นปีพุทธศักราช
@@ -1554,6 +1582,14 @@
         rowPersonal.style.display = isJuristic ? 'none' : 'grid';
         // Disable inputs inside
         const inputs = rowPersonal.querySelectorAll('input, select');
+        inputs.forEach(inp => inp.disabled = isJuristic);
+      }
+
+      // Ethnicity, Nationality, Religion, Marital Status - Hide for Juristic
+      const rowEthnicity = document.getElementById('rowEthnicity');
+      if (rowEthnicity) {
+        rowEthnicity.style.display = isJuristic ? 'none' : 'grid';
+        const inputs = rowEthnicity.querySelectorAll('input, select');
         inputs.forEach(inp => inp.disabled = isJuristic);
       }
 
