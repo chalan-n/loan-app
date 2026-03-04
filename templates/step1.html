@@ -2427,6 +2427,9 @@
 
       // ── วันเกิด → flatpickr readonly field ────────────────────────
       // Gemini ส่งมา DD/MM/YYYY (ค.ศ.) — แปลงเป็น พ.ศ. สำหรับ flatpickr
+      console.log('[OCR DEBUG] date_of_birth:', JSON.stringify(d.date_of_birth),
+                  'issue_date:', JSON.stringify(d.issue_date),
+                  'expiry_date:', JSON.stringify(d.expiry_date));
       if (d.date_of_birth) setFlatpickrDate('#date_of_birth', d.date_of_birth);
 
       // ── วันออกบัตร / วันหมดอายุ ──────────────────────────────────
@@ -2450,65 +2453,99 @@
      * แปลงปีเป็น พ.ศ. (+543) เพื่อส่งให้ flatpickr ที่ใช้ Thai locale
      */
     function setFlatpickrDate(selector, dateStr) {
+      console.log('[setFlatpickrDate] selector:', selector, 'dateStr:', JSON.stringify(dateStr));
       if (!dateStr) return;
       const el = document.querySelector(selector);
-      if (!el) return;
+      if (!el) { console.warn('[setFlatpickrDate] element not found:', selector); return; }
 
-      // พยายาม parse เผื่อ Gemini ส่ง "DD/MM/YYYY", "DD-MM-YYYY" หรือมีปี พ.ศ.
-      const parts = dateStr.replace(/-/g, '/').split('/');
-      if (parts.length !== 3) return;
+      // ── Parse วันที่ รองรับหลาย format ──────────────────────────────
+      let dd, mm, yyyy;
+      const normalized = dateStr.replace(/-/g, '/').trim();
+      const parts = normalized.split('/');
 
-      const dd = parseInt(parts[0], 10);
-      const mm = parseInt(parts[1], 10) - 1;
-      let yyyy = parseInt(parts[2], 10);
+      if (parts.length === 3) {
+        const p0 = parseInt(parts[0], 10);
+        const p1 = parseInt(parts[1], 10);
+        const p2 = parseInt(parts[2], 10);
 
-      if (isNaN(dd) || isNaN(mm) || isNaN(yyyy)) return;
+        if (parts[0].length === 4) {
+          // YYYY/MM/DD หรือ YYYY-MM-DD
+          yyyy = p0; mm = p1; dd = p2;
+        } else if (parts[2].length === 4) {
+          // DD/MM/YYYY หรือ DD-MM-YYYY
+          dd = p0; mm = p1; yyyy = p2;
+        } else {
+          // fallback: สมมุติ DD/MM/YYYY
+          dd = p0; mm = p1; yyyy = p2;
+        }
+      } else {
+        console.warn('[setFlatpickrDate] cannot parse:', dateStr);
+        return;
+      }
+
+      if (isNaN(dd) || isNaN(mm) || isNaN(yyyy)) {
+        console.warn('[setFlatpickrDate] NaN after parse:', dd, mm, yyyy);
+        return;
+      }
+
+      // mm ใน Date() เริ่มจาก 0
+      const monthIndex = mm - 1;
 
       // ถ้าปีเกิน 2400 ถือว่าเป็น พ.ศ. → แปลงกลับเป็น ค.ศ.
       const ceYear = yyyy > 2400 ? yyyy - 543 : yyyy;
-      const jsDate = new Date(ceYear, mm, dd);
-      if (isNaN(jsDate.getTime())) return;
+      const jsDate = new Date(ceYear, monthIndex, dd);
+      if (isNaN(jsDate.getTime())) {
+        console.warn('[setFlatpickrDate] invalid Date:', ceYear, monthIndex, dd);
+        return;
+      }
 
       const padded = (n) => String(n).padStart(2, '0');
       const beYear = ceYear + 543;
-      const ceStr = `${ceYear}-${padded(mm + 1)}-${padded(dd)}`;        // YYYY-MM-DD ค.ศ. สำหรับ hidden input
-      const beDisplayStr = `${padded(dd)}-${padded(mm + 1)}-${beYear}`; // DD-MM-YYYY พ.ศ. สำหรับ altInput
+      const ceStr = `${ceYear}-${padded(mm)}-${padded(dd)}`;        // YYYY-MM-DD ค.ศ. สำหรับ hidden input
+      const beDisplayStr = `${padded(dd)}-${padded(mm)}-${beYear}`; // DD-MM-YYYY พ.ศ. สำหรับ altInput
+
+      console.log('[setFlatpickrDate] parsed → CE:', ceStr, 'BE display:', beDisplayStr,
+                  'has _flatpickr:', !!el._flatpickr);
 
       // วิธีที่ 1: ผ่าน flatpickr instance (ถ้ามี)
       if (el._flatpickr) {
         try {
           el._flatpickr.setDate(jsDate, true);
-          // Force altInput ให้แสดงปี พ.ศ. เสมอ (กัน instance ที่ formatDate ทำงานผิดพลาด)
+          // Force altInput ให้แสดงปี พ.ศ. เสมอ
           const fpAlt = el._flatpickr.altInput;
           if (fpAlt) {
             fpAlt.removeAttribute('readonly');
             fpAlt.value = beDisplayStr;
             fpAlt.setAttribute('readonly', 'readonly');
           }
+          console.log('[setFlatpickrDate] ✅ set via _flatpickr OK, altInput:', fpAlt?.value);
           // Trigger calculateAge สำหรับ date_of_birth
           if (selector === '#date_of_birth') setTimeout(() => calculateAge(), 50);
           return;
         } catch (e) {
-          console.warn('setFlatpickrDate via _flatpickr failed:', selector, e.message);
+          console.warn('[setFlatpickrDate] _flatpickr.setDate failed:', e.message);
         }
       }
 
       // วิธีที่ 2: ตั้งค่า hidden input (CE) และ altInput (BE) โดยตรง
+      console.log('[setFlatpickrDate] fallback → direct DOM');
       el.removeAttribute('readonly');
       el.value = ceStr;
       el.setAttribute('readonly', 'readonly');
 
-      // หา altInput ที่ flatpickr สร้างให้ (อยู่ถัดจาก original input ใน DOM)
+      // หา altInput ที่ flatpickr สร้างให้
       const altInput = el.nextElementSibling && el.nextElementSibling.classList.contains('flatpickr-input')
         ? el.nextElementSibling
-        : el.parentElement && el.parentElement.querySelector('input.flatpickr-input.flatpickr-alt-input')
-          ? el.parentElement.querySelector('input.flatpickr-input.flatpickr-alt-input')
+        : el.parentElement ? el.parentElement.querySelector('input.flatpickr-input')
           : null;
 
       if (altInput) {
         altInput.removeAttribute('readonly');
         altInput.value = beDisplayStr;
         altInput.setAttribute('readonly', 'readonly');
+        console.log('[setFlatpickrDate] fallback altInput set to:', beDisplayStr);
+      } else {
+        console.warn('[setFlatpickrDate] no altInput found for:', selector);
       }
 
       // Trigger calculateAge สำหรับ date_of_birth
