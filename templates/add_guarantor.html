@@ -934,13 +934,17 @@
           <div class="row">
             <div class="col">
               <label>วันออกบัตร :</label>
-              <input type="text" name="id_card_issue_date" class="datepicker-th" placeholder="วัน-เดือน-ปี พ.ศ."
-                value="{{ if .Guarantor.IdCardIssueDate }}{{ .Guarantor.IdCardIssueDate }}{{ end }}">
+              <div class="input-group">
+                <input type="text" name="id_card_issue_date" class="datepicker-th date-input-icon no-keyboard" placeholder="เลือกวันที่"
+                value="{{ if .Guarantor.IdCardIssueDate }}{{ .Guarantor.IdCardIssueDate }}{{ end }}" readonly>
+              </div>
             </div>
             <div class="col">
               <label>วันบัตรหมดอายุ :</label>
-              <input type="text" name="id_card_expiry_date" class="datepicker-th" placeholder="วัน-เดือน-ปี พ.ศ."
-                value="{{ .Guarantor.IdCardExpiryDate }}">
+              <div class="input-group">
+                <input type="text" name="id_card_expiry_date" class="datepicker-th date-input-icon no-keyboard" placeholder="เลือกวันที่"
+                value="{{ .Guarantor.IdCardExpiryDate }}" readonly>
+              </div>
             </div>
           </div>
 
@@ -948,8 +952,10 @@
           <div class="row" id="rowRegDate" style="display:none;">
             <div class="col">
               <label>วันจดทะเบียน :</label>
-              <input type="text" name="registration_date" class="datepicker-th" placeholder="วัน-เดือน-ปี พ.ศ."
-                value="{{ if .Guarantor.RegistrationDate }}{{ .Guarantor.RegistrationDate }}{{ end }}">
+              <div class="input-group">
+                <input type="text" name="registration_date" class="datepicker-th date-input-icon no-keyboard" placeholder="เลือกวันที่"
+                value="{{ if .Guarantor.RegistrationDate }}{{ .Guarantor.RegistrationDate }}{{ end }}" readonly>
+              </div>
             </div>
           </div>
 
@@ -957,8 +963,10 @@
           <div class="row" id="rowPersonalExtra">
             <div class="col">
               <label>วันเดือนปีเกิด :</label>
-              <input type="text" name="date_of_birth" class="datepicker-th" placeholder="วัน-เดือน-ปี พ.ศ."
-                value="{{ if .Guarantor.DateOfBirth }}{{ .Guarantor.DateOfBirth }}{{ end }}">
+              <div class="input-group">
+                <input type="text" name="date_of_birth" class="datepicker-th date-input-icon no-keyboard" placeholder="เลือกวันที่"
+                value="{{ if .Guarantor.DateOfBirth }}{{ .Guarantor.DateOfBirth }}{{ end }}" readonly>
+              </div>
             </div>
             <div class="col">
               <label>เพศ :</label>
@@ -1018,14 +1026,18 @@
             <!-- วันออกบัตร -->
             <div class="col">
               <label>วันออกบัตร :</label>
-              <input type="text" name="other_card_issue_date" class="datepicker-th" placeholder="วัน-เดือน-ปี พ.ศ."
-                value="{{ if .Guarantor.OtherCardIssueDate }}{{ .Guarantor.OtherCardIssueDate }}{{ end }}">
+              <div class="input-group">
+                <input type="text" name="other_card_issue_date" class="datepicker-th date-input-icon no-keyboard" placeholder="เลือกวันที่"
+                value="{{ if .Guarantor.OtherCardIssueDate }}{{ .Guarantor.OtherCardIssueDate }}{{ end }}" readonly>
+              </div>
             </div>
             <!-- วันบัตรหมดอายุ -->
             <div class="col">
               <label>วันบัตรหมดอายุ :</label>
-              <input type="text" name="other_card_expiry_date" class="datepicker-th" placeholder="วัน-เดือน-ปี พ.ศ."
-                value="{{ .Guarantor.OtherCardExpiryDate }}">
+              <div class="input-group">
+                <input type="text" name="other_card_expiry_date" class="datepicker-th date-input-icon no-keyboard" placeholder="เลือกวันที่"
+                value="{{ .Guarantor.OtherCardExpiryDate }}" readonly>
+              </div>
             </div>
           </div>
         </div>
