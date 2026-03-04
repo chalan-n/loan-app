@@ -785,79 +785,48 @@
 
       .btn-back,
       .btn-next {
-        width: 100%;
+        padding: 14px 24px;
+        font-size: 1.1rem;
       }
     }
 
     /* ========== OCR Camera Scan Card ========== */
     .ocr-card {
       background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #1e40af 100%);
-      border-radius: 20px;
-      padding: 28px 32px;
-      margin-bottom: 28px;
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
       display: flex;
       align-items: center;
-      gap: 28px;
+      gap: 14px;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 8px 32px rgba(30, 58, 138, 0.25);
+      box-shadow: 0 4px 16px rgba(30, 58, 138, 0.22);
     }
 
-    .ocr-card::before {
-      content: '';
-      position: absolute;
-      top: -60px;
-      right: -60px;
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.05);
-    }
-
+    .ocr-card::before,
     .ocr-card::after {
-      content: '';
-      position: absolute;
-      bottom: -40px;
-      left: 40%;
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.04);
+      display: none;
     }
 
     .ocr-card-icon {
-      width: 80px;
-      height: 80px;
-      background: rgba(255, 255, 255, 0.12);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .ocr-card-icon i {
-      font-size: 2.2rem;
-      color: #93c5fd;
+      display: none;
     }
 
     .ocr-card-text {
       flex: 1;
-      z-index: 1;
+      min-width: 0;
     }
 
     .ocr-card-text h3 {
       color: white;
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
     }
 
     .ocr-card-text p {
-      color: #bfdbfe;
-      font-size: 0.9rem;
-      line-height: 1.5;
+      display: none;
     }
 
     .btn-scan {
@@ -865,26 +834,26 @@
       color: white;
       border: none;
       border-radius: 50px;
-      padding: 14px 28px;
-      font-size: 1.05rem;
+      padding: 10px 18px;
+      font-size: 0.88rem;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       white-space: nowrap;
-      z-index: 1;
-      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5);
+      flex-shrink: 0;
+      box-shadow: 0 3px 12px rgba(99, 102, 241, 0.35);
       transition: all 0.3s ease;
     }
 
     .btn-scan:hover {
-      transform: translateY(-3px) scale(1.04);
-      box-shadow: 0 8px 28px rgba(99, 102, 241, 0.65);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 18px rgba(99, 102, 241, 0.5);
     }
 
     .btn-scan i {
-      font-size: 1.3rem;
+      font-size: 1rem;
     }
 
     /* OCR Loading Overlay */
@@ -931,14 +900,15 @@
     .ocr-badge {
       display: none;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       background: #d1fae5;
       color: #065f46;
       border-radius: 50px;
-      padding: 6px 16px;
-      font-size: 0.9rem;
+      padding: 3px 10px;
+      font-size: 0.78rem;
       font-weight: 600;
-      margin-top: 8px;
+      margin-top: 6px;
+      width: fit-content;
     }
 
     .ocr-badge.show {
@@ -947,13 +917,13 @@
 
     @media (max-width: 768px) {
       .ocr-card {
-        flex-direction: column;
-        text-align: center;
+        flex-direction: row;
+        text-align: left;
       }
 
       .btn-scan {
-        width: 100%;
-        justify-content: center;
+        padding: 8px 14px;
+        font-size: 0.82rem;
       }
     }
   </style>
