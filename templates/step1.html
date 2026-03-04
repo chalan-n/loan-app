@@ -1241,13 +1241,17 @@
           <div class="row" id="rowOtherCardDates">
             <div class="col">
               <label>วันออกบัตร :</label>
-              <input type="text" name="other_card_issue_date" class="datepicker-th" placeholder="วัน-เดือน-ปี พ.ศ."
-                readonly="readonly" value="{{ if .Loan.OtherCardIssueDate }}{{ .Loan.OtherCardIssueDate }}{{ end }}">
+              <div class="input-group">
+                <input type="text" name="other_card_issue_date" class="datepicker-th date-input-icon no-keyboard" placeholder="เลือกวันที่"
+                  readonly value="{{ if .Loan.OtherCardIssueDate }}{{ .Loan.OtherCardIssueDate }}{{ end }}">
+                </div>
             </div>
             <div class="col">
               <label>วันบัตรหมดอายุ :</label>
-              <input type="text" name="other_card_expiry_date" class="datepicker-th" placeholder="วัน-เดือน-ปี พ.ศ."
-                readonly="readonly" value="{{ if .Loan.OtherCardExpiryDate }}{{ .Loan.OtherCardExpiryDate }}{{ end }}">
+              <div class="input-group">
+                <input type="text" name="other_card_expiry_date" class="datepicker-th date-input-icon no-keyboard" placeholder="เลือกวันที่"
+                  readonly value="{{ if .Loan.OtherCardExpiryDate }}{{ .Loan.OtherCardExpiryDate }}{{ end }}">
+                </div>
             </div>
           </div>
 

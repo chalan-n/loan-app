@@ -939,8 +939,10 @@
               <div class="row">
                 <div class="col">
                   <label>วันที่รับแจ้ง</label>
-                  <input type="text" name="notification_date" class="datepicker-th" placeholder="วัน-เดือน-ปี พ.ศ."
-                    value="{{ if .Loan.CarInsuranceNotifyDate }}{{ .Loan.CarInsuranceNotifyDate }}{{ end }}" />
+                  <div class="input-group">
+                    <input type="text" name="notification_date" class="datepicker-th date-input-icon no-keyboard" placeholder="เลือกวันที่"
+                      value="{{ if .Loan.CarInsuranceNotifyDate }}{{ .Loan.CarInsuranceNotifyDate }}{{ end }}" readonly/>
+                    </div>
                 </div>
                 <div class="col">
                   <label>เลขที่รับแจ้ง</label>
@@ -950,8 +952,10 @@
               <div class="row">
                 <div class="col">
                   <label>วันที่เริ่มคุ้มครอง</label>
-                  <input type="text" name="coverage_start_date" class="datepicker-th" placeholder="วัน-เดือน-ปี พ.ศ."
-                    value="{{ if .Loan.CarInsuranceStartDate }}{{ .Loan.CarInsuranceStartDate }}{{ end }}" />
+                  <div class="input-group">
+                    <input type="text" name="coverage_start_date" class="datepicker-th date-input-icon no-keyboard" placeholder="เลือกวันที่"
+                      value="{{ if .Loan.CarInsuranceStartDate }}{{ .Loan.CarInsuranceStartDate }}{{ end }}" readonly/>
+                    </div>
                 </div>
                 <div class="col">
                   <label>ค่าประกัน :</label>

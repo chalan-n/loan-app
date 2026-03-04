@@ -1121,8 +1121,10 @@
             </div>
             <div class="col">
               <label>วันจดทะเบียน :</label>
-              <input type="text" name="car_register_date" class="datepicker-th" placeholder="วัน-เดือน-ปี พ.ศ."
-                value="{{ if .Loan.CarRegisterDate }}{{ .Loan.CarRegisterDate }}{{ end }}">
+              <div class="input-group">
+                <input type="text" name="car_register_date" class="datepicker-th date-input-icon no-keyboard" placeholder="เลือกวันที่"
+                  value="{{ if .Loan.CarRegisterDate }}{{ .Loan.CarRegisterDate }}{{ end }}" readonly>
+                </div>
             </div>
             <div class="col">
               <label>รุ่น :</label>
