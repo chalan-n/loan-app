@@ -2950,29 +2950,81 @@
 
     /**
      * openCamOverlay — เปิดกล้อง live preview พร้อมกรอบนำสายตา
-     * ถ้า getUserMedia ไม่ได้ (Desktop / permission denied) → fallback เป็น file picker
+     * - ตรวจ Secure Context (HTTPS) ก่อน
+     * - ลองหลาย constraints: environment → any → minimal
+     * - ถ้าไม่ได้เลย → แจ้งเหตุผล + fallback file picker
      */
     async function openCamOverlay() {
-      try {
-        camStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: { ideal: 'environment' },
-            width: { ideal: 1920 },
-            height: { ideal: 1080 }
-          },
-          audio: false
-        });
-
-        const video = document.getElementById('camVideo');
-        video.srcObject = camStream;
-        await video.play();
-
-        document.getElementById('camOverlay').style.display = 'flex';
-
-      } catch (err) {
-        console.warn('[Camera] getUserMedia failed, falling back to file picker:', err.message);
-        // Fallback → file picker เหมือนเดิม
+      // ── 0. ตรวจว่ามี mediaDevices หรือไม่ (ต้องเป็น HTTPS / localhost) ───
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        const isSecure = window.isSecureContext;
+        console.error('[Camera] mediaDevices not available. isSecureContext:', isSecure);
+        if (!isSecure) {
+          alert('⚠️ เปิดกล้องไม่ได้\n\nเบราว์เซอร์ต้องการ HTTPS เพื่อเข้าถึงกล้อง\nURL ปัจจุบัน: ' + location.origin + '\n\nกรุณาใช้ HTTPS หรือเลือกรูปจากแกลเลอรีแทน');
+        }
         document.getElementById('idcardFileInput').click();
+        return;
+      }
+
+      // ── 1. แสดง overlay ก่อนเพื่อให้ user เห็นกรอบทันที ───────────────
+      const overlay = document.getElementById('camOverlay');
+      overlay.style.display = 'flex';
+
+      // ── 2. ลอง getUserMedia หลาย constraints ──────────────────────────
+      const constraintsList = [
+        // Attempt 1: กล้องหลัง Full HD
+        { video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false },
+        // Attempt 2: กล้องหลัง (ไม่ระบุ resolution)
+        { video: { facingMode: 'environment' }, audio: false },
+        // Attempt 3: กล้องใดก็ได้
+        { video: true, audio: false }
+      ];
+
+      let stream = null;
+      let lastErr = null;
+
+      for (const constraints of constraintsList) {
+        try {
+          console.log('[Camera] trying constraints:', JSON.stringify(constraints));
+          stream = await navigator.mediaDevices.getUserMedia(constraints);
+          console.log('[Camera] ✅ success');
+          break;
+        } catch (err) {
+          console.warn('[Camera] attempt failed:', err.name, err.message);
+          lastErr = err;
+        }
+      }
+
+      if (!stream) {
+        // ทุก attempt ล้มเหลว
+        overlay.style.display = 'none';
+        console.error('[Camera] all attempts failed:', lastErr);
+
+        let reason = 'ไม่สามารถเปิดกล้องได้';
+        if (lastErr) {
+          if (lastErr.name === 'NotAllowedError') {
+            reason = 'ผู้ใช้ปฏิเสธสิทธิ์กล้อง — กรุณาอนุญาตในการตั้งค่าเบราว์เซอร์';
+          } else if (lastErr.name === 'NotFoundError') {
+            reason = 'ไม่พบกล้องในอุปกรณ์นี้';
+          } else if (lastErr.name === 'NotReadableError') {
+            reason = 'กล้องถูกใช้งานโดยแอปอื่น';
+          } else {
+            reason = lastErr.message || lastErr.name;
+          }
+        }
+        alert('⚠️ ' + reason + '\n\nจะเปิดหน้าเลือกรูปจากแกลเลอรีแทน');
+        document.getElementById('idcardFileInput').click();
+        return;
+      }
+
+      // ── 3. สำเร็จ → เชื่อม stream กับ video ───────────────────────────
+      camStream = stream;
+      const video = document.getElementById('camVideo');
+      video.srcObject = stream;
+      try {
+        await video.play();
+      } catch (playErr) {
+        console.warn('[Camera] video.play() failed (autoplay blocked?):', playErr.message);
       }
     }
 
