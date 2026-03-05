@@ -892,6 +892,271 @@
         font-size: 0.82rem;
       }
     }
+
+    /* ========== Camera Guide Overlay ========== */
+    .cam-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #camVideo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .cam-guide-mask {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .cam-guide {
+      position: relative;
+      width: min(82vw, 520px);
+      aspect-ratio: 8.5 / 5.4;
+      border: 3px dashed #34d399;
+      border-radius: 16px;
+      box-shadow:
+        0 0 0 9999px rgba(0, 0, 0, 0.55),
+        0 0 30px rgba(52, 211, 153, 0.3),
+        inset 0 0 30px rgba(52, 211, 153, 0.08);
+      animation: camPulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes camPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55), 0 0 20px rgba(52, 211, 153, 0.2), inset 0 0 20px rgba(52, 211, 153, 0.05);
+      }
+
+      50% {
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55), 0 0 40px rgba(52, 211, 153, 0.45), inset 0 0 40px rgba(52, 211, 153, 0.12);
+      }
+    }
+
+    /* Corner marks */
+    .cam-corner {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border-color: #34d399;
+      border-style: solid;
+      border-width: 0;
+    }
+
+    .cam-corner.tl {
+      top: -3px;
+      left: -3px;
+      border-top-width: 4px;
+      border-left-width: 4px;
+      border-radius: 12px 0 0 0;
+    }
+
+    .cam-corner.tr {
+      top: -3px;
+      right: -3px;
+      border-top-width: 4px;
+      border-right-width: 4px;
+      border-radius: 0 12px 0 0;
+    }
+
+    .cam-corner.bl {
+      bottom: -3px;
+      left: -3px;
+      border-bottom-width: 4px;
+      border-left-width: 4px;
+      border-radius: 0 0 0 12px;
+    }
+
+    .cam-corner.br {
+      bottom: -3px;
+      right: -3px;
+      border-bottom-width: 4px;
+      border-right-width: 4px;
+      border-radius: 0 0 12px 0;
+    }
+
+    .cam-guide-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.95rem;
+      text-align: center;
+      pointer-events: none;
+      line-height: 1.5;
+    }
+
+    .cam-hint {
+      position: absolute;
+      top: max(env(safe-area-inset-top, 12px), 12px);
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(8px);
+      padding: 10px 22px;
+      border-radius: 50px;
+      white-space: nowrap;
+      z-index: 2;
+      animation: fadeInDown 0.4s ease;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+
+    .cam-controls {
+      position: absolute;
+      bottom: max(env(safe-area-inset-bottom, 20px), 20px);
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 24px;
+      z-index: 2;
+    }
+
+    .cam-btn-close {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: white;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .cam-btn-close:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .cam-btn-capture {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 4px solid white;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+      position: relative;
+    }
+
+    .cam-btn-capture:hover {
+      transform: scale(1.08);
+    }
+
+    .cam-btn-capture:active {
+      transform: scale(0.92);
+    }
+
+    .cam-shutter {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: white;
+      display: block;
+      transition: background 0.15s;
+    }
+
+    .cam-btn-capture:active .cam-shutter {
+      background: #34d399;
+    }
+
+    .cam-btn-gallery {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: white;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .cam-btn-gallery:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Flash animation on capture */
+    .cam-flash {
+      position: absolute;
+      inset: 0;
+      background: white;
+      z-index: 3;
+      animation: flashAnim 0.35s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes flashAnim {
+      0% {
+        opacity: 0.8;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .cam-guide {
+        width: 90vw;
+      }
+
+      .cam-btn-capture {
+        width: 64px;
+        height: 64px;
+      }
+
+      .cam-shutter {
+        width: 48px;
+        height: 48px;
+      }
+
+      .cam-btn-close,
+      .cam-btn-gallery {
+        padding: 10px 14px;
+        font-size: 0.82rem;
+      }
+
+      .cam-hint {
+        font-size: 0.88rem;
+        padding: 8px 16px;
+      }
+    }
   </style>
 </head>
 
@@ -1006,7 +1271,7 @@
           </div>
           <input type="file" id="idcardFileInput" accept="image/*" capture="environment" style="display:none;"
             onchange="handleIdCardFile(this)">
-          <button type="button" class="btn-scan-id" onclick="document.getElementById('idcardFileInput').click()">
+          <button type="button" class="btn-scan-id" onclick="openCamOverlay()">
             <i class="fas fa-camera"></i> ถ่ายรูป / อัปโหลด
           </button>
         </div>
@@ -1016,6 +1281,33 @@
           <div class="idcard-spinner"></div>
           <div id="idcardOverlayMsg">🤖 กำลังสแกนบัตรด้วย AI...</div>
         </div>
+
+        <!-- ===== Camera Guide Overlay ===== -->
+        <div id="camOverlay" class="cam-overlay" style="display:none;">
+          <video id="camVideo" autoplay playsinline muted></video>
+          <div class="cam-guide-mask">
+            <div class="cam-guide">
+              <div class="cam-corner tl"></div>
+              <div class="cam-corner tr"></div>
+              <div class="cam-corner bl"></div>
+              <div class="cam-corner br"></div>
+              <div class="cam-guide-label">
+                <i class="fas fa-id-card" style="font-size:1.8rem; opacity:0.4; margin-bottom:6px;"></i><br>
+                บัตรประชาชน
+              </div>
+            </div>
+          </div>
+          <div class="cam-hint">📷 วางบัตรประชาชนให้อยู่ในกรอบ</div>
+          <div class="cam-controls">
+            <button type="button" class="cam-btn-close" onclick="closeCamOverlay()">✕ ยกเลิก</button>
+            <button type="button" class="cam-btn-capture" id="camCaptureBtn" onclick="captureIdCard()">
+              <span class="cam-shutter"></span>
+            </button>
+            <button type="button" class="cam-btn-gallery"
+              onclick="closeCamOverlay(); document.getElementById('idcardFileInput').click();">🖼️ แกลเลอรี</button>
+          </div>
+        </div>
+        <canvas id="camCanvas" style="display:none;"></canvas>
 
         <!-- Section: ประเภทผู้เช่าซื้อ -->
         <div class="section">
@@ -2647,6 +2939,131 @@
         el.style.boxShadow = '0 0 0 4px rgba(16,185,129,0.25)';
         setTimeout(() => { el.style.borderColor = ''; el.style.boxShadow = ''; }, 2500);
       });
+    }
+  </script>
+
+  <!-- ===================================================
+       Camera Guide — Live preview + Capture
+       =================================================== -->
+  <script>
+    let camStream = null;
+
+    /**
+     * openCamOverlay — เปิดกล้อง live preview พร้อมกรอบนำสายตา
+     * ถ้า getUserMedia ไม่ได้ (Desktop / permission denied) → fallback เป็น file picker
+     */
+    async function openCamOverlay() {
+      try {
+        camStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: 'environment' },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+          },
+          audio: false
+        });
+
+        const video = document.getElementById('camVideo');
+        video.srcObject = camStream;
+        await video.play();
+
+        document.getElementById('camOverlay').style.display = 'flex';
+
+      } catch (err) {
+        console.warn('[Camera] getUserMedia failed, falling back to file picker:', err.message);
+        // Fallback → file picker เหมือนเดิม
+        document.getElementById('idcardFileInput').click();
+      }
+    }
+
+    /**
+     * closeCamOverlay — ปิดกล้อง + หยุด stream
+     */
+    function closeCamOverlay() {
+      document.getElementById('camOverlay').style.display = 'none';
+      if (camStream) {
+        camStream.getTracks().forEach(t => t.stop());
+        camStream = null;
+      }
+      const video = document.getElementById('camVideo');
+      video.srcObject = null;
+    }
+
+    /**
+     * captureIdCard — จับภาพจาก video → Canvas → Blob → ส่ง OCR
+     */
+    async function captureIdCard() {
+      const video = document.getElementById('camVideo');
+      const canvas = document.getElementById('camCanvas');
+
+      // ── 1. Flash effect ─────────────────────────────────────────────
+      const flash = document.createElement('div');
+      flash.className = 'cam-flash';
+      document.getElementById('camOverlay').appendChild(flash);
+      setTimeout(() => flash.remove(), 400);
+
+      // ── 2. จับภาพจาก video เต็ม resolution ──────────────────────────
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // ── 3. ปิดกล้อง ─────────────────────────────────────────────────
+      closeCamOverlay();
+
+      // ── 4. แปลง Canvas → Blob ──────────────────────────────────────
+      const blob = await new Promise(resolve =>
+        canvas.toBlob(resolve, 'image/jpeg', 0.92)
+      );
+
+      // ── 5. ส่ง OCR (reuse logic จาก handleIdCardFile) ──────────────
+      const overlay = document.getElementById('idcardOverlay');
+      const overlayMsg = document.getElementById('idcardOverlayMsg');
+      const badge = document.getElementById('idcardBadge');
+      const badgeText = document.getElementById('idcardBadgeText');
+
+      overlay.classList.add('show');
+      overlayMsg.textContent = '🤖 กำลังสแกนบัตรด้วย AI...';
+      badge.className = 'idcard-ocr-badge';
+
+      try {
+        const formData = new FormData();
+        formData.append('image', blob, 'idcard_capture.jpg');
+
+        const res = await fetch('/api/v1/ocr/idcard', { method: 'POST', body: formData });
+        const json = await res.json();
+
+        if (!res.ok || !json.success) {
+          throw new Error(json.message || json.error || 'API ตอบกลับผิดพลาด');
+        }
+
+        const d = json.data;
+
+        // ── ตรวจสอบเลขบัตร 13 หลัก + checksum ───────────────────────
+        const idNum = (d.id_number || '').replace(/\D/g, '');
+        const idOk = /^\d{13}$/.test(idNum) && validateIDChecksum(idNum);
+        const serverValid = json.id_valid === true;
+
+        // ── Auto-fill ────────────────────────────────────────────────
+        overlayMsg.textContent = '✅ กำลังกรอกข้อมูล...';
+        fillIDCardFields(d, idNum);
+
+        // ── Badge ────────────────────────────────────────────────────
+        if (serverValid && idOk) {
+          badgeText.textContent = `✅ เลขบัตร ${formatIDDisplay(idNum)} — ตรวจสอบผ่าน`;
+          badge.className = 'idcard-ocr-badge show';
+        } else {
+          badgeText.textContent = `⚠️ เลขบัตร ${formatIDDisplay(idNum)} — กรุณาตรวจสอบอีกครั้ง`;
+          badge.className = 'idcard-ocr-badge show warn';
+        }
+
+        highlightIDCardFields();
+
+      } catch (err) {
+        alert('❌ สแกนบัตรไม่สำเร็จ: ' + err.message + '\n\nกรุณาถ่ายรูปให้ชัดขึ้น และให้เห็นเลข 13 หลักครบถ้วน');
+      } finally {
+        overlay.classList.remove('show');
+      }
     }
   </script>
 </body>
