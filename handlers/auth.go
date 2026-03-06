@@ -12,14 +12,8 @@ import (
 
 func LoginPage(c *fiber.Ctx) error {
 	// Check if user is already logged in
-	tokenStr := c.Cookies("token")
-	if tokenStr != "" {
-		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-			return []byte(config.GetConfig().JWTSecret), nil
-		})
-		if err == nil && token.Valid {
-			return c.Redirect("/main")
-		}
+	if parseJWTUsername(c.Cookies("token")) != "" {
+		return c.Redirect("/main")
 	}
 
 	// ส่ง error message ไปหน้า login ถ้ามี (จาก login ไม่สำเร็จ)
@@ -69,18 +63,10 @@ func AuthMiddleware(c *fiber.Ctx) error {
 	if tokenStr == "" {
 		return c.Redirect("/login")
 	}
-
-	// Validate Token
-	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		return []byte(config.GetConfig().JWTSecret), nil
-	})
-
-	if err != nil || !token.Valid {
-		// Token expired or invalid -> Clear cookie and Redirect
+	if parseJWTUsername(tokenStr) == "" {
 		c.ClearCookie("token")
 		return c.Redirect("/login")
 	}
-
 	return c.Next()
 }
 
@@ -103,15 +89,7 @@ func ChangePasswordPost(c *fiber.Ctx) error {
 	newPassword := c.FormValue("new_password")
 
 	// Get user from token
-	tokenStr := c.Cookies("token")
-	token, _ := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		return []byte(config.GetConfig().JWTSecret), nil
-	})
-
-	var username string
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		username, _ = claims["username"].(string)
-	}
+	username := parseJWTUsername(c.Cookies("token"))
 
 	if username == "" {
 		// Should be caught by middleware normally, but double check

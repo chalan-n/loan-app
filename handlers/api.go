@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -319,17 +320,24 @@ func GetInsuClasses(c *fiber.Ctx) error {
 	return c.JSON(classes)
 }
 
-// Helper to get S3 Client using config
-func getR2Client() *s3.S3 {
-	r2 := config.GetConfig()
-	creds := credentials.NewStaticCredentials(r2.R2AccessKeyId, r2.R2SecretAccessKey, "")
-	awsCfg := aws.NewConfig().
-		WithRegion("auto").
-		WithEndpoint(r2.R2Endpoint).
-		WithCredentials(creds)
+var (
+	r2Once   sync.Once
+	r2Client *s3.S3
+)
 
-	sess := session.Must(session.NewSession(awsCfg))
-	return s3.New(sess)
+// getR2Client returns a cached S3 client (singleton) for Cloudflare R2.
+func getR2Client() *s3.S3 {
+	r2Once.Do(func() {
+		r2 := config.GetConfig()
+		creds := credentials.NewStaticCredentials(r2.R2AccessKeyId, r2.R2SecretAccessKey, "")
+		awsCfg := aws.NewConfig().
+			WithRegion("auto").
+			WithEndpoint(r2.R2Endpoint).
+			WithCredentials(creds)
+		sess := session.Must(session.NewSession(awsCfg))
+		r2Client = s3.New(sess)
+	})
+	return r2Client
 }
 
 // Upload Insurance File to Cloudflare R2

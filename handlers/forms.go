@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 // Helper to handle optional dates
@@ -28,16 +27,7 @@ func Dashboard(c *fiber.Ctx) error {
 // 📱 API: Get Loan List as JSON (สำหรับ Mobile App)
 func GetLoanList(c *fiber.Ctx) error {
 	// 1. Get User from Token (same as MainPage)
-	tokenStr := c.Cookies("token")
-	var staffID string
-	if tokenStr != "" {
-		token, _ := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-			return []byte(config.GetConfig().JWTSecret), nil
-		})
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			staffID, _ = claims["username"].(string)
-		}
-	}
+	staffID := parseJWTUsername(c.Cookies("token"))
 
 	// 2. Query loans for this user
 	var loans []models.LoanApplication
@@ -56,16 +46,7 @@ func GetLoanList(c *fiber.Ctx) error {
 
 func MainPage(c *fiber.Ctx) error {
 	// 1. Get User from Token
-	tokenStr := c.Cookies("token")
-	var staffID string
-	if tokenStr != "" {
-		token, _ := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-			return []byte(config.GetConfig().JWTSecret), nil
-		})
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			staffID, _ = claims["username"].(string)
-		}
-	}
+	staffID := parseJWTUsername(c.Cookies("token"))
 
 	// 2. Filter query
 	var loans []models.LoanApplication
@@ -140,16 +121,7 @@ func Step1Post(c *fiber.Ctx) error {
 	}
 
 	// Parse Staff ID from token
-	tokenStr := c.Cookies("token")
-	var staffID string
-	if tokenStr != "" {
-		token, _ := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-			return []byte(config.GetConfig().JWTSecret), nil
-		})
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			staffID, _ = claims["username"].(string)
-		}
-	}
+	staffID := parseJWTUsername(c.Cookies("token"))
 
 	// Check if updating existing loan
 	cookieID := c.Cookies("loan_id")

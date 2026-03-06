@@ -1072,9 +1072,20 @@
                 btn.disabled = false;
                 btn.dataset.submitting = 'false';
               } else {
+                // Update button
                 btn.className = "btn-bottom btn-sent";
                 btn.innerHTML = '<i class="fas fa-check"></i> ส่งแล้ว';
                 btn.disabled = true;
+                // Update card UI dynamically — no page reload needed
+                const carActions = btn.closest('.car-actions');
+                const editLink = carActions.querySelector('a');
+                if (editLink) editLink.style.display = 'none';
+                const deleteBtn = carActions.querySelector('.btn-delete');
+                if (deleteBtn) deleteBtn.style.display = 'none';
+                const badge = document.createElement('div');
+                badge.className = 'status-badge status-p';
+                badge.innerHTML = '<i class="fas fa-clock"></i> รออนุมัติ';
+                carActions.appendChild(badge);
               }
             })
             .catch(() => {

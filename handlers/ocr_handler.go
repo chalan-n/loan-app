@@ -10,11 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"loan-app/config"
 	"loan-app/services"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 // maxFileSizeMB คือขนาดสูงสุดของไฟล์ที่รับได้ (MB)
@@ -164,24 +162,6 @@ func extractUsername(c *fiber.Ctx) string {
 	}
 
 	return "anonymous"
-}
-
-// parseJWTUsername parse token string ดึง claim "username"
-func parseJWTUsername(tokenStr string) string {
-	if tokenStr == "" {
-		return ""
-	}
-	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
-		return []byte(config.GetConfig().JWTSecret), nil
-	})
-	if err != nil || !token.Valid {
-		return ""
-	}
-	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		u, _ := claims["username"].(string)
-		return u
-	}
-	return ""
 }
 
 // isAllowedMIME ตรวจ MIME type จาก magic bytes

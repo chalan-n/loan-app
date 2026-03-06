@@ -83,6 +83,10 @@ func main() {
 
 	config.ConnectDB()
 
+	// === AutoMigrate — run once at startup ===
+	config.DB.AutoMigrate(&models.Guarantor{})
+	// =============================================
+
 	// === Seed default users from env (DEFAULT_ADMIN_PASSWORD) ===
 	defaultPass := config.GetConfig().DefaultAdminPassword
 	if defaultPass != "" {
