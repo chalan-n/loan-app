@@ -108,20 +108,24 @@ func main() {
 	// ── TLS: สร้าง self-signed cert (ถ้ายังไม่มี) แล้ว listen HTTPS ────
 	cert, key := config.TLSCertFiles()
 
-	// แสดง URL ที่เข้าถึงได้ทั้งหมด
-	fmt.Println("\n╔═══════════════════════════════════════════════════╗")
-	fmt.Println("║           🚀 HTTPS Server Ready                  ║")
-	fmt.Println("╠═══════════════════════════════════════════════════╣")
-	fmt.Printf("║  Local:   https://localhost:3000                  ║\n")
-	addrs, _ := net.InterfaceAddrs()
-	for _, a := range addrs {
-		if ipNet, ok := a.(*net.IPNet); ok && ipNet.IP.To4() != nil && !ipNet.IP.IsLoopback() {
-			fmt.Printf("║  LAN:     https://%-15s:3000       ║\n", ipNet.IP)
+	if config.GetConfig().IsProd() {
+		// Production: รัน HTTP (ให้ nginx จัดการ TLS)
+		log.Fatal(app.Listen("0.0.0.0:3000"))
+	} else {
+		// Development: รัน HTTPS สำหรับทดสอบ
+		fmt.Println("\n╔═══════════════════════════════════════════════════╗")
+		fmt.Println("║           🚀 HTTPS Server Ready                  ║")
+		fmt.Println("╠═══════════════════════════════════════════════════╣")
+		fmt.Printf("║  Local:   https://localhost:3000                  ║\n")
+		addrs, _ := net.InterfaceAddrs()
+		for _, a := range addrs {
+			if ipNet, ok := a.(*net.IPNet); ok && ipNet.IP.To4() != nil && !ipNet.IP.IsLoopback() {
+				fmt.Printf("║  LAN:     https://%-15s:3000       ║\n", ipNet.IP)
+			}
 		}
+		fmt.Println("║                                                   ║")
+		fmt.Println("║  ⚠️  Tablet: ยอมรับ cert แล้วเปิดกล้องได้          ║")
+		fmt.Println("╚═══════════════════════════════════════════════════╝\n")
+		log.Fatal(app.ListenTLS("0.0.0.0:3000", cert, key))
 	}
-	fmt.Println("║                                                   ║")
-	fmt.Println("║  ⚠️  Tablet: ยอมรับ cert แล้วเปิดกล้องได้          ║")
-	fmt.Println("╚═══════════════════════════════════════════════════╝\n")
-
-	log.Fatal(app.ListenTLS("0.0.0.0:3000", cert, key))
 }
