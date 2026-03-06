@@ -15,7 +15,7 @@ func LoginPage(c *fiber.Ctx) error {
 	tokenStr := c.Cookies("token")
 	if tokenStr != "" {
 		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-			return []byte("mysecret"), nil
+			return []byte(config.GetConfig().JWTSecret), nil
 		})
 		if err == nil && token.Valid {
 			return c.Redirect("/main")
@@ -46,7 +46,7 @@ func LoginPost(c *fiber.Ctx) error {
 		"username": user.Username,
 		"exp":      time.Now().Add(time.Hour * 24).Unix(),
 	})
-	tokenStr, _ := token.SignedString([]byte("mysecret"))
+	tokenStr, _ := token.SignedString([]byte(config.GetConfig().JWTSecret))
 
 	c.Cookie(&fiber.Cookie{
 		Name:     "token",
@@ -72,7 +72,7 @@ func AuthMiddleware(c *fiber.Ctx) error {
 
 	// Validate Token
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		return []byte("mysecret"), nil
+		return []byte(config.GetConfig().JWTSecret), nil
 	})
 
 	if err != nil || !token.Valid {
@@ -88,6 +88,16 @@ func ChangePasswordPage(c *fiber.Ctx) error {
 	return c.Render("change_password", nil)
 }
 
+// MobileAPIKeyMiddleware ตรวจ X-API-Key header สำหรับ endpoint ที่ mobile app เรียก
+func MobileAPIKeyMiddleware(c *fiber.Ctx) error {
+	key := c.Get("X-API-Key")
+	expected := config.GetConfig().MobileAPIKey
+	if expected == "" || key != expected {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized: invalid or missing API key"})
+	}
+	return c.Next()
+}
+
 func ChangePasswordPost(c *fiber.Ctx) error {
 	oldPassword := c.FormValue("old_password")
 	newPassword := c.FormValue("new_password")
@@ -95,7 +105,7 @@ func ChangePasswordPost(c *fiber.Ctx) error {
 	// Get user from token
 	tokenStr := c.Cookies("token")
 	token, _ := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		return []byte("mysecret"), nil
+		return []byte(config.GetConfig().JWTSecret), nil
 	})
 
 	var username string

@@ -143,15 +143,6 @@ func CalculateInsuranceRate(c *fiber.Ctx) error {
 	installmentsStr := fmt.Sprintf("%d", req.Installments)
 	ageStr := fmt.Sprintf("%d", age)
 
-	// Construct Debug SQL (Strictly matching user example)
-	debugSQL := fmt.Sprintf("SELECT Fnc_LoanProtect_Rate('%s', '%s', '%s', '%s', '%s') AS RATE",
-		req.InsuranceCompany, genderStr, installmentsStr, ageStr, signDateStr)
-
-	// Log to Server Console
-	log.Println("-------- INSURANCE CALC DEBUG --------")
-	log.Println(debugSQL)
-	log.Println("--------------------------------------")
-
 	// SQL: SELECT Fnc_LoanProtect_Rate(?, ?, ?, ?, ?) AS RATE
 	query := "SELECT Fnc_LoanProtect_Rate(?, ?, ?, ?, ?) AS RATE"
 
@@ -169,11 +160,7 @@ func CalculateInsuranceRate(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{
-		"rate":         rate,
-		"debug_age":    age,
-		"debug_gender": genderCode,
-		"debug_id":     loan.ID,
-		"debug_sql":    debugSQL,
+		"rate": rate,
 	})
 }
 
@@ -332,24 +319,16 @@ func GetInsuClasses(c *fiber.Ctx) error {
 	return c.JSON(classes)
 }
 
-// Cloudflare R2 Config
-const (
-	R2AccountId       = "1c3c174d2225cf15e7006b4a55f7a4a3"
-	R2AccessKeyId     = "b7b136ea56fc886041267387cd6d211a"
-	R2SecretAccessKey = "0edec23269dcdef1010706dcdeecdf44b0e174be1226d2a97e2ba40b63e22f10"
-	R2BucketName      = "cmo-loan-app"
-	R2Endpoint        = "https://1c3c174d2225cf15e7006b4a55f7a4a3.r2.cloudflarestorage.com"
-)
-
-// Helper to get S3 Client
+// Helper to get S3 Client using config
 func getR2Client() *s3.S3 {
-	creds := credentials.NewStaticCredentials(R2AccessKeyId, R2SecretAccessKey, "")
-	cfg := aws.NewConfig().
+	r2 := config.GetConfig()
+	creds := credentials.NewStaticCredentials(r2.R2AccessKeyId, r2.R2SecretAccessKey, "")
+	awsCfg := aws.NewConfig().
 		WithRegion("auto").
-		WithEndpoint(R2Endpoint).
+		WithEndpoint(r2.R2Endpoint).
 		WithCredentials(creds)
 
-	sess := session.Must(session.NewSession(cfg))
+	sess := session.Must(session.NewSession(awsCfg))
 	return s3.New(sess)
 }
 
@@ -378,7 +357,7 @@ func UploadInsuranceFile(c *fiber.Ctx) error {
 	// Upload to R2
 	svc := getR2Client()
 	_, err = svc.PutObject(&s3.PutObjectInput{
-		Bucket:      aws.String(R2BucketName),
+		Bucket:      aws.String(config.GetConfig().R2BucketName),
 		Key:         aws.String(filename),
 		Body:        src,
 		ContentType: aws.String(fileHeader.Header.Get("Content-Type")),
@@ -420,7 +399,7 @@ func GetFile(c *fiber.Ctx) error {
 
 	svc := getR2Client()
 	req, _ := svc.GetObjectRequest(&s3.GetObjectInput{
-		Bucket: aws.String(R2BucketName),
+		Bucket: aws.String(config.GetConfig().R2BucketName),
 		Key:    aws.String(filename),
 	})
 
@@ -466,7 +445,7 @@ func DeleteInsuranceFile(c *fiber.Ctx) error {
 			// Delete from R2
 			svc := getR2Client()
 			_, err := svc.DeleteObject(&s3.DeleteObjectInput{
-				Bucket: aws.String(R2BucketName),
+				Bucket: aws.String(config.GetConfig().R2BucketName),
 				Key:    aws.String(f),
 			})
 			if err != nil {
@@ -514,7 +493,7 @@ func DeleteLoan(c *fiber.Ctx) error {
 			if f != "" {
 				// Delete from R2
 				_, err := svc.DeleteObject(&s3.DeleteObjectInput{
-					Bucket: aws.String(R2BucketName),
+					Bucket: aws.String(config.GetConfig().R2BucketName),
 					Key:    aws.String(f),
 				})
 				if err != nil {

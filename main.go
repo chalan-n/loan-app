@@ -74,33 +74,30 @@ func main() {
 
 	// Add CORS middleware for cross-domain requests
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
+		AllowOrigins: config.GetConfig().CORSAllowOrigins,
 		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
-		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization, X-API-Key",
 	}))
 
 	app.Static("/static", "./static")
 
 	config.ConnectDB()
 
-	// === ย้ายมาอยู่ตรงนี้เลย ปลอดภัย 100% ไม่มี cycle ===
-	var count int64
-	config.DB.Model(&models.User{}).Count(&count)
-	if count == 0 {
-		hashed, _ := bcrypt.GenerateFromPassword([]byte("123456"), 12)
-		config.DB.Create(&models.User{
-			Username: "570639",
-			Password: string(hashed),
-		})
-		log.Println("สร้างผู้ใช้สำเร็จ: 570639 / 123456")
-
-		config.DB.Create(&models.User{
-			Username: "580639",
-			Password: string(hashed),
-		})
-		log.Println("สร้างผู้ใช้สำเร็จ: 580639 / 123456")
+	// === Seed default users from env (DEFAULT_ADMIN_PASSWORD) ===
+	defaultPass := config.GetConfig().DefaultAdminPassword
+	if defaultPass != "" {
+		var count int64
+		config.DB.Model(&models.User{}).Count(&count)
+		if count == 0 {
+			hashed, _ := bcrypt.GenerateFromPassword([]byte(defaultPass), 12)
+			config.DB.Create(&models.User{Username: "570639", Password: string(hashed)})
+			config.DB.Create(&models.User{Username: "580639", Password: string(hashed)})
+			log.Println("[seed] สร้างผู้ใช้เริ่มต้นสำเร็จ")
+		}
+	} else {
+		log.Println("[seed] DEFAULT_ADMIN_PASSWORD ไม่ได้ตั้งค่า — ข้ามการสร้างผู้ใช้เริ่มต้น")
 	}
-	// ================================================
+	// =============================================================
 
 	routes.Setup(app)
 

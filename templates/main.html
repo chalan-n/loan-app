@@ -1046,20 +1046,22 @@
       if (e.target && e.target.closest(".btn-send")) {
         e.preventDefault();
         const btn = e.target.closest(".btn-send");
+
+        // Guard: prevent double submission
+        if (btn.dataset.submitting === 'true') return;
+
         const refCode = btn.dataset.id;
         const name = btn.dataset.name;
 
         if (confirm(`ยืนยันการส่งงานสำหรับ ${name} หรือไม่?`)) {
-          // Show Loading
+          btn.dataset.submitting = 'true';
           const originalText = btn.innerHTML;
           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...';
           btn.disabled = true;
 
           fetch('/api/sync-work', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ref_code: refCode })
           })
             .then(response => response.json())
@@ -1068,18 +1070,18 @@
                 alert('เกิดข้อผิดพลาด: ' + data.error);
                 btn.innerHTML = originalText;
                 btn.disabled = false;
+                btn.dataset.submitting = 'false';
               } else {
-                // Change button state
                 btn.className = "btn-bottom btn-sent";
                 btn.innerHTML = '<i class="fas fa-check"></i> ส่งแล้ว';
                 btn.disabled = true;
               }
             })
-            .catch(error => {
-              console.error('Error:', error);
+            .catch(() => {
               alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
               btn.innerHTML = originalText;
               btn.disabled = false;
+              btn.dataset.submitting = 'false';
             });
         }
       }
@@ -1134,36 +1136,6 @@
         btn.style.cursor = 'not-allowed';
       }
     }
-
-    // ปุ่มส่งงาน
-    document.querySelectorAll('.btn-send').forEach(btn => {
-      btn.addEventListener('click', async function () {
-        if (!confirm('ยืนยันส่งงานใบนี้ไปตรวจสอบหรือไม่?')) return;
-
-        const refCode = this.dataset.id;
-        const customerName = this.dataset.name;
-        const btnElement = this;
-
-        try {
-          const response = await fetch('/api/update-status', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ref_code: refCode })
-          });
-
-          if (!response.ok) throw new Error('Update failed');
-
-          btnElement.innerHTML = '<i class="fas fa-check"></i> ส่งแล้ว';
-          btnElement.disabled = true;
-          btnElement.classList.remove('btn-send');
-          btnElement.classList.add('btn-sent'); // Optional styling update if you have btn-sent style
-
-        } catch (error) {
-          console.error('Error:', error);
-          alert('เกิดข้อผิดพลาดในการส่งงาน กรุณาลองใหม่อีกครั้ง');
-        }
-      });
-    });
 
     // ปุ่มลบรายการ
     document.querySelectorAll('.btn-delete').forEach(btn => {

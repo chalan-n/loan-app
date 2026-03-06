@@ -32,7 +32,7 @@ func GetLoanList(c *fiber.Ctx) error {
 	var staffID string
 	if tokenStr != "" {
 		token, _ := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-			return []byte("mysecret"), nil
+			return []byte(config.GetConfig().JWTSecret), nil
 		})
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			staffID, _ = claims["username"].(string)
@@ -60,7 +60,7 @@ func MainPage(c *fiber.Ctx) error {
 	var staffID string
 	if tokenStr != "" {
 		token, _ := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-			return []byte("mysecret"), nil
+			return []byte(config.GetConfig().JWTSecret), nil
 		})
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			staffID, _ = claims["username"].(string)
@@ -144,7 +144,7 @@ func Step1Post(c *fiber.Ctx) error {
 	var staffID string
 	if tokenStr != "" {
 		token, _ := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-			return []byte("mysecret"), nil
+			return []byte(config.GetConfig().JWTSecret), nil
 		})
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			staffID, _ = claims["username"].(string)

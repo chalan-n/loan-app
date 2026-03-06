@@ -22,11 +22,25 @@ type AppConfig struct {
 	DBName     string
 
 	// Server
-	AppPort string
-	AppEnv  string
+	AppPort          string
+	AppEnv           string
+	CORSAllowOrigins string
 
 	// JWT
 	JWTSecret string
+
+	// Mobile API
+	MobileAPIKey string
+
+	// Cloudflare R2
+	R2AccountId       string
+	R2AccessKeyId     string
+	R2SecretAccessKey string
+	R2BucketName      string
+	R2Endpoint        string
+
+	// Seed
+	DefaultAdminPassword string
 }
 
 // cfg เป็น singleton ที่เก็บค่าคอนฟิกไว้ภายใน package
@@ -55,10 +69,21 @@ func GetConfig() *AppConfig {
 		DBPassword: getEnv("DB_PASSWORD", ""),
 		DBName:     getEnv("DB_NAME", "loan_db"),
 
-		AppPort: getEnv("APP_PORT", "3000"),
-		AppEnv:  getEnv("APP_ENV", "development"),
+		AppPort:          getEnv("APP_PORT", "3000"),
+		AppEnv:           getEnv("APP_ENV", "development"),
+		CORSAllowOrigins: getEnv("CORS_ALLOW_ORIGINS", "*"),
 
 		JWTSecret: getEnv("JWT_SECRET", "changeme-secret"),
+
+		MobileAPIKey: getEnv("MOBILE_API_KEY", ""),
+
+		R2AccountId:       getEnv("R2_ACCOUNT_ID", ""),
+		R2AccessKeyId:     getEnv("R2_ACCESS_KEY_ID", ""),
+		R2SecretAccessKey: getEnv("R2_SECRET_ACCESS_KEY", ""),
+		R2BucketName:      getEnv("R2_BUCKET_NAME", "cmo-loan-app"),
+		R2Endpoint:        getEnv("R2_ENDPOINT", ""),
+
+		DefaultAdminPassword: getEnv("DEFAULT_ADMIN_PASSWORD", ""),
 	}
 
 	log.Printf("[config] ✅ ENV=%s | DB=%s:%s/%s | Port=%s",
@@ -69,6 +94,12 @@ func GetConfig() *AppConfig {
 	}
 	if cfg.IsProd() && cfg.JWTSecret == "changeme-secret" {
 		log.Println("[config] ⚠️  JWT_SECRET กำลังใช้ค่า default ใน production — ควรเปลี่ยนด่วน!")
+	}
+	if cfg.R2AccountId == "" {
+		log.Println("[config] ⚠️  R2_ACCOUNT_ID ยังไม่ได้ตั้งค่า — ฟีเจอร์อัปโหลดไฟล์จะไม่ทำงาน")
+	}
+	if cfg.MobileAPIKey == "" {
+		log.Println("[config] ⚠️  MOBILE_API_KEY ยังไม่ได้ตั้งค่า — /api/update-status จะปฏิเสธทุก request")
 	}
 
 	return cfg

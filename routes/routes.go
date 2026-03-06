@@ -14,6 +14,10 @@ func Setup(app *fiber.App) {
 	app.Get("/login", handlers.LoginPage)
 	app.Post("/login", handlers.LoginPost)
 	app.Get("/logout", handlers.Logout)
+
+	// Mobile App API — protected by API Key (not cookie)
+	app.Post("/api/update-status", handlers.MobileAPIKeyMiddleware, handlers.UpdateStatus)
+
 	app.Use(handlers.AuthMiddleware)
 
 	app.Get("/change-password", handlers.ChangePasswordPage)
@@ -39,7 +43,6 @@ func Setup(app *fiber.App) {
 	// API
 	app.Get("/api/loan-list", handlers.GetLoanList) // 📱 Mobile App
 	app.Post("/api/sync-work", handlers.UpdateSyncStatus)
-	app.Post("/api/update-status", handlers.UpdateStatus)
 	app.Post("/api/search-car", handlers.SearchCar)
 	app.Post("/api/calculate-insurance", handlers.CalculateInsuranceRate)
 	app.Post("/api/search-agent", handlers.SearchAgent)

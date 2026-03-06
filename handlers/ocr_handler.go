@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"loan-app/config"
 	"loan-app/services"
 
 	"github.com/gofiber/fiber/v2"
@@ -171,7 +172,7 @@ func parseJWTUsername(tokenStr string) string {
 		return ""
 	}
 	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
-		return []byte("mysecret"), nil
+		return []byte(config.GetConfig().JWTSecret), nil
 	})
 	if err != nil || !token.Valid {
 		return ""
