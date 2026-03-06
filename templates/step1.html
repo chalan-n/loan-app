@@ -1324,6 +1324,8 @@
             <i class="fas fa-camera"></i> ถ่ายรูป / อัปโหลด
           </button>
         </div>
+        <!-- Image Quality Feedback -->
+        <div id="iq-result-idcard" style="display:none;"></div>
 
         <!-- ID Card Loading Overlay -->
         <div id="idcardOverlay">
@@ -2381,7 +2383,7 @@
           });
           // Trigger change manually if default value exists
           if (provinceSelect.dataset.defaultValue) {
-            provinceSelect.dispatchEvent(new Event('change'));
+            provinceSelect.dispatchEvent(new Event('change'));  // populate district options
           }
         };
 
@@ -2680,6 +2682,15 @@
       if (!input.files || !input.files[0]) return;
 
       const file = input.files[0];
+
+      // ── Quality analysis + compression (parallel, non-blocking) ────────
+      const iqEl = document.getElementById('iq-result-idcard');
+      const [qResult, compressed] = await Promise.all([
+        ImageQuality.analyze(file),
+        ImageQuality.compress(file)
+      ]);
+      ImageQuality.showFeedback(iqEl, qResult);
+
       const overlay = document.getElementById('idcardOverlay');
       const overlayMsg = document.getElementById('idcardOverlayMsg');
       const badge = document.getElementById('idcardBadge');
@@ -2692,7 +2703,7 @@
 
       try {
         const formData = new FormData();
-        formData.append('image', file);
+        formData.append('image', compressed, file.name || 'idcard.jpg');
 
         const res = await fetch('/api/v1/ocr/idcard', { method: 'POST', body: formData });
         const json = await res.json();
@@ -2708,11 +2719,11 @@
         const idOk = /^\d{13}$/.test(idNum) && validateIDChecksum(idNum);
         const serverValid = json.id_valid === true;
 
-        // ── Auto-fill fields ─────────────────────────────────────────
+        // ── Auto-fill fields ──────────────────────────────────────────
         overlayMsg.textContent = '✅ กำลังกรอกข้อมูล...';
         fillIDCardFields(d, idNum);
 
-        // ── แสดง badge ───────────────────────────────────────────────
+        // ── แสดง badge ────────────────────────────────────────────────
         if (serverValid && idOk) {
           badgeText.textContent = `✅ เลขบัตร ${formatIDDisplay(idNum)} — ตรวจสอบผ่าน`;
           badge.className = 'idcard-ocr-badge show';
@@ -2727,7 +2738,6 @@
         alert('❌ สแกนบัตรไม่สำเร็จ: ' + err.message + '\n\nกรุณาถ่ายรูปให้ชัดขึ้น และให้เห็นเลข 13 หลักครบถ้วน');
       } finally {
         overlay.classList.remove('show');
-        input.value = ''; // reset ให้ถ่ายซ้ำได้
       }
     }
 
@@ -2875,11 +2885,11 @@
         const p2 = parseInt(parts[2], 10);
 
         if (parts[0].length === 4) {
-          yyyy = p0; mm = p1; dd = p2;           // YYYY-MM-DD
-        } else if (parts[2].length === 4) {
-          dd = p0; mm = p1; yyyy = p2;            // DD/MM/YYYY
+          // YYYY-MM-DD (format จาก onChange ของ flatpickr)
+          year = p0; mm = p1; dd = p2;           // YYYY-MM-DD
         } else {
-          dd = p0; mm = p1; yyyy = p2;            // fallback DD/MM/YY
+          // DD-MM-YYYY (format จาก input value ปกติ)
+          dd = p0; mm = p1; yyyy = p2;            // DD-MM-YYYY
         }
       } else {
         console.warn('[setFlatpickrDate] cannot parse:', dateStr);
@@ -3187,11 +3197,19 @@
       closeCamOverlay();
 
       // ── 4. แปลง Canvas → Blob ──────────────────────────────────────
-      const blob = await new Promise(resolve =>
+      const rawBlob = await new Promise(resolve =>
         canvas.toBlob(resolve, 'image/jpeg', 0.92)
       );
 
-      // ── 5. ส่ง OCR (reuse logic จาก handleIdCardFile) ──────────────
+      // ── 5. Quality check + compress ──────────────────────────────────
+      const iqEl = document.getElementById('iq-result-idcard');
+      const [qResult, blob] = await Promise.all([
+        ImageQuality.analyze(rawBlob),
+        ImageQuality.compress(rawBlob)
+      ]);
+      ImageQuality.showFeedback(iqEl, qResult);
+
+      // ── 6. ส่ง OCR (reuse logic จาก handleIdCardFile) ──────────────
       const overlay = document.getElementById('idcardOverlay');
       const overlayMsg = document.getElementById('idcardOverlayMsg');
       const badge = document.getElementById('idcardBadge');
@@ -3241,6 +3259,8 @@
       }
     }
   </script>
+  <!-- Smart Image Validation -->
+  <script src="/static/js/image-quality.js"></script>
   <!-- Offline Draft System -->
   <script src="/static/js/dexie.min.js"></script>
   <script src="/static/js/draft-db.js"></script>

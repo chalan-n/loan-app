@@ -2,6 +2,7 @@ package routes
 
 import (
 	"loan-app/handlers"
+	"loan-app/middleware"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
@@ -25,31 +26,35 @@ func Setup(app *fiber.App) {
 
 	app.Get("/", handlers.LoginPage)
 	app.Get("/main", handlers.MainPage)
+
+	// Idempotency middleware — prevents duplicate submissions (double-click / offline retry)
+	idem := middleware.Idempotency()
+
 	app.Get("/step1", handlers.Step1)
-	app.Post("/step1", handlers.Step1Post)
+	app.Post("/step1", idem, handlers.Step1Post)
 	app.Get("/step2", handlers.Step2)
-	app.Post("/step2", handlers.Step2Post)
+	app.Post("/step2", idem, handlers.Step2Post)
 	app.Get("/step3", handlers.Step3)
-	app.Post("/step3", handlers.Step3Post)
+	app.Post("/step3", idem, handlers.Step3Post)
 	app.Get("/step4", handlers.Step4)
-	app.Post("/step4", handlers.Step4Post)
+	app.Post("/step4", idem, handlers.Step4Post)
 	app.Get("/step5", handlers.Step5)
-	app.Post("/step5", handlers.Step5Post)
+	app.Post("/step5", idem, handlers.Step5Post)
 	app.Get("/step6", handlers.Step6)
-	app.Post("/step6", handlers.Step6Post)
+	app.Post("/step6", idem, handlers.Step6Post)
 	app.Get("/step7", handlers.Step7)
-	app.Post("/step7", handlers.Step7Post)
+	app.Post("/step7", idem, handlers.Step7Post)
 
 	// API
 	app.Get("/api/loan-list", handlers.GetLoanList) // 📱 Mobile App
-	app.Post("/api/sync-work", handlers.UpdateSyncStatus)
+	app.Post("/api/sync-work", idem, handlers.UpdateSyncStatus)
 	app.Post("/api/search-car", handlers.SearchCar)
 	app.Post("/api/calculate-insurance", handlers.CalculateInsuranceRate)
 	app.Post("/api/search-agent", handlers.SearchAgent)
 	app.Post("/api/search-showroom", handlers.SearchShowroom)
 	app.Post("/api/upload-insurance-file", handlers.UploadInsuranceFile)
 	app.Post("/api/delete-insurance-file", handlers.DeleteInsuranceFile)
-	app.Post("/api/delete-loan", handlers.DeleteLoan)
+	app.Post("/api/delete-loan", idem, handlers.DeleteLoan)
 	app.Get("/api/titles", handlers.GetTitles)
 	app.Get("/api/races", handlers.GetRaces)
 	app.Get("/api/nations", handlers.GetNations)
@@ -69,6 +74,6 @@ func Setup(app *fiber.App) {
 
 	// Guarantor
 	app.Get("/add-guarantor", handlers.AddGuarantorGetV2)
-	app.Post("/add-guarantor", handlers.AddGuarantorPostV2)
+	app.Post("/add-guarantor", idem, handlers.AddGuarantorPostV2)
 	app.Post("/delete-guarantor", handlers.DeleteGuarantor)
 }

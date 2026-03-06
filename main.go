@@ -76,7 +76,7 @@ func main() {
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: config.GetConfig().CORSAllowOrigins,
 		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
-		AllowHeaders: "Origin, Content-Type, Accept, Authorization, X-API-Key",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization, X-API-Key, X-Idempotency-Key",
 	}))
 
 	app.Static("/static", "./static")
@@ -84,7 +84,7 @@ func main() {
 	config.ConnectDB()
 
 	// === AutoMigrate — run once at startup ===
-	config.DB.AutoMigrate(&models.Guarantor{})
+	config.DB.AutoMigrate(&models.Guarantor{}, &models.RefRunning{})
 	// =============================================
 
 	// === Seed default users from env (DEFAULT_ADMIN_PASSWORD) ===

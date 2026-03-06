@@ -996,6 +996,8 @@
                   <i class="fas fa-spinner fa-spin fa-2x"></i>
                   <div style="margin-top:5px; font-size:0.9rem;">กำลังอัปโหลด...</div>
                 </div>
+                <!-- Image Quality Feedback -->
+                <div id="iq-result-insurance" style="display:none;"></div>
 
                 <!-- File List -->
                 <div id="uploadedFileList" style="margin-top:20px;">
@@ -1340,6 +1342,59 @@
         }
       });
 
+      async function handleFileUpload(input) {
+        if (!input.files || input.files.length === 0) return;
+
+        const file = input.files[0];
+
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+        if (!allowedTypes.includes(file.type)) {
+          alert('ประเภทไฟล์ไม่รองรับ\nรองรับเฉพาะ JPG, PNG, WEBP, PDF เท่านั้น');
+          input.value = '';
+          return;
+        }
+        const maxSizeMB = 10;
+        if (file.size > maxSizeMB * 1024 * 1024) {
+          alert(`ไฟล์ขนาดใหญ่เกินไป\nขนาดสูงสุดที่อนุญาต: ${maxSizeMB} MB`);
+          input.value = '';
+          return;
+        }
+
+        // Quality analysis + compression (images only; PDFs pass through)
+        const iqEl = document.getElementById('iq-result-insurance');
+        const [qResult, uploadBlob] = await Promise.all([
+          ImageQuality.analyze(file),
+          ImageQuality.compress(file)
+        ]);
+        ImageQuality.showFeedback(iqEl, qResult);
+
+        const loading = document.getElementById('uploadLoading');
+        loading.style.display = 'block';
+
+        const formData = new FormData();
+        formData.append('file', uploadBlob, file.name || 'upload.jpg');
+
+        fetch('/api/upload-insurance-file', {
+          method: 'POST',
+          body: formData
+        })
+          .then(res => res.json())
+          .then(data => {
+            loading.style.display = 'none';
+            if (data.error) {
+              alert('อัปโหลดไม่สำเร็จ: ' + data.error);
+            } else {
+              addFileToList(data.filename);
+              input.value = '';
+            }
+          })
+          .catch(err => {
+            loading.style.display = 'none';
+            console.error(err);
+            alert('เกิดข้อผิดพลาดในการอัปโหลดไฟล์');
+          });
+      }
+
       function addFileToList(filename) {
         const list = document.getElementById('uploadedFileList');
         const item = document.createElement('div');
@@ -1386,51 +1441,6 @@
         list.appendChild(item);
       }
 
-      function handleFileUpload(input) {
-        if (!input.files || input.files.length === 0) return;
-
-        const file = input.files[0];
-
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
-        if (!allowedTypes.includes(file.type)) {
-          alert('ประเภทไฟล์ไม่รองรับ\nรองรับเฉพาะ JPG, PNG, WEBP, PDF เท่านั้น');
-          input.value = '';
-          return;
-        }
-        const maxSizeMB = 10;
-        if (file.size > maxSizeMB * 1024 * 1024) {
-          alert(`ไฟล์ขนาดใหญ่เกินไป\nขนาดสูงสุดที่อนุญาต: ${maxSizeMB} MB`);
-          input.value = '';
-          return;
-        }
-
-        const loading = document.getElementById('uploadLoading');
-        loading.style.display = 'block';
-
-        const formData = new FormData();
-        formData.append('file', file);
-
-        fetch('/api/upload-insurance-file', {
-          method: 'POST',
-          body: formData
-        })
-          .then(res => res.json())
-          .then(data => {
-            loading.style.display = 'none';
-            if (data.error) {
-              alert('อัปโหลดไม่สำเร็จ: ' + data.error);
-            } else {
-              addFileToList(data.filename);
-              input.value = '';
-            }
-          })
-          .catch(err => {
-            loading.style.display = 'none';
-            console.error(err);
-            alert('เกิดข้อผิดพลาดในการอัปโหลดไฟล์');
-          });
-      }
-
       function deleteFile(filename, itemElement) {
         if (!confirm('ต้องการลบไฟล์นี้ใช่หรือไม่?')) return;
 
@@ -1453,6 +1463,8 @@
           });
       }
     </script>
+  <!-- Smart Image Validation -->
+  <script src="/static/js/image-quality.js"></script>
   <!-- Offline Draft System -->
   <script src="/static/js/dexie.min.js"></script>
   <script src="/static/js/draft-db.js"></script>

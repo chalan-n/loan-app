@@ -1318,6 +1318,8 @@
             <i class="fas fa-camera"></i> ถ่ายรูป / อัปโหลด
           </button>
         </div>
+        <!-- Image Quality Feedback -->
+        <div id="iq-result-vehicle" style="display:none;"></div>
 
         <!-- OCR Loading Overlay -->
         <div id="ocrOverlay">
@@ -1510,10 +1512,119 @@
   </div>
 
   <script>
+    /**
+     * fillVehicleFields — นำ VehicleInfo JSON ไปใส่ใน input fields ต่างๆ
+     * @param {Object} d - data จาก /api/v1/ocr/vehicle response
+     */
+    function fillVehicleFields(d) {
+      const setVal = (name, val) => {
+        const el = document.querySelector(`[name="${name}"]`);
+        if (el && val) el.value = val;
+      };
 
+      // ── ข้อความตรงไปตรงมา ────────────────────────────────────────
+      setVal('car_chassis_no', d.chassis_number);
+      setVal('car_engine_no', d.engine_number);
+      setVal('license_plate', d.plate_number);
+      setVal('car_year', d.model_year ? String(d.model_year) : '');
 
+      // ── ตัวเลข CC และน้ำหนัก ─────────────────────────────────────
+      if (d.engine_cc && d.engine_cc > 0) setVal('car_cc', String(d.engine_cc));
+      if (d.car_weight && d.car_weight > 0) setVal('car_weight', String(d.car_weight));
 
+      // ── วันจดทะเบียน ──────────────────────────────────────────────
+      if (d.registration_date) {
+        setVal('car_register_date', d.registration_date);
+      }
 
+      // ── Select: จังหวัด (license_province) ───────────────────────
+      if (d.province) {
+        const provSelect = document.querySelector('select[name="license_province"]');
+        if (provSelect) setSelectByText(provSelect, d.province);
+      }
+
+      // ── Select: ยี่ห้อรถ (car_brand) ─────────────────────────────
+      if (d.vehicle_brand) {
+        const brandSelect = document.querySelector('select[name="car_brand"]');
+        if (brandSelect) setSelectByText(brandSelect, d.vehicle_brand);
+      }
+
+      // ── Select: สีรถ (car_color) ──────────────────────────────────
+      if (d.color) {
+        const colorSelect = document.querySelector('select[name="car_color"]');
+        if (colorSelect) setSelectByText(colorSelect, d.color);
+      }
+
+      // Highlight fields ที่ถูก fill เพื่อให้ MO เห็นว่าอะไรเปลี่ยน
+      highlightFilledFields();
+    }
+
+    /**
+     * setSelectByText — เลือก option ที่ text หรือ value ตรงกับ keyword
+     * (ใช้ partial match เพื่อรองรับชื่อที่อาจสะกดต่าง)
+     */
+    function setSelectByText(select, keyword) {
+      const kw = keyword.trim().toLowerCase();
+      let bestIdx = -1;
+      let bestScore = 0;
+
+      for (let i = 0; i < select.options.length; i++) {
+        const text = select.options[i].text.trim().toLowerCase();
+        const value = select.options[i].value.trim().toLowerCase();
+
+        if (text === kw || value === kw) { select.selectedIndex = i; return; } // exact match
+        if (text.includes(kw) || kw.includes(text)) {
+          const score = text.length;
+          if (score > bestScore) { bestScore = score; bestIdx = i; }
+        }
+      }
+      if (bestIdx >= 0) select.selectedIndex = bestIdx;
+    }
+
+    /**
+     * highlightFilledFields — Pulse animation บน fields ที่เพิ่งถูก auto-fill
+     */
+    function highlightFilledFields() {
+      const names = [
+        'car_chassis_no', 'car_engine_no', 'license_plate',
+        'car_year', 'car_register_date', 'license_province', 'car_brand', 'car_color',
+        'car_cc', 'car_weight'
+      ];
+      names.forEach(name => {
+        const el = document.querySelector(`[name="${name}"]`);
+        if (!el) return;
+        el.style.transition = 'box-shadow 0.4s, border-color 0.4s';
+        el.style.borderColor = '#10b981';
+        el.style.boxShadow = '0 0 0 4px rgba(16,185,129,0.25)';
+        setTimeout(() => {
+          el.style.borderColor = '';
+          el.style.boxShadow = '';
+        }, 2500);
+      });
+    }
+  </script>
+
+  <!-- Car Search Modal -->
+  <div id="carSearchModal"
+    style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; align-items:center; justify-content:center; backdrop-filter: blur(5px);">
+    <div
+      style="background:white; padding:30px; border-radius:20px; width:90%; max-width:400px; text-align:center; position:relative; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: fadeIn 0.3s;">
+      <h3 style="color:var(--navy); margin-bottom:20px; font-size:1.4rem;"><i class="fas fa-search"></i> ค้นหารหัสรถ
+      </h3>
+      <input type="text" id="modalCarCode" placeholder="กรอกรหัสรถ (เช่น ABC1234)"
+        style="width:100%; padding:14px; border:2px solid var(--border); border-radius:12px; font-size:1.2rem; text-align:center; margin-bottom:24px; outline:none;"
+        maxlength="7" oninput="this.value = this.value.toUpperCase()">
+
+      <div style="display:flex; justify-content:center; gap:12px;">
+        <button type="button" onclick="closeCarSearchModal()"
+          style="background:#f3f4f6; color:#4b5563; border:none; padding:12px 24px; border-radius:50px; cursor:pointer; font-weight:600; font-size:1rem; flex:1;">ยกเลิก</button>
+        <button type="button" onclick="searchCarFromModal()"
+          style="background:linear-gradient(135deg, var(--navy), var(--blue)); color:white; border:none; padding:12px 24px; border-radius:50px; cursor:pointer; font-weight:600; font-size:1rem; flex:1; box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);">ค้นหา</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
     // Auto-select dropdowns based on data-default-value
     document.addEventListener("DOMContentLoaded", function () {
       showLoading('กำลังโหลดข้อมูล...');
@@ -1851,71 +1962,8 @@
     }
   </script>
 
-  <!-- Car Search Modal -->
-  <div id="carSearchModal"
-    style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; align-items:center; justify-content:center; backdrop-filter: blur(5px);">
-    <div
-      style="background:white; padding:30px; border-radius:20px; width:90%; max-width:400px; text-align:center; position:relative; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: fadeIn 0.3s;">
-      <h3 style="color:var(--navy); margin-bottom:20px; font-size:1.4rem;"><i class="fas fa-search"></i> ค้นหารหัสรถ
-      </h3>
-      <input type="text" id="modalCarCode" placeholder="กรอกรหัสรถ (เช่น ABC1234)"
-        style="width:100%; padding:14px; border:2px solid var(--border); border-radius:12px; font-size:1.2rem; text-align:center; margin-bottom:24px; outline:none;"
-        maxlength="7" oninput="this.value = this.value.toUpperCase()">
-
-      <div style="display:flex; justify-content:center; gap:12px;">
-        <button type="button" onclick="closeCarSearchModal()"
-          style="background:#f3f4f6; color:#4b5563; border:none; padding:12px 24px; border-radius:50px; cursor:pointer; font-weight:600; font-size:1rem; flex:1;">ยกเลิก</button>
-        <button type="button" onclick="searchCarFromModal()"
-          style="background:linear-gradient(135deg, var(--navy), var(--blue)); color:white; border:none; padding:12px 24px; border-radius:50px; cursor:pointer; font-weight:600; font-size:1rem; flex:1; box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);">ค้นหา</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="/static/js/thai_datepicker.js?v=20260304"></script>
-  <script>
-    // --- Helper Functions for Comma Formatting ---
-    function formatCurrency(input) {
-      let value = input.value.replace(/,/g, '');
-      if (value === '' || isNaN(value)) return;
-      input.value = parseFloat(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-
-    function formatInteger(input) {
-      let value = input.value.replace(/,/g, '');
-      if (value === '' || isNaN(value)) return;
-      input.value = parseInt(value, 10).toLocaleString('en-US'); // No decimals
-    }
-
-    function removeCommas(input) {
-      input.value = input.value.replace(/,/g, '');
-    }
-
-    // --- DOMContentLoaded: Format Fields on Load ---
-    document.addEventListener("DOMContentLoaded", function () {
-      // 1. Flatpickr Init Removed (Handled by thai_datepicker.js)
-
-      // 2. Format Comma Fields on Load
-      const integerFields = ['car_weight', 'car_cc', 'car_mileage'];
-      integerFields.forEach(name => {
-        const el = document.querySelector(`input[name="${name}"]`);
-        if (el && el.value) {
-          formatInteger(el);
-        }
-      });
-
-      const currencyFields = ['car_price'];
-      currencyFields.forEach(name => {
-        const el = document.querySelector(`input[name="${name}"]`);
-        if (el && el.value) {
-          formatCurrency(el);
-        }
-      });
-    });
-  </script>
-
-  <!-- ===================================================
-       Vehicle Book OCR — Camera + Auto-fill
-       =================================================== -->
+  <!-- Smart Image Validation -->
+  <script src="/static/js/image-quality.js"></script>
   <script>
     /* ========== Camera ========== */
     let camStream = null;
@@ -1969,14 +2017,27 @@
       canvas.width = video.videoWidth; canvas.height = video.videoHeight;
       canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
       closeVehicleCam();
-      const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.92));
-      await sendVehicleOcr(blob);
+      const rawBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.92));
+      const iqEl = document.getElementById('iq-result-vehicle');
+      const [qResult, compressed] = await Promise.all([
+        ImageQuality.analyze(rawBlob),
+        ImageQuality.compress(rawBlob)
+      ]);
+      ImageQuality.showFeedback(iqEl, qResult);
+      await sendVehicleOcr(compressed);
     }
 
     /* ========== File upload handler ========== */
     async function handleOcrFile(input) {
       if (!input.files || !input.files[0]) return;
-      await sendVehicleOcr(input.files[0]);
+      const file = input.files[0];
+      const iqEl = document.getElementById('iq-result-vehicle');
+      const [qResult, compressed] = await Promise.all([
+        ImageQuality.analyze(file),
+        ImageQuality.compress(file)
+      ]);
+      ImageQuality.showFeedback(iqEl, qResult);
+      await sendVehicleOcr(compressed);
       input.value = '';
     }
 
@@ -2137,7 +2198,7 @@
         text.textContent = '🔴 ภาพเบลอ (ห้ามถ่าย)';
         fill.style.background = 'linear-gradient(90deg,#ef4444,#f87171)';
       } else if (pct <= 70) {
-        text.textContent = '� กำลังโฟกัส...';
+        text.textContent = '🟡 กำลังโฟกัส...';
         fill.style.background = 'linear-gradient(90deg,#f59e0b,#fbbf24)';
       } else {
         text.textContent = '🟢 ภาพชัดเจน (พร้อมถ่าย)';

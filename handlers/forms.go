@@ -257,8 +257,6 @@ func Step1Post(c *fiber.Ctx) error {
 	}
 
 	var refRunning models.RefRunning
-	// Ensure table exists
-	config.DB.AutoMigrate(&models.RefRunning{})
 
 	// Check/Create RefRunning record for THIS staffID (User Requirement)
 	if err := config.DB.Where("ref_year = ? AND emp_id = ?", currentYear, staffID).First(&refRunning).Error; err != nil {

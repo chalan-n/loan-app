@@ -1260,6 +1260,8 @@
           <i class="fas fa-camera"></i> ถ่ายรูป / อัปโหลด
         </button>
       </div>
+      <!-- Image Quality Feedback -->
+      <div id="iq-result-idcard" style="display:none;"></div>
       <!-- OCR Loading Overlay -->
       <div id="idcardOverlay">
         <div class="idcard-spinner"></div>
@@ -2585,15 +2587,27 @@
       canvas.width = video.videoWidth; canvas.height = video.videoHeight;
       canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
       closeCamOverlay();
-      const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.92));
-      await sendOcrBlob(blob);
+      const rawBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.92));
+      const iqEl = document.getElementById('iq-result-idcard');
+      const [qResult, compressed] = await Promise.all([
+        ImageQuality.analyze(rawBlob),
+        ImageQuality.compress(rawBlob)
+      ]);
+      ImageQuality.showFeedback(iqEl, qResult);
+      await sendOcrBlob(compressed);
     }
 
     /* ========== OCR: File upload ========== */
     async function handleIdCardFile(input) {
       if (!input.files || !input.files[0]) return;
       const file = input.files[0];
-      await sendOcrBlob(file);
+      const iqEl = document.getElementById('iq-result-idcard');
+      const [qResult, compressed] = await Promise.all([
+        ImageQuality.analyze(file),
+        ImageQuality.compress(file)
+      ]);
+      ImageQuality.showFeedback(iqEl, qResult);
+      await sendOcrBlob(compressed);
       input.value = '';
     }
 
@@ -2809,6 +2823,13 @@
       }
     }
   </script>
+  <!-- Smart Image Validation -->
+  <script src="/static/js/image-quality.js"></script>
+  <!-- Offline Draft System -->
+  <script src="/static/js/dexie.min.js"></script>
+  <script src="/static/js/draft-db.js"></script>
+  <script src="/static/js/connectivity.js"></script>
+  <script src="/static/js/draft-autosave.js"></script>
 </body>
 
 </html>
