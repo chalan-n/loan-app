@@ -7,6 +7,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -35,10 +36,14 @@ func LoginPost(c *fiber.Ctx) error {
 		return c.Redirect("/login?status=error")
 	}
 
-	// ล็อกอินสำเร็จ
+	// ล็อกอินสำเร็จ — สร้าง session ID ใหม่ (kick session เก่า)
+	newSessionID := uuid.NewString()
+	config.DB.Model(user).Update("current_session_id", newSessionID)
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": user.Username,
-		"exp":      time.Now().Add(time.Hour * 24).Unix(),
+		"username":   user.Username,
+		"session_id": newSessionID,
+		"exp":        time.Now().Add(time.Hour * 24).Unix(),
 	})
 	tokenStr, _ := token.SignedString([]byte(config.GetConfig().JWTSecret))
 
@@ -63,10 +68,24 @@ func AuthMiddleware(c *fiber.Ctx) error {
 	if tokenStr == "" {
 		return c.Redirect("/login")
 	}
-	if parseJWTUsername(tokenStr) == "" {
+	username := parseJWTUsername(tokenStr)
+	if username == "" {
 		c.ClearCookie("token")
 		return c.Redirect("/login")
 	}
+
+	// ตรวจสอบ session_id: ถ้าไม่ตรงกับ DB แปลว่ามีการล็อกอินจากอุปกรณ์ใหม่
+	claimSessionID := parseJWTSessionID(tokenStr)
+	if claimSessionID != "" {
+		var user models.User
+		if err := config.DB.Select("current_session_id").Where("username = ?", username).First(&user).Error; err == nil {
+			if user.CurrentSessionID != claimSessionID {
+				c.ClearCookie("token")
+				return c.Redirect("/login?error=session_expired")
+			}
+		}
+	}
+
 	return c.Next()
 }
 
