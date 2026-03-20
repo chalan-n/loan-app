@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"loan-app/config"
 	"loan-app/models"
@@ -67,6 +68,18 @@ func thaiDate(dateStr string) string {
 func main() {
 	engine := html.New("./templates", ".html")
 	engine.AddFunc("thaiDate", thaiDate)
+	engine.AddFunc("add", func(a, b int) int { return a + b })
+	engine.AddFunc("jsonEncode", func(v interface{}) string {
+		b, _ := json.Marshal(v)
+		return string(b)
+	})
+	engine.AddFunc("seq", func(start, end int) []int {
+		s := make([]int, 0, end-start+1)
+		for i := start; i <= end; i++ {
+			s = append(s, i)
+		}
+		return s
+	})
 
 	app := fiber.New(fiber.Config{
 		Views: engine,
@@ -94,45 +107,9 @@ func main() {
 		config.DB.Model(&models.User{}).Count(&count)
 		if count == 0 {
 			hashed, _ := bcrypt.GenerateFromPassword([]byte(defaultPass), 12)
-
-			// สร้างผู้ใช้ Admin
-			adminUser := models.User{
-				Username: "570639",
-				Password: string(hashed),
-				FullName: "ผู้ดูแลระบบ",
-				Email:    "admin@loan.app",
-				IsActive: true,
-			}
-			config.DB.Create(&adminUser)
-
-			// กำหนดบทบาท admin ให้ผู้ใช้ 570639
-			var adminRole models.Role
-			config.DB.Where("name = ?", "admin").First(&adminRole)
-			config.DB.Create(&models.UserRole{
-				UserID: adminUser.ID,
-				RoleID: adminRole.ID,
-			})
-
-			// สร้างผู้ใช้ Officer
-			officerUser := models.User{
-				Username: "580639",
-				Password: string(hashed),
-				FullName: "เจ้าหน้าที่ประจำ",
-				Email:    "officer@loan.app",
-				IsActive: true,
-			}
-			config.DB.Create(&officerUser)
-
-			// กำหนดบทบาท officer ให้ผู้ใช้ 580639
-			var officerRole models.Role
-			config.DB.Where("name = ?", "officer").First(&officerRole)
-			config.DB.Create(&models.UserRole{
-				UserID: officerUser.ID,
-				RoleID: officerRole.ID,
-			})
-
-			log.Println("[seed] สร้างผู้ใช้เริ่มต้นพร้อมบทบาทสำเร็จ")
-			log.Println("[seed] 570639 = admin, 580639 = officer")
+			config.DB.Create(&models.User{Username: "570639", Password: string(hashed), Role: models.RoleAdmin})
+			config.DB.Create(&models.User{Username: "580639", Password: string(hashed), Role: models.RoleOfficer})
+			log.Println("[seed] สร้างผู้ใช้เริ่มต้นสำเร็จ")
 		}
 	} else {
 		log.Println("[seed] DEFAULT_ADMIN_PASSWORD ไม่ได้ตั้งค่า — ข้ามการสร้างผู้ใช้เริ่มต้น")

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1e3a8a">
+  <title>Audit Log | CMO APP</title>
+  <link rel="stylesheet" href="/static/css/kanit.css">
+  <link rel="stylesheet" href="/static/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/custom_loading.css">
+  <script src="/static/js/custom_loading.js"></script>
+  <style>
+    :root {
+      --navy: #1e3a8a; --sky: #dbeafe; --green: #059669;
+      --red: #dc2626; --orange: #d97706; --gray: #6b7280;
+      --light: #f8fafc; --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Kanit', sans-serif; background: linear-gradient(135deg, #f0f9ff, #e0f2fe); min-height: 100vh; color: #1e293b; }
+
+    .top-header {
+      background: linear-gradient(135deg, var(--navy), #1e40af);
+      color: white; padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .top-header h1 { font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .nav-links { display: flex; gap: 12px; align-items: center; }
+    .nav-links a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.95rem; padding: 6px 14px; border-radius: 20px; transition: background 0.2s; }
+    .nav-links a:hover, .nav-links a.active { background: rgba(255,255,255,0.2); color: white; }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px 16px; }
+
+    .filter-bar {
+      background: white; border-radius: 16px; padding: 16px 20px;
+      box-shadow: 0 4px 15px rgba(30,58,138,0.08); border: 1px solid var(--border);
+      display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;
+      margin-bottom: 20px;
+    }
+    .filter-bar .field { display: flex; flex-direction: column; gap: 4px; }
+    .filter-bar label { font-size: 0.85rem; font-weight: 600; color: var(--gray); }
+    .filter-bar input, .filter-bar select {
+      padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: 'Kanit', sans-serif; font-size: 0.95rem;
+    }
+    .filter-bar input:focus, .filter-bar select:focus { outline: none; border-color: var(--navy); }
+    .btn-filter {
+      padding: 8px 20px; background: var(--navy); color: white; border: none;
+      border-radius: 10px; font-family: 'Kanit', sans-serif; font-size: 0.95rem;
+      cursor: pointer; align-self: flex-end;
+    }
+    .btn-filter:hover { background: #1e40af; }
+
+    .table-card {
+      background: white; border-radius: 16px; overflow: hidden;
+      box-shadow: 0 4px 15px rgba(30,58,138,0.08); border: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .table-card table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .table-card th { background: var(--sky); color: var(--navy); padding: 12px 14px; text-align: left; font-weight: 700; white-space: nowrap; }
+    .table-card td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .table-card tr:last-child td { border-bottom: none; }
+    .table-card tr:hover td { background: #f8faff; }
+
+    .action-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 0.8rem; font-weight: 600; white-space: nowrap;
+    }
+    .action-badge.login      { background: #d1fae5; color: #065f46; }
+    .action-badge.logout     { background: #f3f4f6; color: #374151; }
+    .action-badge.create_loan { background: #dbeafe; color: #1e40af; }
+    .action-badge.delete_loan { background: #fee2e2; color: #991b1b; }
+    .action-badge.submit_loan { background: #ede9fe; color: #5b21b6; }
+    .action-badge.update_user_role { background: #fef3c7; color: #92400e; }
+    .action-badge.create_user { background: #d1fae5; color: #065f46; }
+    .action-badge.delete_user { background: #fee2e2; color: #991b1b; }
+    .action-badge.default    { background: #f1f5f9; color: #475569; }
+
+    .role-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.78rem; font-weight: 600; }
+    .role-badge.admin   { background: #7c3aed; color: white; }
+    .role-badge.manager { background: #1e3a8a; color: white; }
+    .role-badge.officer { background: #e2e8f0; color: #475569; }
+
+    .pagination { display: flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap; }
+    .pagination a, .pagination span {
+      padding: 8px 16px; border-radius: 10px; font-size: 0.9rem; text-decoration: none;
+      border: 1.5px solid var(--border); color: var(--navy); font-weight: 500;
+    }
+    .pagination a:hover { background: var(--sky); }
+    .pagination .current { background: var(--navy); color: white; border-color: var(--navy); }
+    .pagination .disabled { color: var(--gray); cursor: default; }
+
+    .summary-bar { display: flex; gap: 16px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+    .summary-bar .count { font-size: 0.9rem; color: var(--gray); }
+    .summary-bar strong { color: var(--navy); }
+
+    @media (max-width: 768px) {
+      .table-card { overflow-x: auto; }
+      .top-header { flex-direction: column; gap: 10px; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-header">
+    <h1><i class="fas fa-history"></i> Audit Log</h1>
+    <div class="nav-links">
+      <a href="/main"><i class="fas fa-list"></i> รายการ</a>
+      <a href="/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
+      <a href="/admin/users"><i class="fas fa-users-cog"></i> จัดการ User</a>
+      <a href="/admin/audit" class="active"><i class="fas fa-history"></i> Audit Log</a>
+      <a href="/logout"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Filter -->
+    <form method="GET" action="/admin/audit" class="filter-bar">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" name="username" value="{{.FilterUsername}}" placeholder="ค้นหา username...">
+      </div>
+      <div class="field">
+        <label>Action</label>
+        <select name="action">
+          <option value="">-- ทั้งหมด --</option>
+          <option value="login"       {{if eq .FilterAction "login"}}selected{{end}}>login</option>
+          <option value="logout"      {{if eq .FilterAction "logout"}}selected{{end}}>logout</option>
+          <option value="create_loan" {{if eq .FilterAction "create_loan"}}selected{{end}}>create_loan</option>
+          <option value="submit_loan" {{if eq .FilterAction "submit_loan"}}selected{{end}}>submit_loan</option>
+          <option value="delete_loan" {{if eq .FilterAction "delete_loan"}}selected{{end}}>delete_loan</option>
+          <option value="create_user" {{if eq .FilterAction "create_user"}}selected{{end}}>create_user</option>
+          <option value="update_user_role" {{if eq .FilterAction "update_user_role"}}selected{{end}}>update_user_role</option>
+          <option value="delete_user" {{if eq .FilterAction "delete_user"}}selected{{end}}>delete_user</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-filter"><i class="fas fa-search"></i> ค้นหา</button>
+      <a href="/admin/audit" style="align-self:flex-end; color:var(--gray); font-size:0.9rem; padding:8px;">รีเซ็ต</a>
+    </form>
+
+    <div class="summary-bar">
+      <div class="count">พบ <strong>{{.Total}}</strong> รายการ (หน้า {{.Page}} / {{.TotalPages}})</div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>เวลา</th>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Action</th>
+            <th>RefCode</th>
+            <th>รายละเอียด</th>
+            <th>IP</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range .Logs}}
+          <tr>
+            <td style="white-space:nowrap; color:var(--gray); font-size:0.82rem;">{{.CreatedAt.Format "02/01/06 15:04:05"}}</td>
+            <td><strong>{{.Username}}</strong></td>
+            <td>
+              {{if eq .Role "admin"}}<span class="role-badge admin">admin</span>
+              {{else if eq .Role "manager"}}<span class="role-badge manager">manager</span>
+              {{else}}<span class="role-badge officer">officer</span>{{end}}
+            </td>
+            <td>
+              <span class="action-badge {{.Action}}">{{.Action}}</span>
+            </td>
+            <td style="font-size:0.82rem; color:var(--navy);">{{.RefCode}}</td>
+            <td style="font-size:0.82rem; color:var(--gray); max-width:200px;">{{.Detail}}</td>
+            <td style="font-size:0.78rem; color:var(--gray);">{{.IPAddress}}</td>
+          </tr>
+          {{else}}
+          <tr><td colspan="7" style="text-align:center; color:var(--gray); padding:32px;">ไม่พบข้อมูล</td></tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {{if gt .TotalPages 1}}
+    <div class="pagination">
+      {{if gt .Page 1}}
+      <a href="?page={{add .Page -1}}&action={{.FilterAction}}&username={{.FilterUsername}}"><i class="fas fa-chevron-left"></i></a>
+      {{else}}
+      <span class="disabled"><i class="fas fa-chevron-left"></i></span>
+      {{end}}
+
+      {{range $i := seq 1 .TotalPages}}
+      {{if eq $i $.Page}}
+      <span class="current">{{$i}}</span>
+      {{else}}
+      <a href="?page={{$i}}&action={{$.FilterAction}}&username={{$.FilterUsername}}">{{$i}}</a>
+      {{end}}
+      {{end}}
+
+      {{if lt .Page .TotalPages}}
+      <a href="?page={{add .Page 1}}&action={{.FilterAction}}&username={{.FilterUsername}}"><i class="fas fa-chevron-right"></i></a>
+      {{else}}
+      <span class="disabled"><i class="fas fa-chevron-right"></i></span>
+      {{end}}
+    </div>
+    {{end}}
+
+  </div>
+
+</body>
+</html>

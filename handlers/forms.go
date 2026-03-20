@@ -57,9 +57,10 @@ func MainPage(c *fiber.Ctx) error {
 	}
 
 	return c.Render("main", fiber.Map{
-		"title":   "หน้าหลัก - CMO APP",
-		"Loans":   loans,
-		"StaffID": staffID,
+		"title":       "หน้าหลัก - CMO APP",
+		"Loans":       loans,
+		"StaffID":     staffID,
+		"CurrentRole": getUserRole(staffID),
 	})
 }
 
@@ -384,6 +385,8 @@ func Step1Post(c *fiber.Ctx) error {
 	if err := config.DB.Create(&loan).Error; err != nil {
 		return c.Status(500).SendString(err.Error())
 	}
+
+	WriteAudit(c, "create_loan", loan.RefCode, loan.FirstName+" "+loan.LastName)
 
 	// Set cookie
 	c.Cookie(&fiber.Cookie{
@@ -793,6 +796,7 @@ func Step7Post(c *fiber.Ctx) error {
 	loan.LastUpdateDate = time.Now().Format("2006-01-02 15:04:05")
 
 	config.DB.Save(&loan)
+	WriteAudit(c, "submit_loan", loan.RefCode, "บันทึกสมบูรณ์ step 7")
 
 	// Clear cookie after finish
 	c.ClearCookie("loan_id")

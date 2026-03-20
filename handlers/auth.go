@@ -49,11 +49,13 @@ func LoginPost(c *fiber.Ctx) error {
 		Path:     "/",
 	})
 
+	WriteAudit(c, "login", "", "เข้าสู่ระบบสำเร็จ")
 	// ส่งกลับไป login พร้อมสถานะ success → JS จะโชว์ Toast เขียว แล้วค่อยไป /main
 	return c.Redirect("/main")
 }
 
 func Logout(c *fiber.Ctx) error {
+	WriteAudit(c, "logout", "", "ออกจากระบบ")
 	c.ClearCookie("token")
 	return c.Redirect("/login")
 }

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1e3a8a">
+  <title>จัดการ User | CMO APP</title>
+  <link rel="stylesheet" href="/static/css/kanit.css">
+  <link rel="stylesheet" href="/static/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/custom_loading.css">
+  <script src="/static/js/custom_loading.js"></script>
+  <style>
+    :root {
+      --navy: #1e3a8a; --sky: #dbeafe; --green: #059669;
+      --red: #dc2626; --orange: #d97706; --gray: #6b7280;
+      --light: #f8fafc; --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Kanit', sans-serif; background: linear-gradient(135deg, #f0f9ff, #e0f2fe); min-height: 100vh; color: #1e293b; }
+
+    .top-header {
+      background: linear-gradient(135deg, var(--navy), #1e40af);
+      color: white; padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .top-header h1 { font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .nav-links { display: flex; gap: 12px; align-items: center; }
+    .nav-links a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.95rem; padding: 6px 14px; border-radius: 20px; transition: background 0.2s; }
+    .nav-links a:hover, .nav-links a.active { background: rgba(255,255,255,0.2); color: white; }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 24px 16px; }
+
+    .card {
+      background: white; border-radius: 16px; padding: 24px;
+      box-shadow: 0 4px 15px rgba(30,58,138,0.08); border: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .card h2 { font-size: 1.1rem; font-weight: 700; color: var(--navy); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+
+    /* Create User Form */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: flex-end; }
+    @media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 0.85rem; font-weight: 600; color: var(--gray); }
+    .field input, .field select {
+      padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: 'Kanit', sans-serif; font-size: 0.95rem;
+    }
+    .field input:focus, .field select:focus { outline: none; border-color: var(--navy); }
+
+    .btn { padding: 10px 20px; border-radius: 10px; border: none; font-family: 'Kanit', sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-primary { background: var(--navy); color: white; }
+    .btn-primary:hover { background: #1e40af; }
+    .btn-danger  { background: var(--red); color: white; padding: 6px 14px; font-size: 0.85rem; border-radius: 8px; }
+    .btn-danger:hover { background: #b91c1c; }
+
+    /* Users Table */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th { background: var(--sky); color: var(--navy); padding: 12px 16px; text-align: left; font-weight: 700; white-space: nowrap; }
+    td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8faff; }
+
+    .role-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; }
+    .role-badge.admin   { background: #ede9fe; color: #5b21b6; }
+    .role-badge.manager { background: #dbeafe; color: #1e40af; }
+    .role-badge.officer { background: #f1f5f9; color: #475569; }
+
+    .role-select {
+      padding: 6px 10px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-family: 'Kanit', sans-serif; font-size: 0.88rem; cursor: pointer;
+    }
+    .role-select:focus { outline: none; border-color: var(--navy); }
+
+    .actions { display: flex; gap: 8px; align-items: center; }
+
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--green); color: white;
+      padding: 14px 22px; border-radius: 14px;
+      box-shadow: 0 8px 25px rgba(5,150,105,0.3);
+      font-size: 1rem; font-weight: 600;
+      display: flex; align-items: center; gap: 10px;
+      opacity: 0; transform: translateY(20px);
+      transition: all 0.4s; z-index: 9999; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.error { background: var(--red); box-shadow: 0 8px 25px rgba(220,38,38,0.3); }
+
+    @media (max-width: 640px) { .top-header { flex-direction: column; gap: 10px; align-items: flex-start; } }
+  </style>
+</head>
+<body>
+
+  <div class="top-header">
+    <h1><i class="fas fa-users-cog"></i> จัดการ User</h1>
+    <div class="nav-links">
+      <a href="/main"><i class="fas fa-list"></i> รายการ</a>
+      <a href="/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
+      <a href="/admin/users" class="active"><i class="fas fa-users-cog"></i> จัดการ User</a>
+      <a href="/admin/audit"><i class="fas fa-history"></i> Audit Log</a>
+      <a href="/logout"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Create User -->
+    <div class="card">
+      <h2><i class="fas fa-user-plus"></i> เพิ่ม User ใหม่</h2>
+      <div class="form-row">
+        <div class="field">
+          <label>รหัสพนักงาน (Username)</label>
+          <input type="text" id="newUsername" placeholder="เช่น 570639" maxlength="20">
+        </div>
+        <div class="field">
+          <label>รหัสผ่าน</label>
+          <input type="password" id="newPassword" placeholder="อย่างน้อย 6 ตัวอักษร">
+        </div>
+        <div class="field">
+          <label>Role</label>
+          <select id="newRole">
+            <option value="officer">officer — พนักงาน</option>
+            <option value="manager">manager — ผู้จัดการ</option>
+            <option value="admin">admin — ผู้ดูแลระบบ</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="createUser()">
+          <i class="fas fa-plus"></i> เพิ่ม
+        </button>
+      </div>
+    </div>
+
+    <!-- User List -->
+    <div class="card">
+      <h2><i class="fas fa-users"></i> รายการ User ทั้งหมด ({{len .Users}} คน)</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Username</th>
+              <th>Role ปัจจุบัน</th>
+              <th>เปลี่ยน Role</th>
+              <th>จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{range .Users}}
+            <tr id="row-{{.ID}}">
+              <td style="color:var(--gray); font-size:0.85rem;">{{.ID}}</td>
+              <td><strong>{{.Username}}</strong></td>
+              <td>
+                {{if eq .Role "admin"}}<span class="role-badge admin">admin</span>
+                {{else if eq .Role "manager"}}<span class="role-badge manager">manager</span>
+                {{else}}<span class="role-badge officer">officer</span>{{end}}
+              </td>
+              <td>
+                <select class="role-select" id="role-{{.ID}}" onchange="updateRole({{.ID}}, this.value)">
+                  <option value="officer" {{if eq .Role "officer"}}selected{{end}}>officer</option>
+                  <option value="manager" {{if eq .Role "manager"}}selected{{end}}>manager</option>
+                  <option value="admin"   {{if eq .Role "admin"}}selected{{end}}>admin</option>
+                </select>
+              </td>
+              <td>
+                <div class="actions">
+                  <button class="btn btn-danger" onclick="deleteUser({{.ID}}, '{{.Username}}')">
+                    <i class="fas fa-trash"></i> ลบ
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {{else}}
+            <tr><td colspan="5" style="text-align:center; color:var(--gray); padding:32px;">ยังไม่มี user</td></tr>
+            {{end}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg"></span></div>
+
+  <script>
+    function showToast(msg, isError) {
+      var t = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      t.classList.toggle('error', !!isError);
+      t.classList.add('show');
+      setTimeout(function() { t.classList.remove('show'); }, 3000);
+    }
+
+    async function createUser() {
+      var username = document.getElementById('newUsername').value.trim();
+      var password = document.getElementById('newPassword').value;
+      var role     = document.getElementById('newRole').value;
+      if (!username || !password) { showToast('กรุณากรอก username และ password', true); return; }
+      if (password.length < 6)    { showToast('รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร', true); return; }
+
+      var fd = new FormData();
+      fd.append('username', username);
+      fd.append('password', password);
+      fd.append('role', role);
+
+      showLoading('กำลังสร้าง user...');
+      try {
+        var res = await fetch('/admin/users/create', { method: 'POST', body: fd });
+        var data = await res.json();
+        hideLoading();
+        if (data.success) {
+          showToast('สร้าง user สำเร็จ');
+          document.getElementById('newUsername').value = '';
+          document.getElementById('newPassword').value = '';
+          setTimeout(function() { location.reload(); }, 1200);
+        } else {
+          showToast(data.error || 'เกิดข้อผิดพลาด', true);
+        }
+      } catch(e) { hideLoading(); showToast('เกิดข้อผิดพลาดในการเชื่อมต่อ', true); }
+    }
+
+    async function updateRole(userID, role) {
+      try {
+        var res = await fetch('/admin/users/update-role', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: userID, role: role })
+        });
+        var data = await res.json();
+        if (data.success) { showToast('อัปเดต role สำเร็จ'); }
+        else { showToast(data.error || 'เกิดข้อผิดพลาด', true); }
+      } catch(e) { showToast('เกิดข้อผิดพลาดในการเชื่อมต่อ', true); }
+    }
+
+    async function deleteUser(userID, username) {
+      if (!confirm('ยืนยันลบ user "' + username + '" ?\nการกระทำนี้ไม่สามารถเลิกทำได้')) return;
+      try {
+        var res = await fetch('/admin/users/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: userID })
+        });
+        var data = await res.json();
+        if (data.success) {
+          showToast('ลบ user สำเร็จ');
+          var row = document.getElementById('row-' + userID);
+          if (row) row.remove();
+        } else { showToast(data.error || 'เกิดข้อผิดพลาด', true); }
+      } catch(e) { showToast('เกิดข้อผิดพลาดในการเชื่อมต่อ', true); }
+    }
+  </script>
+
+</body>
+</html>

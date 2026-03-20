@@ -77,15 +77,14 @@ func Setup(app *fiber.App) {
 	app.Post("/add-guarantor", idem, handlers.AddGuarantorPostV2)
 	app.Post("/delete-guarantor", handlers.DeleteGuarantor)
 
-	// User Management (RBAC)
-	app.Get("/users", middleware.RequirePermission("manage_users"), handlers.UsersPage)
-	app.Post("/api/users", middleware.RequirePermission("manage_users"), handlers.CreateUser)
-	app.Put("/api/users/:id", middleware.RequirePermission("manage_users"), handlers.UpdateUser)
-	app.Delete("/api/users/:id", middleware.RequirePermission("manage_users"), handlers.DeleteUser)
+	// Dashboard (manager + admin)
+	app.Get("/dashboard", handlers.RequireManagerOrAbove(), handlers.ManagerDashboard)
 
-	// Role Management
-	app.Get("/roles", middleware.RequirePermission("manage_roles"), handlers.RolesPage)
-	app.Post("/api/roles", middleware.RequirePermission("manage_roles"), handlers.CreateRole)
-	app.Put("/api/roles/:id", middleware.RequirePermission("manage_roles"), handlers.UpdateRole)
-	app.Delete("/api/roles/:id", middleware.RequirePermission("manage_roles"), handlers.DeleteRole)
+	// Admin panel (admin only)
+	admin := app.Group("/admin", handlers.RequireAdmin())
+	admin.Get("/audit", handlers.AuditLogPage)
+	admin.Get("/users", handlers.AdminUsersPage)
+	admin.Post("/users/create", handlers.AdminCreateUser)
+	admin.Post("/users/update-role", handlers.AdminUpdateUserRole)
+	admin.Post("/users/delete", handlers.AdminDeleteUser)
 }

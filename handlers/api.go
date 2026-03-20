@@ -527,5 +527,6 @@ func DeleteLoan(c *fiber.Ctx) error {
 	}
 
 	tx.Commit()
+	WriteAudit(c, "delete_loan", loan.RefCode, loan.FirstName+" "+loan.LastName)
 	return c.JSON(fiber.Map{"success": true})
 }
