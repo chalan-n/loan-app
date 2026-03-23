@@ -403,9 +403,6 @@
         <i class="fas fa-fingerprint"></i> แสกนใบหน้า / ลายนิ้วมือ
       </button>
 
-      <div class="extra-links">
-        <a href="#">ลืมรหัสผ่าน?</a>
-      </div>
     </div>
   </div>
 
@@ -501,7 +498,7 @@
         } catch (e) {
           console.error('[WebAuthn] error name:', e.name, 'message:', e.message);
           if (e.name === 'NotAllowedError') {
-            showBiometricError('ยกเลิกการยืนยันตัวตน');
+            showBiometricError('ยังไม่ได้ลงทะเบียนแสกนใบหน้า / ลายนิ้วมือ');
           } else if (e.name === 'SyntaxError' || (e.message && e.message.includes('pattern'))) {
             showBiometricError('Browser ไม่รองรับ format นี้: ' + e.name + ': ' + e.message);
           } else {
