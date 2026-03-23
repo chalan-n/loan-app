@@ -175,6 +175,11 @@ func WebAuthnRegisterFinish(c *fiber.Ctx) error {
 		transportStrs[i] = string(t)
 	}
 
+	deviceName := c.Get("User-Agent")
+	if len(deviceName) > 500 {
+		deviceName = deviceName[:500]
+	}
+
 	// บันทึกลง DB
 	dbCred := models.WebAuthnCredential{
 		UserID:          waUser.user.ID,
@@ -183,7 +188,7 @@ func WebAuthnRegisterFinish(c *fiber.Ctx) error {
 		AttestationType: credential.AttestationType,
 		Transport:       strings.Join(transportStrs, ","),
 		SignCount:       credential.Authenticator.SignCount,
-		DeviceName:      c.Get("User-Agent"),
+		DeviceName:      deviceName,
 	}
 	if err := config.DB.Create(&dbCred).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "บันทึก credential ไม่สำเร็จ"})
