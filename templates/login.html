@@ -456,18 +456,32 @@
             var err = await beginRes.json();
             throw new Error(err.error || 'เริ่มต้นไม่สำเร็จ');
           }
-          var options = await beginRes.json();
+          var rawOptions = await beginRes.json();
+          console.log('[WebAuthn] begin response:', JSON.stringify(rawOptions));
+
+          // go-webauthn returns { publicKey: { challenge, ... } }
+          var pkOptions = rawOptions.publicKey || rawOptions;
 
           // 2. แปลง base64url → ArrayBuffer
-          options.publicKey.challenge = base64urlToBuffer(options.publicKey.challenge);
-          if (options.publicKey.allowCredentials) {
-            options.publicKey.allowCredentials = options.publicKey.allowCredentials.map(function (c) {
+          pkOptions.challenge = base64urlToBuffer(pkOptions.challenge);
+          if (pkOptions.allowCredentials && pkOptions.allowCredentials.length > 0) {
+            pkOptions.allowCredentials = pkOptions.allowCredentials.map(function (c) {
               return Object.assign({}, c, { id: base64urlToBuffer(c.id) });
             });
+          } else {
+            // Usernameless: ต้องไม่มี allowCredentials หรือเป็น array ว่าง
+            delete pkOptions.allowCredentials;
           }
 
+          var credGetOptions = { publicKey: pkOptions };
+          console.log('[WebAuthn] calling credentials.get with:', JSON.stringify({
+            challenge_len: pkOptions.challenge.byteLength,
+            userVerification: pkOptions.userVerification,
+            rpId: pkOptions.rpId
+          }));
+
           // 3. prompt biometric
-          var assertion = await navigator.credentials.get(options);
+          var assertion = await navigator.credentials.get(credGetOptions);
 
           // 4. Finish
           var finishRes = await fetch('/webauthn/login/finish', {
@@ -483,13 +497,16 @@
             throw new Error(result.error || 'ยืนยันตัวตนไม่สำเร็จ');
           }
         } catch (e) {
+          console.error('[WebAuthn] error name:', e.name, 'message:', e.message);
           if (e.name === 'NotAllowedError') {
             showBiometricError('ยกเลิกการยืนยันตัวตน');
+          } else if (e.name === 'SyntaxError' || (e.message && e.message.includes('pattern'))) {
+            showBiometricError('Browser ไม่รองรับ format นี้: ' + e.name + ': ' + e.message);
           } else {
-            showBiometricError(e.message || 'เกิดข้อผิดพลาด');
+            showBiometricError(e.name + ': ' + (e.message || 'เกิดข้อผิดพลาด'));
           }
           btn.disabled = false;
-          btn.innerHTML = '<i class="fas fa-fingerprint"></i> เข้าสู่ระบบด้วย Biometric';
+          btn.innerHTML = '<i class="fas fa-fingerprint"></i> แสกนใบหน้า / ลายนิ้วมือ';
         }
       });
 

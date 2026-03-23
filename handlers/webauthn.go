@@ -260,7 +260,7 @@ func WebAuthnLoginFinish(c *fiber.Ctx) error {
 	bodyReader := strings.NewReader(string(c.Body()))
 	parsedResponse, err := protocol.ParseCredentialRequestResponseBody(bodyReader)
 	if err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": "ข้อมูลไม่ถูกต้อง: " + err.Error()})
+		return c.Status(400).JSON(fiber.Map{"error": "parse_error: " + err.Error(), "body": string(c.Body())})
 	}
 
 	// Discoverable login: ใช้ userHandler เพื่อหา user จาก userHandle ใน assertion
