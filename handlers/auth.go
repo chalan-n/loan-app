@@ -72,18 +72,6 @@ func AuthMiddleware(c *fiber.Ctx) error {
 		return c.Redirect("/login")
 	}
 
-	// โหลดข้อมูลผู้ใช้พร้อม Roles
-	var user models.User
-	if err := config.DB.
-		Preload("Roles").
-		Where("username = ? AND is_active = ?", username, true).
-		First(&user).Error; err != nil {
-		c.ClearCookie("token")
-		return c.Redirect("/login")
-	}
-
-	// เก็บข้อมูลผู้ใช้ไว้ใน context สำหรับใช้ใน handlers และ middleware อื่นๆ
-	c.Locals("user", &user)
 	c.Locals("username", username)
 
 	return c.Next()
