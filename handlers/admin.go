@@ -24,7 +24,7 @@ func AuditLogPage(c *fiber.Ctx) error {
 	action := c.Query("action")
 	username := c.Query("username")
 
-	q := config.DB.Model(&models.AuditLog{}).Order("created_at desc")
+	q := config.DB.Model(&models.AuditLog{})
 	if action != "" {
 		q = q.Where("action = ?", action)
 	}
@@ -36,7 +36,7 @@ func AuditLogPage(c *fiber.Ctx) error {
 	q.Count(&total)
 
 	var logs []models.AuditLog
-	q.Limit(limit).Offset(offset).Find(&logs)
+	q.Order("created_at desc").Limit(limit).Offset(offset).Find(&logs)
 
 	totalPages := int((total + int64(limit) - 1) / int64(limit))
 
