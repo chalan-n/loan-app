@@ -398,10 +398,13 @@
       </form>
 
       <!-- Biometric Login -->
-      <div class="divider">หรือ</div>
-      <button type="button" class="btn-biometric hidden" id="btnBiometric">
+      <div class="divider" id="biometricDivider" style="display:none;">หรือ</div>
+      <button type="button" class="btn-biometric hidden" id="btnBiometric" style="display:none;">
         <i class="fas fa-fingerprint"></i> เข้าสู่ระบบด้วย Biometric
       </button>
+      <p id="biometricHint" style="text-align:center;font-size:0.85rem;color:#94a3b8;margin-top:10px;display:none;">
+        กรอกรหัสพนักงาน 6 หลัก แล้วกดปุ่ม Biometric
+      </p>
 
       <div class="extra-links">
         <a href="#">ลืมรหัสผ่าน?</a>
@@ -425,25 +428,47 @@
   <script>
     /* ── WebAuthn Biometric Login ─────────────────────────────── */
     (function () {
-      var btn = document.getElementById('btnBiometric');
+      var btn      = document.getElementById('btnBiometric');
+      var divider  = document.getElementById('biometricDivider');
+      var hint     = document.getElementById('biometricHint');
+      var platformOK = false;
 
       // ตรวจสอบว่า browser รองรับ WebAuthn
       if (!window.PublicKeyCredential) return;
 
-      // ตรวจว่ามี credential ใน browser ของเครื่องนี้ไหม (platform authenticator)
+      // ตรวจว่า device รองรับ platform authenticator (fingerprint/face)
       PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
         .then(function (available) {
-          if (available) btn.classList.remove('hidden');
+          platformOK = available;
+          if (available) {
+            // แสดง divider และ hint เสมอ แต่ปุ่มรอ username ครบ 6 หลัก
+            divider.style.display = '';
+            hint.style.display = '';
+            // ตรวจ username ปัจจุบันทันที (กรณี autofill)
+            updateBiometricBtn();
+          }
         })
         .catch(function () {});
 
+      // ฟัง username input → แสดง/ซ่อนปุ่ม biometric
+      document.getElementById('username').addEventListener('input', function () {
+        if (platformOK) updateBiometricBtn();
+      });
+
+      function updateBiometricBtn() {
+        var val = document.getElementById('username').value.trim();
+        if (val.length === 6) {
+          btn.style.display = '';
+          btn.classList.remove('hidden');
+          hint.style.display = 'none';
+        } else {
+          btn.style.display = 'none';
+          hint.style.display = divider.style.display === '' ? '' : 'none';
+        }
+      }
+
       btn.addEventListener('click', async function () {
         var usernameVal = document.getElementById('username').value.trim();
-        if (!usernameVal || usernameVal.length !== 6) {
-          alert('กรุณากรอกรหัสพนักงาน 6 หลักก่อนใช้ Biometric');
-          document.getElementById('username').focus();
-          return;
-        }
 
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังยืนยันตัวตน...';
