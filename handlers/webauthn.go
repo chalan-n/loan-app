@@ -78,6 +78,10 @@ func loadWebAuthnUser(username string) (*webAuthnUser, error) {
 			Authenticator: webauthn.Authenticator{
 				SignCount: dc.SignCount,
 			},
+			Flags: webauthn.CredentialFlags{
+				BackupEligible: dc.BackupEligible,
+				BackupState:    dc.BackupState,
+			},
 		})
 	}
 
@@ -195,6 +199,8 @@ func WebAuthnRegisterFinish(c *fiber.Ctx) error {
 		AttestationType: credential.AttestationType,
 		Transport:       strings.Join(transportStrs, ","),
 		SignCount:       credential.Authenticator.SignCount,
+		BackupEligible:  credential.Flags.BackupEligible,
+		BackupState:     credential.Flags.BackupState,
 		DeviceName:      deviceName,
 	}
 	if err := config.DB.Create(&dbCred).Error; err != nil {
@@ -293,11 +299,15 @@ func WebAuthnLoginFinish(c *fiber.Ctx) error {
 		return c.Status(401).JSON(fiber.Map{"error": "ยืนยันตัวตนไม่สำเร็จ: " + err.Error()})
 	}
 
-	// อัปเดต SignCount
+	// อัปเดต SignCount + Flags หลัง login สำเร็จ
 	credIDStr := base64.RawURLEncoding.EncodeToString(credential.ID)
 	config.DB.Model(&models.WebAuthnCredential{}).
 		Where("user_id = ? AND credential_id = ?", resolvedUser.user.ID, credIDStr).
-		Update("sign_count", credential.Authenticator.SignCount)
+		Updates(map[string]interface{}{
+			"sign_count":      credential.Authenticator.SignCount,
+			"backup_eligible": credential.Flags.BackupEligible,
+			"backup_state":    credential.Flags.BackupState,
+		})
 
 	c.ClearCookie("wa_login_session")
 	tokenStr, err := createJWTToken(resolvedUser.user.Username)

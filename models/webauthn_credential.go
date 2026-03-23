@@ -9,6 +9,8 @@ type WebAuthnCredential struct {
 	AttestationType string `gorm:"type:varchar(64)"`
 	Transport       string `gorm:"type:varchar(128)"`
 	SignCount       uint32 `gorm:"default:0"`
+	BackupEligible  bool   `gorm:"default:false"`
+	BackupState     bool   `gorm:"default:false"`
 	DeviceName      string `gorm:"type:varchar(512)"` // ชื่ออุปกรณ์ (user-agent)
 	CreatedAt       LocalTime
 }
