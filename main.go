@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"loan-app/config"
+	"loan-app/handlers"
 	"loan-app/models"
 	"loan-app/routes"
 	"log"
@@ -99,6 +100,14 @@ func main() {
 	// === AutoMigrate — run once at startup ===
 	config.DB.AutoMigrate(&models.Guarantor{}, &models.RefRunning{})
 	// =============================================
+
+	// === WebAuthn Init ===
+	waCfg := config.GetConfig()
+	if err := handlers.InitWebAuthn(waCfg.WebAuthnRPID, waCfg.WebAuthnOrigin, "CMO APP"); err != nil {
+		log.Fatalf("[webauthn] init failed: %v", err)
+	}
+	log.Printf("[webauthn] ✅ RPID=%s Origin=%s", waCfg.WebAuthnRPID, waCfg.WebAuthnOrigin)
+	// =====================
 
 	// === Seed default users with roles ===
 	defaultPass := config.GetConfig().DefaultAdminPassword

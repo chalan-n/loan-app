@@ -41,6 +41,10 @@ type AppConfig struct {
 
 	// Seed
 	DefaultAdminPassword string
+
+	// WebAuthn
+	WebAuthnRPID   string
+	WebAuthnOrigin string
 }
 
 // cfg เป็น singleton ที่เก็บค่าคอนฟิกไว้ภายใน package
@@ -84,6 +88,9 @@ func GetConfig() *AppConfig {
 		R2Endpoint:        getEnv("R2_ENDPOINT", ""),
 
 		DefaultAdminPassword: getEnv("DEFAULT_ADMIN_PASSWORD", ""),
+
+		WebAuthnRPID:   getEnv("WEBAUTHN_RPID", "localhost"),
+		WebAuthnOrigin: getEnv("WEBAUTHN_ORIGIN", "https://localhost:3000"),
 	}
 
 	log.Printf("[config] ✅ ENV=%s | DB=%s:%s/%s | Port=%s",

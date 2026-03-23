@@ -19,183 +19,106 @@
    - ต้องมี MySQL Server ทำงานอยู่
    - สร้างฐานข้อมูลชื่อ `loan_db`
 
-## ⚙️ การตั้งค่าฐานข้อมูล
+##📈 ฟีเจอร์ที่แนะนำเพิ่ม (เพื่อความสมบูรณ์)
+1. ระบบสิทธิ์ผู้ใช้ (RBAC)
+go
+// models/role.go
+type Role struct {
+    ID          uint      `gorm:"primaryKey"`
+    Name        string    `gorm:"unique"` // admin, officer, manager
+    Permissions []string  // ["view_all", "approve", "delete"]
+} 
+// ผูกกับ User: RoleID uint
+แบ่งสิทธิ์: Admin, Officer, Manager
+จำกัดการเข้าถึงหน้า/ฟังก์ชันตาม Role
 
-### ขั้นตอนที่ 1: สร้างฐานข้อมูล
+2. ระบบ Audit Log
+go
+type AuditLog struct {
+    ID        uint      `gorm:"primaryKey"`
+    UserID    uint
+    Action    string    // "create_loan", "approve", "delete"
+    Detail    string    // JSON ของข้อมูลเก่า/ใหม่
+    IPAddress string
+    UserAgent string
+    CreatedAt time.Time
+}
+บันทึกทุกการเปลี่ยนแปลงข้อมูล
+ใช้สืบค้นปัญหา/ตรวจสอบ
 
-```sql
-CREATE DATABASE loan_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
+3. ระบบ Notifications ขั้นสูง
+แจ้งเตือนผ่าน LINE Notify / Email
+แจ้งเตือนเมื่อใบคำขอใกล้หมดอายุ
+แจ้งเตือนเมื่อมีใบคำขอใหม่
 
-### ขั้นตอนที่ 2: ตั้งค่าการเชื่อมต่อ
+4. ระบบ Dashboard และรายงาน
+Dashboard สำหรับ Manager (ยอดรวม/สถิติ/กราฟ)
+รายงาน Excel ขั้นสูง (รายวัน/รายเดือน/ประเภทสินเชื่อ)
+ระบบ Export PDF ใบคำขอ
 
-แก้ไขไฟล์ `config/database.go` ตามการตั้งค่า MySQL ของคุณ:
+5. ระบบ File Management
+อัปโหลดไฟล์เอกสารเพิ่มเติม (สลิปเงินเดือน, บัญชีธนาคาร)
+จัดเก็บไฟล์บน Cloud (S3/MinIO)
+บีบอัดไฟล์อัตโนมัติ
 
-```go
-// ปัจจุบันตั้งค่าไว้ที่:
-dsn := "root:@tcp(127.0.0.1:3308)/loan_db?charset=utf8mb4&parseTime=True&loc=Local"
+6. ระบบ Workflow การอนุมัติ
+หลายขั้นตอนการอนุมัติ (Officer → Manager → Director)
+แจ้งเตือนเมื่อถึงคิวอนุมัติ
+ประวัติการอนุมัติ
 
-// รูปแบบ:
-// dsn := "username:password@tcp(host:port)/database_name?charset=utf8mb4&parseTime=True&loc=Local"
-```
+7. ระบบ Security ขั้นสูง
+2FA (Google Authenticator)
+Rate Limiting (ป้องกัน DoS)
+Captcha บนหน้า Login
+บันทึก IP ที่พยายามเข้าผิด
 
-**ตัวอย่างการตั้งค่า:**
-- **Username:** `root`
-- **Password:** (ว่างเปล่า หรือใส่รหัสผ่านของคุณ)
-- **Host:** `127.0.0.1`
-- **Port:** `3308` (หรือ `3306` ตามการตั้งค่าของคุณ)
-- **Database:** `loan_db`
+8. ระบบ Performance
+แคชผลลัพธ์ OCR ด้วย Redis
+ใช้งาน Database Connection Pool
+บีบอัด Response ด้วย Gzip
+CDN สำหรับ static files
 
-## 🚀 วิธีการรันโปรเจ็ค
+9. ระบบ Mobile App (Flutter/React Native)
+สแกนเอกสารผ่านกล้อง
+แจ้งเตือน Push Notification
+Offline Mode สำหรับพนักงานขาย
 
-### วิธีที่ 1: รันจากไฟล์ .exe (แนะนำสำหรับ Production)
+10. ระบบ Integration
+ต่อกับระบบ Core Banking
+ต่อกับระบบ Credit Bureau
+API สำหรับระบบอื่นๆ เรียกใช้
 
-```powershell
-# รันเวอร์ชันล่าสุด
-.\loan-app.exe
-
-# หรือเวอร์ชันอื่นๆ
-.\loan-app-r2-v6.exe
-```
-
-### วิธีที่ 2: รันด้วย Go (แนะนำสำหรับ Development)
-
-#### ขั้นตอนที่ 1: ติดตั้ง Dependencies
-
-```powershell
-go mod download
-```
-
-#### ขั้นตอนที่ 2: รันโปรเจ็ค
-
-```powershell
-go run main.go
-```
-
-#### ขั้นตอนที่ 3 (ทางเลือก): Build โปรเจ็ค
-
-```powershell
-# Build สำหรับ Windows
-go build -o loan-app.exe
-
-# Build สำหรับ Linux
-GOOS=linux GOARCH=amd64 go build -o loan-app-linux
-
-# รันไฟล์ที่ build แล้ว
-.\loan-app.exe
-```
-
-## 🌐 เข้าใช้งานระบบ
-
-เมื่อรันสำเร็จ เปิดเบราว์เซอร์และเข้าที่:
-
-```
-http://localhost:3000
-```
-
-## 👤 ข้อมูลเข้าสู่ระบบเริ่มต้น
-
-ระบบจะสร้าง User เริ่มต้น 2 คนอัตโนมัติ:
-
-| Username | Password |
-|----------|----------|
-| 570639   | 123456   |
-| 580639   | 123456   |
-
-## 📁 โครงสร้างโปรเจ็ค
-
-```
+------------------------------------------------------------------------------------------------------
+🔧 การจัดการโครงสร้างให้สมบูรณ์
 loan-app/
-├── config/          # การตั้งค่าฐานข้อมูล
-├── handlers/        # Business Logic และ Controllers
-├── models/          # Database Models (GORM)
-├── routes/          # Route Definitions
-├── static/          # Static Files (CSS, JS, Images)
-├── templates/       # HTML Templates
-├── main.go          # Entry Point
-├── go.mod           # Go Dependencies
-└── go.sum           # Dependencies Checksum
-```
+├── cmd/
+│   └── server/
+│       └── main.go
+├── internal/
+│   ├── auth/
+│   ├── audit/
+│   ├── notification/
+│   └── workflow/
+├── pkg/
+│   ├── middleware/
+│   └── utils/
+├── configs/
+├── migrations/
+├── docs/
+└── scripts/
 
-## 🔧 การพัฒนา
+------------------------------------------------------------------------------------------------------
+📋 แผนพัฒนา (Roadmap)
+Phase 1 
+ระบบสิทธิ์ผู้ใช้ (RBAC)
+ระบบ Audit Log
+Dashboard สำหรับ Manager
 
-### Hot Reload (แนะนำ)
+Phase 2 
+ระบบ File Management
 
-ติดตั้ง Air สำหรับ Hot Reload:
-
-```powershell
-# ติดตั้ง Air
-go install github.com/cosmtrek/air@latest
-
-# รันด้วย Air
-air
-```
-
-### การ Debug
-
-รันเวอร์ชัน Debug:
-
-```powershell
-.\loan-app-password-debug.exe
-```
-
-## 📊 Database Models
-
-ระบบจะสร้างตารางอัตโนมัติ (Auto Migration):
-
-1. **users** - ข้อมูลผู้ใช้งาน
-2. **loan_applications** - ข้อมูลคำขอสินเชื่อ
-3. **guarantors** - ข้อมูลผู้ค้ำประกัน
-
-## 🐛 การแก้ไขปัญหา
-
-### ปัญหา: เชื่อมต่อฐานข้อมูลไม่ได้
-
-```
-panic: เชื่อม DB ไม่ได้: ...
-```
-
-**วิธีแก้:**
-1. ตรวจสอบว่า MySQL Server ทำงานอยู่
-2. ตรวจสอบ username, password, port ใน `config/database.go`
-3. ตรวจสอบว่าสร้างฐานข้อมูล `loan_db` แล้ว
-
-### ปัญหา: Port 3000 ถูกใช้งานอยู่
-
-```
-Error: listen tcp :3000: bind: Only one usage of each socket address...
-```
-
-**วิธีแก้:**
-1. ปิดโปรแกรมที่ใช้ Port 3000
-2. หรือแก้ไข Port ใน `main.go` บรรทัดสุดท้าย:
-   ```go
-   log.Fatal(app.Listen(":3001")) // เปลี่ยนเป็น port อื่น
-   ```
-
-### ปัญหา: Go ไม่พบ Module
-
-```
-go: cannot find main module
-```
-
-**วิธีแก้:**
-```powershell
-go mod tidy
-go mod download
-```
-
-## 📝 หมายเหตุ
-
-- ระบบใช้ Port **3000** เป็นค่าเริ่มต้น
-- รหัสผ่านจะถูกเข้ารหัสด้วย **bcrypt** (cost 12)
-- ฐานข้อมูลใช้ **UTF-8 (utf8mb4)** รองรับภาษาไทย
-- วันที่แสดงเป็น **พุทธศักราช (พ.ศ.)** อัตโนมัติ
-
-## 📞 ติดต่อ & สนับสนุน
-
-หากพบปัญหาหรือต้องการความช่วยเหลือ กรุณาติดต่อทีมพัฒนา
-
----
-
-**สร้างด้วย ❤️ โดยใช้ Go & Fiber Framework**
+Phase 3 
+ระบบ Notifications ขั้นสูง (LINE/Email)
+ระบบ Mobile App
+ระบบ Integration 
+ระบบ Reporting ขั้นสูง

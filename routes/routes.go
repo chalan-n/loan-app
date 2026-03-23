@@ -77,6 +77,15 @@ func Setup(app *fiber.App) {
 	app.Post("/add-guarantor", idem, handlers.AddGuarantorPostV2)
 	app.Post("/delete-guarantor", handlers.DeleteGuarantor)
 
+	// WebAuthn — biometric login/register
+	app.Post("/webauthn/login/begin", handlers.WebAuthnLoginBegin)
+	app.Post("/webauthn/login/finish", handlers.WebAuthnLoginFinish)
+	app.Post("/webauthn/register/begin", handlers.WebAuthnRegisterBegin)
+	app.Post("/webauthn/register/finish", handlers.WebAuthnRegisterFinish)
+	app.Get("/webauthn/credentials", handlers.WebAuthnListCredentials)
+	app.Delete("/webauthn/credentials/:id", handlers.WebAuthnDeleteCredential)
+	app.Get("/webauthn/register", handlers.WebAuthnRegisterPage)
+
 	// Dashboard (manager + admin)
 	app.Get("/dashboard", handlers.RequireManagerOrAbove(), handlers.ManagerDashboard)
 

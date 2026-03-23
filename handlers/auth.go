@@ -36,11 +36,10 @@ func LoginPost(c *fiber.Ctx) error {
 	}
 
 	// ล็อกอินสำเร็จ
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": user.Username,
-		"exp":      time.Now().Add(time.Hour * 24).Unix(),
-	})
-	tokenStr, _ := token.SignedString([]byte(config.GetConfig().JWTSecret))
+	tokenStr, err := createJWTToken(user.Username)
+	if err != nil {
+		return c.Status(500).SendString("สร้าง token ไม่สำเร็จ")
+	}
 
 	c.Cookie(&fiber.Cookie{
 		Name:     "token",
@@ -51,6 +50,15 @@ func LoginPost(c *fiber.Ctx) error {
 
 	WriteAuditAs(c, user.Username, "login", "", "เข้าสู่ระบบสำเร็จ")
 	return c.Redirect("/main")
+}
+
+// createJWTToken สร้าง JWT token สำหรับ username ที่กำหนด
+func createJWTToken(username string) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"username": username,
+		"exp":      time.Now().Add(time.Hour * 24).Unix(),
+	})
+	return token.SignedString([]byte(config.GetConfig().JWTSecret))
 }
 
 func Logout(c *fiber.Ctx) error {

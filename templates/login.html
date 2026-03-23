@@ -185,6 +185,42 @@
       box-shadow: 0 12px 25px rgba(30, 58, 138, 0.35);
     }
 
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 20px 0 16px;
+      color: #94a3b8; font-size: 0.9rem;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: #e2e8f0;
+    }
+
+    .btn-biometric {
+      width: 100%;
+      background: white;
+      color: #1e3a8a;
+      border: 2px solid #1e3a8a;
+      padding: 14px;
+      border-radius: 50px;
+      font-family: 'Kanit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.3s;
+    }
+    .btn-biometric:hover:not(:disabled) {
+      background: #eff6ff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(30,58,138,0.15);
+    }
+    .btn-biometric:disabled {
+      opacity: 0.4; cursor: not-allowed;
+    }
+    .btn-biometric.hidden { display: none; }
+
     .spinner {
       display: none;
       width: 20px;
@@ -361,6 +397,12 @@
         </button>
       </form>
 
+      <!-- Biometric Login -->
+      <div class="divider">หรือ</div>
+      <button type="button" class="btn-biometric hidden" id="btnBiometric">
+        <i class="fas fa-fingerprint"></i> เข้าสู่ระบบด้วย Biometric
+      </button>
+
       <div class="extra-links">
         <a href="#">ลืมรหัสผ่าน?</a>
       </div>
@@ -379,6 +421,119 @@
     </div>
     <span class="close-toast" onclick="this.parentElement.classList.remove('show')">&times;</span>
   </div>
+
+  <script>
+    /* ── WebAuthn Biometric Login ─────────────────────────────── */
+    (function () {
+      var btn = document.getElementById('btnBiometric');
+
+      // ตรวจสอบว่า browser รองรับ WebAuthn
+      if (!window.PublicKeyCredential) return;
+
+      // ตรวจว่ามี credential ใน browser ของเครื่องนี้ไหม (platform authenticator)
+      PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+        .then(function (available) {
+          if (available) btn.classList.remove('hidden');
+        })
+        .catch(function () {});
+
+      btn.addEventListener('click', async function () {
+        var usernameVal = document.getElementById('username').value.trim();
+        if (!usernameVal || usernameVal.length !== 6) {
+          alert('กรุณากรอกรหัสพนักงาน 6 หลักก่อนใช้ Biometric');
+          document.getElementById('username').focus();
+          return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังยืนยันตัวตน...';
+
+        try {
+          // 1. Begin
+          var beginRes = await fetch('/webauthn/login/begin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: usernameVal })
+          });
+          if (!beginRes.ok) {
+            var err = await beginRes.json();
+            throw new Error(err.error || 'เริ่มต้นไม่สำเร็จ');
+          }
+          var options = await beginRes.json();
+
+          // 2. แปลง base64url → ArrayBuffer
+          options.publicKey.challenge = base64urlToBuffer(options.publicKey.challenge);
+          if (options.publicKey.allowCredentials) {
+            options.publicKey.allowCredentials = options.publicKey.allowCredentials.map(function (c) {
+              return Object.assign({}, c, { id: base64urlToBuffer(c.id) });
+            });
+          }
+
+          // 3. prompt biometric
+          var assertion = await navigator.credentials.get(options);
+
+          // 4. Finish
+          var finishRes = await fetch('/webauthn/login/finish', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(credentialToJSON(assertion))
+          });
+          var result = await finishRes.json();
+          if (result.success) {
+            showLoading('กำลังเข้าสู่หน้าหลัก...');
+            window.location.href = result.redirect || '/main';
+          } else {
+            throw new Error(result.error || 'ยืนยันตัวตนไม่สำเร็จ');
+          }
+        } catch (e) {
+          if (e.name === 'NotAllowedError') {
+            showBiometricError('ยกเลิกการยืนยันตัวตน');
+          } else {
+            showBiometricError(e.message || 'เกิดข้อผิดพลาด');
+          }
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-fingerprint"></i> เข้าสู่ระบบด้วย Biometric';
+        }
+      });
+
+      function showBiometricError(msg) {
+        var toast = document.getElementById('errorToast');
+        document.getElementById('errorToastMsg').textContent = msg;
+        toast.classList.add('show');
+        setTimeout(function () { toast.classList.remove('show'); }, 4000);
+      }
+
+      function base64urlToBuffer(base64url) {
+        var base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+        while (base64.length % 4) base64 += '=';
+        var bin = atob(base64);
+        var buf = new Uint8Array(bin.length);
+        for (var i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+        return buf.buffer;
+      }
+
+      function bufferToBase64url(buffer) {
+        var bytes = new Uint8Array(buffer);
+        var bin = '';
+        for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+        return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+      }
+
+      function credentialToJSON(cred) {
+        return {
+          id: cred.id,
+          rawId: bufferToBase64url(cred.rawId),
+          type: cred.type,
+          response: {
+            authenticatorData: bufferToBase64url(cred.response.authenticatorData),
+            clientDataJSON:    bufferToBase64url(cred.response.clientDataJSON),
+            signature:         bufferToBase64url(cred.response.signature),
+            userHandle:        cred.response.userHandle ? bufferToBase64url(cred.response.userHandle) : null
+          }
+        };
+      }
+    })();
+  </script>
 
   <script>
     const form = document.getElementById('loginForm');
