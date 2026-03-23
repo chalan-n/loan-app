@@ -84,9 +84,21 @@ func loadWebAuthnUser(username string) (*webAuthnUser, error) {
 	return &webAuthnUser{user: user, creds: creds}, nil
 }
 
+// webAuthnReady ตรวจสอบว่า WebAuthn instance พร้อมใช้งาน
+func webAuthnReady(c *fiber.Ctx) bool {
+	if WebAuthn == nil {
+		c.Status(503).JSON(fiber.Map{"error": "WebAuthn ยังไม่พร้อม กรุณาตั้งค่า WEBAUTHN_RPID และ WEBAUTHN_ORIGIN ใน .env แล้ว restart"})
+		return false
+	}
+	return true
+}
+
 // ── Register: Begin ──────────────────────────────────────────────────────────
 // POST /webauthn/register/begin
 func WebAuthnRegisterBegin(c *fiber.Ctx) error {
+	if !webAuthnReady(c) {
+		return nil
+	}
 	username := parseJWTUsername(c.Cookies("token"))
 	if username == "" {
 		return c.Status(401).JSON(fiber.Map{"error": "กรุณาเข้าสู่ระบบก่อน"})
@@ -118,6 +130,9 @@ func WebAuthnRegisterBegin(c *fiber.Ctx) error {
 // ── Register: Finish ─────────────────────────────────────────────────────────
 // POST /webauthn/register/finish
 func WebAuthnRegisterFinish(c *fiber.Ctx) error {
+	if !webAuthnReady(c) {
+		return nil
+	}
 	username := parseJWTUsername(c.Cookies("token"))
 	if username == "" {
 		return c.Status(401).JSON(fiber.Map{"error": "กรุณาเข้าสู่ระบบก่อน"})
@@ -184,6 +199,9 @@ func WebAuthnRegisterFinish(c *fiber.Ctx) error {
 // ── Login: Begin ─────────────────────────────────────────────────────────────
 // POST /webauthn/login/begin  body: {"username": "570639"}
 func WebAuthnLoginBegin(c *fiber.Ctx) error {
+	if !webAuthnReady(c) {
+		return nil
+	}
 	type Req struct {
 		Username string `json:"username"`
 	}
@@ -226,6 +244,9 @@ func WebAuthnLoginBegin(c *fiber.Ctx) error {
 // ── Login: Finish ─────────────────────────────────────────────────────────────
 // POST /webauthn/login/finish
 func WebAuthnLoginFinish(c *fiber.Ctx) error {
+	if !webAuthnReady(c) {
+		return nil
+	}
 	// กู้คืน session
 	sessionCookie := c.Cookies("wa_login_session")
 	if sessionCookie == "" {
