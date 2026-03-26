@@ -88,27 +88,23 @@ func OcrIDCard(c *fiber.Ctx) error {
 		})
 	}
 
-	// ── 6. Preprocess ภาพ (Adaptive Thresholding + Contrast) ───────────────
+	// ── 6. Preprocess ภาพ (Contrast Enhancement) ──────────────────────────
 	logOCRRequest(moUsername, branch, filename, fileSize, "IDCARD PREPROCESSING")
 
-	processedBytes, err := utils.PreprocessIDCard(imageBytes, mimeType)
+	preResult, err := utils.PreprocessIDCard(imageBytes, mimeType)
 	if err != nil {
-		// Fallback ถ้า OpenCV ใช้ไม่ได้
-		processedBytes, err = utils.PreprocessIDCardFallback(imageBytes, mimeType)
-		if err != nil {
-			logOCRRequest(moUsername, branch, filename, fileSize, "IDCARD PREPROCESS FAILED")
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"success": false,
-				"message": "ประมวลผลภาพไม่สำเร็จ",
-				"error":   err.Error(),
-			})
-		}
+		logOCRRequest(moUsername, branch, filename, fileSize, "IDCARD PREPROCESS FAILED: "+err.Error())
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"success": false,
+			"message": "ประมวลผลภาพไม่สำเร็จ",
+			"error":   err.Error(),
+		})
 	}
 
 	// ── 7. เรียก Gemini ───────────────────────────────────────────────
 	logOCRRequest(moUsername, branch, filename, fileSize, "IDCARD SENDING → Gemini")
 
-	idInfo, err := services.AnalyzeIDCard(c.Context(), processedBytes, mimeType)
+	idInfo, err := services.AnalyzeIDCard(c.Context(), preResult.Data, preResult.MIMEType)
 	if err != nil {
 		logOCRRequest(moUsername, branch, filename, fileSize, "IDCARD FAILED: "+err.Error())
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
