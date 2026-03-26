@@ -115,10 +115,10 @@ Phase 1
 Dashboard สำหรับ Manager
 
 Phase 2 
-ระบบ File Management
+ระบบ Mobile App
 
 Phase 3 
 ระบบ Notifications ขั้นสูง (LINE/Email)
-ระบบ Mobile App
+ระบบ File Management 
 ระบบ Integration 
 ระบบ Reporting ขั้นสูง
